@@ -17,7 +17,6 @@ ac_add_options --enable-lto
 ac_add_options --enable-wasm-avx
 ac_add_options --enable-optimize="-O3 -mavx -maes -Wall"
 ac_add_options --enable-rust-simd
-ac_add_options --disable-profiling
 ac_add_options --disable-trace-logging
 
 # Media settings
@@ -30,11 +29,7 @@ ac_add_options --enable-webrtc
 
 # Client settings
 ac_add_options --disable-parental-controls
-ac_add_options --disable-bootstrap
 ac_add_options --disable-crashreporter
-ac_add_options --disable-debug
-ac_add_options --disable-dmd
-ac_add_options --disable-jprof
 ac_add_options --disable-updater
 #ac_add_options --disable-maintenance-service
 #ac_add_options --disable-bits-download
@@ -48,7 +43,7 @@ ac_add_options --with-distribution-id=org.mercury
 # -app=/home/alex/bin/Mercury/application.ini
 
 # Make flags (set to number of CPU cores)
-mk_add_options MOZ_MAKE_FLAGS="-v -j8"
+mk_add_options MOZ_MAKE_FLAGS="-j8"
 
 # Autoclobber
 mk_add_options AUTOCLOBBER=1
