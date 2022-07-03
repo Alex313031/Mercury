@@ -1,4 +1,4 @@
-<img src="https://github.com/Alex313031/Mercury/blob/main/logos/Mercury_256.png" width="200">
+<img src="https://github.com/Alex313031/Mercury/blob/main/logos/Mercury_256.png" width="144">
 
 ## List of patches included in Mercury
 
