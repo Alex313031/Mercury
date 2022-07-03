@@ -36,7 +36,7 @@ export NINJA_SUMMARIZE_BUILD=1 &&
 
 cd $HOME/mozilla-unified &&
 
-./mach build &&
+./mach build -v &&
 
 printf "${GRE}${bold}Build Completed. ${YEL}${bold}You can now run ./mach package to build a tarball package.\n" &&
 tput sgr0
