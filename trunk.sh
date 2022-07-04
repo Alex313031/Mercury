@@ -35,7 +35,7 @@ cd $HOME/mozilla-unified &&
 
 hg pull &&
 
-hg update --clean -C mozilla-unified &&
+hg update --clean -C default &&
 
 hg purge &&
 
