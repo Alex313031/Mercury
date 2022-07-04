@@ -9,4 +9,4 @@ _**The scripts assume the Mercury source is at $HOME/Mercury/ and Mozilla source
 
 *Happy Mercury Building!*
 
-<img src="https://github.com/Alex313031/Thorium/blob/main/logos/STAGING/Thorium90_504.jpg" width="200">
+<img src="https://github.com/Alex313031/Mercury/blob/main/logos/geckoview.svg" width="144">
