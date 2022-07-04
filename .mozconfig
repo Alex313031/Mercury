@@ -57,5 +57,5 @@ export MOZ_PGO=1
 export CFLAGS="-O3 -mavx -maes"
 export CXXFLAGS="-O3 -mavx -maes"
 export LDFLAGS="-Wl,-O3"
-export RUSTFLAGS="-Ctarget-feature=+avx -Ccodegen-units=1 -Clto=yes"
+export RUSTFLAGS="-Ctarget-feature=+avx"
 export VERBOSE=1
