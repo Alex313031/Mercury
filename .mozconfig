@@ -15,12 +15,11 @@ ac_add_options --disable-debug-symbols
 ac_add_options --enable-strip
 ac_add_options --enable-lto
 ac_add_options --enable-wasm-avx
-ac_add_options --enable-optimize="-O3 -mavx -maes -Wall"
+ac_add_options --enable-optimize="-O3 -mavx -maes"
 ac_add_options --enable-rust-simd
 ac_add_options --disable-trace-logging
 
 # Media settings
-ac_add_options --enable-openmax
 ac_add_options --enable-sandbox
 ac_add_options --enable-raw
 ac_add_options --enable-pulseaudio
@@ -49,16 +48,16 @@ mk_add_options MOZ_MAKE_FLAGS="-j8"
 mk_add_options AUTOCLOBBER=1
 
 # Set -Copt-level=3
-ac_add_options RUSTC_OPT_LEVEL="2"
-export RUSTC_OPT_LEVEL="2"
+ac_add_options RUSTC_OPT_LEVEL="3"
+export RUSTC_OPT_LEVEL="3"
 
 # Enable PGO
 #ac_add_options MOZ_PGO=1
 #export MOZ_PGO=1
 
 ## Compiler, Linker, and Rust flags
-export CFLAGS="-O3 -mavx -maes -Wall"
-export CXXFLAGS="-O3 -mavx -maes -Wall"
+export CFLAGS="-O3 -mavx -maes"
+export CXXFLAGS="-O3 -mavx -maes"
 export LDFLAGS="-Wl,-O3"
-#export RUSTFLAGS="-Ctarget-feature=+sse4,+aes,+avx"
 export VERBOSE=1
+#export RUSTFLAGS="-Ctarget-feature=+sse4,+aes,+avx"
