@@ -58,4 +58,4 @@ export CFLAGS="-O3 -mavx -maes"
 export CXXFLAGS="-O3 -mavx -maes"
 export LDFLAGS="-Wl,-O3"
 export VERBOSE=1
-#export RUSTFLAGS="-Ctarget-feature=+sse4,+aes,+avx"
+#export RUSTFLAGS="-Ctarget-feature=+avx"
