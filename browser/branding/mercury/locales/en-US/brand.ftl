@@ -16,11 +16,11 @@
 ## For further details, consult:
 ## https://mozilla-l10n.github.io/styleguides/mozilla_general/#brands-copyright-and-trademark
 
--brand-shorter-name = Nightly
--brand-short-name = Nightly
--brand-full-name = Nightly
+-brand-shorter-name = Mercury
+-brand-short-name = Mercury
+-brand-full-name = Mercury
 # This brand name can be used in messages where the product name needs to
 # remain unchanged across different versions (Nightly, Beta, etc.).
--brand-product-name = Firefox
--vendor-short-name = Mozilla
+-brand-product-name = Mercury Browser
+-vendor-short-name = Alex313031
 trademarkInfo = { " " }
