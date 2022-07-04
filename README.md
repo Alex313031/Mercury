@@ -12,4 +12,4 @@ See > [PATCHES.md](https://github.com/Alex313031/Mercury/blob/main/PATCHES.md)
 See > [BUGS.md](https://github.com/Alex313031/Mercury/blob/main/BUGS.md)
 
 ## Building <img src="https://github.com/Alex313031/Mercury/blob/main/logos/build_light.svg#gh-dark-mode-only"> <img src="https://github.com/Alex313031/Mercury/blob/main/logos/build_dark.svg#gh-light-mode-only">
-See > [BUILDING.md](https://github.com/Alex313031/Mercury/blob/main/infra/BUILDING.md) and [DEBUGGING](https://github.com/Alex313031/Mercury/blob/main/infra/DEBUGGING).
+See > [BUILDING.md](https://github.com/Alex313031/Mercury/blob/main/infra/BUILDING.md) and [DEBUGGING.md](https://github.com/Alex313031/Mercury/blob/main/infra/DEBUGGING.md).
