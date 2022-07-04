@@ -30,14 +30,20 @@ ac_add_options --enable-webrtc
 ac_add_options --disable-parental-controls
 ac_add_options --disable-crashreporter
 ac_add_options --disable-updater
+ac_add_options MOZ_TELEMETRY_REPORTING=
+
+# Windows Only (uncomment these for Windows)
+#ac_add_options --disable-verify-mar
 #ac_add_options --disable-maintenance-service
 #ac_add_options --disable-bits-download
 
 # Branding
 ac_add_options --with-branding=browser/branding/mercury
+ac_add_options --with-app-name=mercury
+ac_add_options --with-app-basename=Mercury
 ac_add_options --with-distribution-id=org.mozilla.mercury
 #ac_add_options --with-l10n-base="$PWD"/browser/locales/l10n
-# -app=/home/alex/bin/Mercury/application.ini
+#-app=/home/alex/bin/Mercury/application.ini
 
 # Make flags (set to number of CPU cores)
 mk_add_options MOZ_MAKE_FLAGS="-j8"
