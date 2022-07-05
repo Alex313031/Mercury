@@ -36,7 +36,7 @@ update-restarting = Restarting…
 
 channel-description = You are currently on the <label data-l10n-name="current-channel"></label> update channel.
 
-warningDesc-version = { -brand-short-name } is experimental and may be unstable, my fine sir.
+warningDesc-version = { -brand-short-name } is experimental and may be unstable.
 
 aboutdialog-help-user = { -brand-product-name } Help
 aboutdialog-submit-feedback = Submit Feedback
@@ -55,7 +55,7 @@ bottomLinks-privacy = Privacy Policy
 # Variables:
 #   $version (String): version of Firefox, e.g. 66.0.1
 #   $bits (Number): bits of the architecture (32 or 64)
-aboutDialog-version = { $version } ({ $bits }-bit) AVX, AES.
+aboutDialog-version = { $version } ({ $bits }-bit) AVX
 
 # Example of resulting string: 66.0a1 (2019-01-16) (64-bit)
 # Variables:
