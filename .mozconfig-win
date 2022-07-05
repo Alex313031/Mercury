@@ -9,6 +9,7 @@ ac_add_options --enable-application=browser
 ac_add_options --target=x86_64-w64-mingw32
 ac_add_options --with-toolchain-prefix=x86_64-w64-mingw32-
 ac_add_options --enable-default-toolkit=cairo-windows
+ac_add_options --enable-bootstrap
 ac_add_options --disable-update-agent
 
 CROSS_COMPILE=1
