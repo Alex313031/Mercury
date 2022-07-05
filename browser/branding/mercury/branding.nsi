@@ -10,8 +10,6 @@
 # instead of BrandFullName and typically should not be modified.
 !define BrandFullNameInternal "Mercury"
 !define BrandFullName         "Mercury"
-!define BrandShortName        "Mercury"
-!define BrandProductName      "Mercury Browser"
 !define CompanyName           "Alex313031"
 !define URLInfoAbout          "https://github.com/Alex313031/Mercury#readme"
 !define URLUpdateInfo         "https://github.com/Alex313031/Mercury/releases"
