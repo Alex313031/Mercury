@@ -23,20 +23,15 @@ ac_add_options --disable-trace-logging
 ac_add_options --enable-sandbox
 ac_add_options --enable-raw
 ac_add_options --enable-webrtc
+ac_add_options --enable-pulseaudio
+ac_add_options --enable-alsa
 
 # Client settings
 ac_add_options --disable-parental-controls
 ac_add_options --disable-crashreporter
 ac_add_options --disable-updater
 ac_add_options MOZ_TELEMETRY_REPORTING=
-
-# Windows Only (uncomment these for Windows)
-#ac_add_options --disable-maintenance-service
-#ac_add_options --disable-bits-download
-
-# Linux Only (comment these for Windows)
-ac_add_options --enable-pulseaudio
-ac_add_options --enable-alsa
+MOZ_REQUIRE_SIGNING=
 
 # Branding
 ac_add_options --with-branding=browser/branding/mercury
