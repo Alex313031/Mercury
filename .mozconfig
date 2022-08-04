@@ -48,6 +48,7 @@ mk_add_options MOZ_MAKE_FLAGS="-j8"
 mk_add_options AUTOCLOBBER=1
 
 # Set -Copt-level=3
+export RUSTC_OPT_LEVEL="3"
 ac_add_options RUSTC_OPT_LEVEL="3"
 
 # Enable PGO
