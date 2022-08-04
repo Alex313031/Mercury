@@ -10,13 +10,11 @@ MOZ_APP_DISPLAYNAME=Mercury
 
 MOZ_APP_UA_NAME=Mercury
 
-MOZ_APP_PROFILE=Mercury
+MOZ_APP_PROFILE=mercury
 
 MOZ_APP_REMOTINGNAME=Mercury
 
 MOZ_APP_VENDOR=Alex313031
-
-MOZ_APP_ID=org.mozilla.mercury
 
 MOZ_APP_CODENAME=hydrargyrum
 
