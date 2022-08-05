@@ -30,7 +30,7 @@ printf "\n" &&
 printf "${YEL}Copying Mercury source files over the Mozilla tree...\n" &&
 tput sgr0 &&
 
-cp -r -v .mozconfig $HOME/mozilla-unified/ &&
+cp -r -v mozconfig $HOME/mozilla-unified/ &&
 cp -r -v application.ini $HOME/mozilla-unified/ &&
 cp -r -v browser/. $HOME/mozilla-unified/ &&
 cp -r -v app/. $HOME/mozilla-unified/browser/app/ &&
