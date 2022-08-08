@@ -34,7 +34,7 @@ ac_add_options MOZ_TELEMETRY_REPORTING=
 MOZ_REQUIRE_SIGNING=
 
 # Branding
-ac_add_options --with-app-name=mercury
+ac_add_options --with-app-name=Mercury
 ac_add_options --with-app-basename=Mercury
 #ac_add_options --with-branding=browser/branding/mercury
 #ac_add_options --with-distribution-id=org.mozilla.mercury
