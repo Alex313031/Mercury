@@ -33,11 +33,17 @@ tput sgr0 &&
 
 cd $HOME/mozilla-unified &&
 
+rm -r -v -f obj-x86_64-pc-linux-gnu &&
+
 hg pull &&
 
 hg update --clean -C default &&
 
 hg purge &&
+
+hg pull &&
+
+hg update --clean -C default &&
 
 printf "\n" &&
 
