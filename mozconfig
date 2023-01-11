@@ -2,21 +2,12 @@
 
 ## .mozconfig for Mercury Browser
 
-#. $topsrcdir/build/win64/mozconfig.vs2017
-#. "$topsrcdir/build/mozconfig.clang-cl"
-#. "$topsrcdir/build/mozconfig.lld-link"
-
 # Build only Mercury
 ac_add_options --enable-application=browser
 ac_add_options --disable-artifact-builds
 
-# Build for Windows
-ac_add_options --enable-bootstrap
-ac_add_options --disable-update-agent
-ac_add_options --without-wasm-sandboxed-libraries
-
-CROSS_COMPILE=0
-export MOZ_INCLUDE_SOURCE_INFO=1
+# Build for Linux
+ac_add_options --target=x86_64-pc-linux-gnu
 
 # Optimization settings
 ac_add_options --enable-release
@@ -35,6 +26,8 @@ ac_add_options --enable-rust-simd
 ac_add_options --enable-sandbox
 ac_add_options --enable-raw
 ac_add_options --enable-webrtc
+ac_add_options --enable-pulseaudio
+ac_add_options --enable-alsa
 ac_add_options --enable-jxl
 
 # Add-ons
@@ -45,8 +38,6 @@ ac_add_options --with-unsigned-addon-scopes=app,system
 ac_add_options --disable-parental-controls
 ac_add_options --disable-crashreporter
 ac_add_options --disable-updater
-ac_add_options --disable-maintenance-service
-ac_add_options --disable-bits-download
 mk_add_options MOZ_CRASHREPORTER=0
 mk_add_options MOZ_DATA_REPORTING=0
 mk_add_options MOZ_SERVICES_HEALTHREPORT=0
@@ -54,21 +45,22 @@ mk_add_options MOZ_TELEMETRY_REPORTING=0
 export MOZ_REQUIRE_SIGNING=
 
 # Branding
-
 ac_add_options --with-app-name=Mercury
 ac_add_options --with-app-basename=Mercury
-ac_add_options --with-distribution-id=org.mozilla.mercury
 ac_add_options --with-branding=browser/branding/mercury
-ac_add_options --with-l10n-base="C:\mozilla-source\mozilla-unified\browser\locales\en-US"
-#-app=/home/alex/bin/Mercury/application.ini
+ac_add_options --with-l10n-base=$PWD/browser/locales/en-US
+ac_add_options --with-distribution-id=org.mozilla.mercury
+# -app=/home/alex/bin/Mercury/application.ini
 
 # Make flags (set to number of CPU cores)
-mk_add_options MOZ_MAKE_FLAGS="-j16"
+mk_add_options MOZ_MAKE_FLAGS="-j16 -v"
 
 # Autoclobber
 mk_add_options AUTOCLOBBER=1
 
 # Set -Copt-level=3
+export OPT_LEVEL="3"
+ac_add_options OPT_LEVEL="3"
 export RUSTC_OPT_LEVEL="3"
 ac_add_options RUSTC_OPT_LEVEL="3"
 
