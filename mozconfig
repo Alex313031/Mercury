@@ -53,7 +53,7 @@ ac_add_options --with-distribution-id=org.mozilla.mercury
 # -app=/home/alex/bin/Mercury/application.ini
 
 # Make flags (set to number of CPU cores)
-mk_add_options MOZ_MAKE_FLAGS="-j16 -v"
+mk_add_options MOZ_MAKE_FLAGS="-j16"
 
 # Autoclobber
 mk_add_options AUTOCLOBBER=1
