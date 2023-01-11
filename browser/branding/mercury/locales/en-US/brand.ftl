@@ -20,4 +20,4 @@
 # remain unchanged across different versions (Nightly, Beta, etc.).
 -brand-product-name = Mercury
 -vendor-short-name = Mercury
-trademarkInfo = { " " }
+trademarkInfo = { "Mercury logos are copyrights of Alex313031." }
