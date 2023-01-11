@@ -4,11 +4,14 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 #include "nsXULAppAPI.h"
-#include "mozilla/CmdLineAndEnvUtils.h"
 #include "mozilla/XREAppData.h"
 #include "XREShellData.h"
 #include "application.ini.h"
 #include "mozilla/Bootstrap.h"
+#include "mozilla/ProcessType.h"
+#include "mozilla/RuntimeExceptionModule.h"
+#include "mozilla/ScopeExit.h"
+#include "BrowserDefines.h"
 #if defined(XP_WIN)
 #  include <windows.h>
 #  include <stdlib.h>
@@ -28,6 +31,7 @@
 #  include "freestanding/SharedSection.h"
 #  include "LauncherProcessWin.h"
 #  include "mozilla/GeckoArgs.h"
+#  include "mozilla/mscom/ProcessRuntime.h"
 #  include "mozilla/WindowsDllBlocklist.h"
 #  include "mozilla/WindowsDpiInitialization.h"
 #  include "mozilla/WindowsProcessMitigations.h"
@@ -205,14 +209,11 @@ static int do_main(int argc, char* argv[], char* envp[]) {
 #if defined(XP_WIN) && defined(MOZ_SANDBOX)
   sandbox::BrokerServices* brokerServices =
       sandboxing::GetInitializedBrokerServices();
-  sandboxing::PermissionsService* permissionsService =
-      sandboxing::GetPermissionsService();
   if (!brokerServices) {
     Output("Couldn't initialize the broker services.\n");
     return 255;
   }
   config.sandboxBrokerServices = brokerServices;
-  config.sandboxPermissionsService = permissionsService;
 #endif
 
 #ifdef LIBFUZZER
@@ -220,9 +221,7 @@ static int do_main(int argc, char* argv[], char* envp[]) {
     gBootstrap->XRE_LibFuzzerSetDriver(fuzzer::FuzzerDriver);
 #endif
 
-  // Note: keep in sync with LauncherProcessWin.
-  const char* acceptableParams[] = {"url", "private-window", nullptr};
-  EnsureCommandlineSafe(argc, argv, acceptableParams);
+  EnsureBrowserCommandlineSafe(argc, argv);
 
   return gBootstrap->XRE_main(argc, argv, config);
 }
@@ -291,14 +290,36 @@ int main(int argc, char* argv[], char* envp[]) {
   AUTO_BASE_PROFILER_INIT;
   AUTO_BASE_PROFILER_LABEL("nsBrowserApp main", OTHER);
 
+  // Make sure we unregister the runtime exception module before returning.
+  // We do this here to cover both registers for child and main processes.
+  auto unregisterRuntimeExceptionModule =
+      MakeScopeExit([] { CrashReporter::UnregisterRuntimeExceptionModule(); });
+
 #ifdef MOZ_BROWSER_CAN_BE_CONTENTPROC
   // We are launching as a content process, delegate to the appropriate
   // main
   if (argc > 1 && IsArg(argv[1], "contentproc")) {
+    // Set the process type. We don't remove the arg here as that will be done
+    // later in common code.
+    SetGeckoProcessType(argv[argc - 1]);
+
+    // Register an external module to report on otherwise uncatchable
+    // exceptions. Note that in child processes this must be called after Gecko
+    // process type has been set.
+    CrashReporter::RegisterRuntimeExceptionModule();
+
 #  ifdef HAS_DLL_BLOCKLIST
-    DllBlocklist_Initialize(gBlocklistInitFlags |
-                            eDllBlocklistInitFlagIsChildProcess);
-#  endif
+    uint32_t initFlags =
+        gBlocklistInitFlags | eDllBlocklistInitFlagIsChildProcess;
+    // This is too early in launch to call XRE_IsUtilityProcess(), so roll
+    // our own.
+    if (GetGeckoProcessType() == GeckoProcessType_Utility) {
+      initFlags |= eDllBlocklistInitFlagIsUtilityProcess;
+    } else if (GetGeckoProcessType() == GeckoProcessType_Socket) {
+      initFlags |= eDllBlocklistInitFlagIsSocketProcess;
+    }
+    DllBlocklist_Initialize(initFlags);
+#  endif  // HAS_DLL_BLOCKLIST
 #  if defined(XP_WIN) && defined(MOZ_SANDBOX)
     // We need to set whether our process is supposed to have win32k locked down
     // from the command line setting before GetInitializedTargetServices and
@@ -348,6 +369,9 @@ int main(int argc, char* argv[], char* envp[]) {
   }
 #endif
 
+  // Register an external module to report on otherwise uncatchable exceptions.
+  CrashReporter::RegisterRuntimeExceptionModule();
+
 #ifdef HAS_DLL_BLOCKLIST
   DllBlocklist_Initialize(gBlocklistInitFlags);
 #endif
@@ -387,7 +411,6 @@ int main(int argc, char* argv[], char* envp[]) {
   // a writable section handle because all dependent modules have been
   // loaded.
   mozilla::freestanding::gSharedSection.ConvertToReadOnly();
-  ::RtlRunOnceInitialize(&mozilla::freestanding::gK32ExportsResolveOnce);
 
   mozilla::CreateAndStorePreXULSkeletonUI(GetModuleHandle(nullptr), argc, argv);
 #endif
