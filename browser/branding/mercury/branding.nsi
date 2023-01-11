@@ -9,7 +9,7 @@
 # BrandFullNameInternal is used for some registry and file system values
 # instead of BrandFullName and typically should not be modified.
 !define BrandFullNameInternal "Mercury"
-# !define BrandShortName        "Mercury"
+#!define BrandShortName        "Mercury"
 !define BrandFullName         "Mercury"
 !define CompanyName           "Mercury"
 !define URLInfoAbout          "https://github.com/Alex313031/Mercury#readme"
