@@ -15,6 +15,8 @@ ac_add_options --disable-debug
 ac_add_options --disable-debug-symbols
 ac_add_options --disable-tests
 ac_add_options --enable-strip
+ac_add_options --enable-install-strip
+ac_add_options --enable-clang-plugin
 ac_add_options --enable-lto
 ac_add_options --enable-wasm-avx
 ac_add_options --enable-optimize="-O3 -mavx -maes"
@@ -38,6 +40,7 @@ ac_add_options --with-unsigned-addon-scopes=app,system
 ac_add_options --disable-parental-controls
 ac_add_options --disable-crashreporter
 ac_add_options --disable-updater
+ac_add_options --without-wasm-sandboxed-libraries
 mk_add_options MOZ_CRASHREPORTER=0
 mk_add_options MOZ_DATA_REPORTING=0
 mk_add_options MOZ_SERVICES_HEALTHREPORT=0
@@ -54,9 +57,11 @@ ac_add_options --with-distribution-id=org.mozilla.mercury
 
 # Make flags (set to number of CPU cores)
 mk_add_options MOZ_MAKE_FLAGS="-j16"
+export MOZ_MAKE_FLAGS="-j16"
 
 # Autoclobber
 mk_add_options AUTOCLOBBER=1
+export AUTOCLOBBER=1
 
 # Set -Copt-level=3
 export OPT_LEVEL="3"
