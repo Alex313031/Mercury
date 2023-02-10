@@ -45,6 +45,8 @@ hg pull &&
 
 hg update --clean -C default &&
 
+hg up -C central &&
+
 printf "\n" &&
 
 printf "${GRE}Done! ${YEL}You can now run ./setup.sh\n"
