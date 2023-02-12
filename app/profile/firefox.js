@@ -1516,11 +1516,11 @@ pref("privacy.donottrackheader.enabled", true);
 // Disable all new tab page stuff except for snippets.
 pref("browser.newtabpage.activity-stream.showSponsored", false);
 pref("browser.newtabpage.activity-stream.showSponsoredTopSites", false);
+pref("browser.newtabpage.activity-stream.topSitesRows", 2);
 pref("browser.newtabpage.activity-stream.section.highlights.includePocket", false);
 pref("browser.newtabpage.activity-stream.feeds.section.topstories", false);
 pref("browser.newtabpage.activity-stream.feeds.section.highlights", false);
 pref("browser.newtabpage.activity-stream.feeds.snippets", true);
-pref("browser.newtabpage.activity-stream.topSitesRows", 2);
 // Enable AutoScrolling and Smooth Scroll by default
 pref("general.autoScroll", true);
 pref("general.smoothScroll", true);
@@ -1528,11 +1528,11 @@ pref("general.smoothScroll", true);
 pref("layers.acceleration.force-enabled", true);
 // Always show menu bar.
 pref("ui.key.menuAccessKeyFocuses", false);
-// Enable overlay scrollbars on Linux.
+// Disable overlay scrollbars on Linux.
 #if defined(XP_LINUX)
   pref("widget.gtk.overlay-scrollbars.enabled", false);
 #endif
-// END OF MISC MERCURY SETTINGS
+// END MISC MERCURY SETTINGS
 
 // A preference which, if false, means sync will only apply incoming preference
 // changes if there's already a local services.sync.prefs.sync.* control pref.
