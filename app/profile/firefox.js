@@ -265,11 +265,11 @@ pref("browser.touchmode.auto", true);
 pref("browser.compactmode.show", false);
 
 // At startup, check if we're the default browser and prompt user if not.
-pref("browser.shell.checkDefaultBrowser", true);
+pref("browser.shell.checkDefaultBrowser", false);
 pref("browser.shell.shortcutFavicons",true);
 pref("browser.shell.mostRecentDateSetAsDefault", "");
 pref("browser.shell.skipDefaultBrowserCheckOnFirstRun", true);
-pref("browser.shell.didSkipDefaultBrowserCheckOnFirstRun", false);
+pref("browser.shell.didSkipDefaultBrowserCheckOnFirstRun", true);
 pref("browser.shell.defaultBrowserCheckCount", 0);
 #if defined(XP_WIN)
 // Attempt to set the default browser on Windows 10 using the UserChoice registry keys,
@@ -277,7 +277,7 @@ pref("browser.shell.defaultBrowserCheckCount", 0);
 pref("browser.shell.setDefaultBrowserUserChoice", true);
 // When setting the default browser on Windows 10 using the UserChoice
 // registry keys, also try to set Firefox as the default PDF handler.
-pref("browser.shell.setDefaultPDFHandler", true);
+pref("browser.shell.setDefaultPDFHandler", false);
 // When setting Firefox as the default PDF handler (subject to conditions
 // above), only set Firefox as the default PDF handler when the existing handler
 // is a known browser, and not when existing handler is another PDF handler such
@@ -414,6 +414,11 @@ pref("browser.urlbar.suggest.calculator",           false);
 // Feature gate pref for weather suggestions in the urlbar.
 pref("browser.urlbar.weather.featureGate", false);
 
+// If true, weather suggestions will be shown on "zero prefix", which means when
+// the user focuses the urlbar without typing anything. If false, the user must
+// type weather-related keywords to show weather suggestions.
+pref("browser.urlbar.weather.zeroPrefix", true);
+
 // If `browser.urlbar.weather.featureGate` is true, this controls whether
 // weather suggestions are turned on.
 pref("browser.urlbar.suggest.weather", true);
@@ -506,7 +511,11 @@ pref("browser.urlbar.switchTabs.adoptIntoActiveWindow", false);
 pref("browser.urlbar.openintab", false);
 
 // Enable three-dot options button and menu for eligible results.
-pref("browser.urlbar.resultMenu", false);
+#ifdef EARLY_BETA_OR_EARLIER
+pref("browser.urlbar.resultMenu", true);
+#else
+pref("browser.urlbar.resultMenu", true);
+#endif
 
 // If true, we show tail suggestions when available.
 pref("browser.urlbar.richSuggestions.tail", true);
@@ -604,6 +613,10 @@ pref("browser.download.folderList", 1);
 pref("browser.download.manager.addToRecentDocs", true);
 pref("browser.download.manager.resumeOnWakeDelay", 10000);
 
+// This allows disabling the animated notifications shown by
+// the Downloads Indicator when a download starts or completes.
+pref("browser.download.animateNotifications", true);
+
 // This records whether or not the panel has been shown at least once.
 pref("browser.download.panel.shown", false);
 
@@ -669,6 +682,9 @@ pref("browser.search.widget.inNavBar", false);
 pref("browser.search.separatePrivateDefault.ui.enabled", false);
 // The maximum amount of times the private default banner is shown.
 pref("browser.search.separatePrivateDefault.ui.banner.max", 0);
+
+// Enables search SERP telemetry (impressions, engagements and abandonment)
+pref("browser.search.serpEventTelemetry.enabled", false);
 
 // Enables the display of the Mozilla VPN banner in private browsing windows
 pref("browser.privatebrowsing.vpnpromourl", "https://vpn.mozilla.org/?utm_source=firefox-browser&utm_medium=firefox-%CHANNEL%-browser&utm_campaign=private-browsing-vpn-link");
@@ -817,7 +833,7 @@ pref("security.allow_parent_unrestricted_js_loads", false);
 #if defined(XP_MACOSX) || defined(XP_WIN)
     pref("browser.tabs.unloadOnLowMemory", true);
 #else
-    pref("browser.tabs.unloadOnLowMemory", false);
+    pref("browser.tabs.unloadOnLowMemory", true);
 #endif
 
 // Tab Unloader does not unload tabs whose last inactive period is longer than
@@ -939,6 +955,10 @@ pref("privacy.panicButton.enabled",         true);
 // Time until temporary permissions expire, in ms
 pref("privacy.temporary_permission_expire_time_ms",  3600000);
 
+// Enables protection mechanism against password spoofing for cross domain auh requests
+// See bug 791594
+pref("privacy.authPromptSpoofingProtection",         true);
+
 pref("network.proxy.share_proxy_settings",  false); // use the same proxy settings for all protocols
 
 // simple gestures support
@@ -994,8 +1014,9 @@ pref("browser.gesture.twist.end", "cmd_gestureRotateEnd");
   // is better for consistency with macOS users.
   pref("mousewheel.with_shift.action", 4);
   pref("mousewheel.with_alt.action", 2);
+  pref("mousewheel.with_meta.action", 1); // win key on Win, Super/Hyper on Linux
 #endif
-
+pref("mousewheel.with_control.action",3);
 pref("mousewheel.with_win.action", 1);
 
 pref("browser.xul.error_pages.expert_bad_cert", false);
@@ -1488,8 +1509,30 @@ pref("services.sync.prefs.sync.signon.rememberSignons", true);
 pref("services.sync.prefs.sync.spellchecker.dictionary", true);
 pref("services.sync.prefs.sync.ui.osk.enabled", true);
 
+// MISC. MERCURY SETTINGS
 // Enable Do Not Track by default.
 pref("privacy.donottrackheader.enabled", true);
+
+// Disable all new tab page stuff except for snippets.
+pref("browser.newtabpage.activity-stream.showSponsored", false);
+pref("browser.newtabpage.activity-stream.showSponsoredTopSites", false);
+pref("browser.newtabpage.activity-stream.section.highlights.includePocket", false);
+pref("browser.newtabpage.activity-stream.feeds.section.topstories", false);
+pref("browser.newtabpage.activity-stream.feeds.section.highlights", false);
+pref("browser.newtabpage.activity-stream.feeds.snippets", true);
+pref("browser.newtabpage.activity-stream.topSitesRows", 2);
+// Enable AutoScrolling and Smooth Scroll by default
+pref("general.autoScroll", true);
+pref("general.smoothScroll", true);
+// Force enable GPU accelerated compositing.
+pref("layers.acceleration.force-enabled", true);
+// Always show menu bar.
+pref("ui.key.menuAccessKeyFocuses", false);
+// Enable overlay scrollbars on Linux.
+#if defined(XP_LINUX)
+  pref("widget.gtk.overlay-scrollbars.enabled", false);
+#endif
+// END OF MISC MERCURY SETTINGS
 
 // A preference which, if false, means sync will only apply incoming preference
 // changes if there's already a local services.sync.prefs.sync.* control pref.
@@ -1659,8 +1702,6 @@ pref("browser.aboutwelcome.enabled", true);
 // Used to set multistage welcome UX
 pref("browser.aboutwelcome.screens", "");
 pref("browser.aboutwelcome.skipFocus", true);
-// Used to enable template for MR 2022 Onboarding
-pref("browser.aboutwelcome.templateMR", true);
 // Used to enable window modal onboarding
 pref("browser.aboutwelcome.showModal", false);
 
@@ -1819,9 +1860,16 @@ pref("media.videocontrols.picture-in-picture.video-toggle.enabled", true);
 pref("media.videocontrols.picture-in-picture.video-toggle.visibility-threshold", "1.0");
 pref("media.videocontrols.picture-in-picture.keyboard-controls.enabled", true);
 
+// Preferences for the older translation service backed by external services. This is
+// planned to be replaced with an integration of the Firefox Translations service.
+// The prefs for the new service are located under "browser.translations" in
+// modules/libpref/init/all.js
+//
+// See Bug 971044.
 pref("browser.translation.detectLanguage", false);
 pref("browser.translation.neverForLanguages", "");
-// Show the translation UI bits, like the info bar, notification icon and preferences.
+// Show the older translation UI that uses external services. This includes UI such as
+// the info bar, notification icon and preferences.
 pref("browser.translation.ui.show", false);
 // Allows to define the translation engine. Google is default, Bing or Yandex are other options.
 pref("browser.translation.engine", "Google");
@@ -1945,8 +1993,9 @@ pref("browser.contentblocking.reportBreakage.url", "https://tracking-protection-
 // Enable Protections report's Lockwise card by default.
 pref("browser.contentblocking.report.lockwise.enabled", true);
 
-// Enable Protections report's Monitor card by default.
-pref("browser.contentblocking.report.monitor.enabled", true);
+// Disable rotections report's Monitor card by default. The new Monitor API does
+// not support this feature as of now. See Bug 1815751.
+pref("browser.contentblocking.report.monitor.enabled", false);
 
 // Disable Protections report's Proxy card by default.
 pref("browser.contentblocking.report.proxy.enabled", false);
@@ -2156,6 +2205,7 @@ pref("browser.migrate.safari.enabled", true);
 pref("browser.migrate.vivaldi.enabled", true);
 
 pref("browser.migrate.content-modal.enabled", false);
+pref("browser.migrate.content-modal.import-all.enabled", false);
 
 pref("extensions.pocket.api", "api.getpocket.com");
 pref("extensions.pocket.enabled", false);
@@ -2165,7 +2215,7 @@ pref("extensions.pocket.onSaveRecs", true);
 pref("extensions.pocket.onSaveRecs.locales", "en-US,en-GB,en-CA");
 
 // Enable Pocket button home panel for non link pages.
-pref("extensions.pocket.showHome", true);
+pref("extensions.pocket.showHome", false);
 
 // Control what version of the logged out doorhanger is displayed
 // Possibilities are: `control`, `control-one-button`, `variant_a`, `variant_b`, `variant_c`
@@ -2179,14 +2229,13 @@ pref("extensions.pocket.refresh.hideRecentSaves.enabled", false);
 pref("signon.management.page.fileImport.enabled", false);
 
 #ifdef NIGHTLY_BUILD
-pref("signon.management.page.os-auth.enabled", true);
+pref("signon.management.page.os-auth.enabled", false);
 
-// "not available"  - feature is not available (will be removed after QA).
+// "not available"  - feature is not available (will be removed after enabling on Release).
 // "available"      - user can see feature offer.
 // "offered"        - we have offered feature to user and they have not yet made a decision.
 // "enabled"        - user opted in to the feature.
 // "disabled"       - user opted out of the feature.
-// will be enabled after QA round
 pref("signon.firefoxRelay.feature", "not available");
 #else
 pref("signon.management.page.os-auth.enabled", false);
@@ -2768,6 +2817,9 @@ pref("browser.pdfjs.feature-tour", "{\"screen\":\"\",\"complete\":false}");
 
 // Enables the cookie banner desktop UI.
 pref("cookiebanners.ui.desktop.enabled", false);
+
+// Controls which variant of the cookie banner CFR the user is presented with.
+pref("cookiebanners.ui.desktop.cfrVariant", 0);
 
 // Parameters for the swipe-to-navigation icon.
 //
