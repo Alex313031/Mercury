@@ -1,4 +1,4 @@
-## Copyright (c) 2022 Alex313031.
+## Copyright (c) 2023 Alex313031.
 
 ## .mozconfig for Mercury Browser
 
@@ -8,6 +8,7 @@ ac_add_options --disable-artifact-builds
 
 # Build for Linux
 ac_add_options --target=x86_64-pc-linux-gnu
+export MOZ_INCLUDE_SOURCE_INFO=1
 
 # Optimization settings
 ac_add_options --enable-release
@@ -21,6 +22,8 @@ ac_add_options --enable-lto
 ac_add_options --enable-wasm-avx
 ac_add_options --enable-optimize="-O3 -mavx -maes"
 ac_add_options --enable-rust-simd
+ac_add_options --enable-hardening
+ac_add_options --enable-default-browser-agent
 # ac_add_options --disable-trace-logging
 # ac_add_options --disable-default-browser-agent
 MOZ_OPTIMIZE=1
@@ -33,6 +36,8 @@ ac_add_options --enable-webrtc
 ac_add_options --enable-pulseaudio
 ac_add_options --enable-alsa
 ac_add_options --enable-jxl
+ac_add_options --enable-av1
+ac_add_options --enable-eme=widevine
 
 # Add-ons
 ac_add_options --allow-addon-sideload
@@ -44,18 +49,19 @@ ac_add_options --disable-crashreporter
 ac_add_options --disable-updater
 ac_add_options --without-wasm-sandboxed-libraries
 mk_add_options MOZ_CRASHREPORTER=0
+ac_add_options MOZ_CRASHREPORTER=0
 mk_add_options MOZ_DATA_REPORTING=0
+ac_add_options MOZ_DATA_REPORTING=0
 mk_add_options MOZ_SERVICES_HEALTHREPORT=0
-mk_add_options MOZ_TELEMETRY_REPORTING=0
+mk_add_options MOZ_TELEMETRY_REPORTING=
+ac_add_options MOZ_TELEMETRY_REPORTING=
 MOZ_CRASHREPORTER=0
 MOZ_DATA_REPORTING=0
-MOZ_SERVICES_HEALTHREPORT=0
-MOZ_TELEMETRY_REPORTING=0
+MOZ_TELEMETRY_REPORTING=
 MOZ_REQUIRE_SIGNING=
 export MOZ_CRASHREPORTER=0
 export MOZ_DATA_REPORTING=0
-export MOZ_SERVICES_HEALTHREPORT=0
-export MOZ_TELEMETRY_REPORTING=0
+export MOZ_TELEMETRY_REPORTING=
 export MOZ_REQUIRE_SIGNING=
 
 # Branding
