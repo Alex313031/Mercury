@@ -1519,6 +1519,7 @@ pref("browser.newtabpage.activity-stream.showSponsoredTopSites", false);
 pref("browser.newtabpage.activity-stream.topSitesRows", 2);
 pref("browser.newtabpage.activity-stream.section.highlights.includePocket", false);
 pref("browser.newtabpage.activity-stream.feeds.section.topstories", false);
+pref("browser.newtabpage.activity-stream.feeds.section.topstories", false);
 pref("browser.newtabpage.activity-stream.feeds.section.highlights", false);
 pref("browser.newtabpage.activity-stream.feeds.snippets", true);
 // Enable AutoScrolling and Smooth Scroll by default
@@ -1526,8 +1527,9 @@ pref("general.autoScroll", true);
 pref("general.smoothScroll", true);
 // Force enable GPU accelerated compositing.
 pref("layers.acceleration.force-enabled", true);
-// Always show menu bar.
-pref("ui.key.menuAccessKeyFocuses", false);
+// Always show menu bar and view image info.
+// pref("ui.key.menuAccessKeyFocuses", false);
+pref("browser.menu.showViewImageInfo", true);
 // Disable overlay scrollbars on Linux.
 #if defined(XP_LINUX)
   pref("widget.gtk.overlay-scrollbars.enabled", false);
