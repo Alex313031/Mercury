@@ -25,4 +25,4 @@ Exec=/home/alex/bin/Mercury/mercury -private-window
 
 [Desktop Action TempUserDir]
 Name=Open With Temp User Dir
-Exec=/home/alex/bin/Mercury/mercury -profile /var/tmp/mercury/
+Exec=/home/alex/bin/Mercury/mercury -profile /tmp/mercury/
