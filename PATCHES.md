@@ -8,6 +8,6 @@
  - Enable backspace to go back, Do Not Track, and GPU acceleration by default.
  - Disable Pocket, highlights, and suggested content on the new tab page.
 
-&ndash; Some help in creating these patches came from LibreWolf and Waterfox.
+&ndash; Some help in creating these patches came from [LibreWolf](https://librewolf.net/), [Waterfox](https://www.waterfox.net/), [FireDragon](https://github.com/dr460nf1r3/firedragon-browser), [PlasmaFox](https://github.com/torvic9/plasmafox), and [GNU IceCat](https://www.gnu.org/software/gnuzilla/).
 
-&ndash; Any other code/patches are written from scratch by me.
+&ndash; Any other code/patches are written from scratch by [me](https://thorium.rocks/about).
