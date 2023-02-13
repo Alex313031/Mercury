@@ -108,5 +108,5 @@ export CFLAGS="-O3 -mavx -maes"
 export CPPFLAGS="-O3 -mavx -maes"
 export CXXFLAGS="-O3 -mavx -maes"
 export LDFLAGS="-Wl,-O3 -mavx -maes"
-export RUSTFLAGS="-Ctarget-feature=+avx"
+export RUSTFLAGS="-C target-feature=+avx"
 export VERBOSE=1
