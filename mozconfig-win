@@ -38,6 +38,7 @@ ac_add_options --enable-default-browser-agent
 # ac_add_options --disable-default-browser-agent
 MOZ_OPTIMIZE=1
 export MOZ_OPTIMIZE=1
+export STRIP_FLAGS="--strip-debug --strip-unneeded"
 
 # Media settings
 ac_add_options --enable-sandbox
