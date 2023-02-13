@@ -14,6 +14,7 @@ export MOZ_INCLUDE_SOURCE_INFO=1
 ac_add_options --enable-release
 ac_add_options --disable-debug
 ac_add_options --disable-debug-symbols
+ac_add_options --disable-debug-js-modules
 ac_add_options --disable-tests
 ac_add_options --enable-strip
 ac_add_options --enable-install-strip
@@ -28,6 +29,7 @@ ac_add_options --enable-default-browser-agent
 # ac_add_options --disable-default-browser-agent
 MOZ_OPTIMIZE=1
 export MOZ_OPTIMIZE=1
+export STRIP_FLAGS="--strip-debug --strip-unneeded"
 
 # Media settings
 ac_add_options --enable-sandbox
