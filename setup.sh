@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Copyright (c) 2022 Alex313031.
+# Copyright (c) 2023 Alex313031.
 
 YEL='\033[1;33m' # Yellow
 RED='\033[1;31m' # Red
@@ -31,7 +31,7 @@ printf "${YEL}Copying Mercury source files over the Mozilla tree...\n" &&
 tput sgr0 &&
 
 cp -r -v mozconfig $HOME/mozilla-unified/ &&
-cp -r -v application.ini $HOME/mozilla-unified/ &&
+cp -r -v app/application.ini $HOME/mozilla-unified/ &&
 cp -r -v browser/. $HOME/mozilla-unified/browser/ &&
 cp -r -v app/. $HOME/mozilla-unified/browser/app/ &&
 
