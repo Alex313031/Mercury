@@ -33,6 +33,7 @@ tput sgr0 &&
 cp -r -v mozconfig $HOME/mozilla-unified/ &&
 cp -r -v app/application.ini $HOME/mozilla-unified/ &&
 cp -r -v browser/. $HOME/mozilla-unified/browser/ &&
+cp -r -v build/. $HOME/mozilla-unified/build/ &&
 cp -r -v app/. $HOME/mozilla-unified/browser/app/ &&
 
 printf "${GRE}Done!\n" &&
