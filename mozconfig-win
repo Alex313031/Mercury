@@ -104,9 +104,9 @@ ac_add_options MOZ_LTO=1
 #ac_add_options MOZ_PGO=1
 
 ## Compiler, Linker, and Rust flags
-export CFLAGS="-O3 -mavx -maes"
-export CPPFLAGS="-O3 -mavx -maes"
-export CXXFLAGS="-O3 -mavx -maes"
-export LDFLAGS="-Wl,-O3 -mavx -maes"
+export CFLAGS="-O3 -mavx -maes /arch:AVX"
+export CPPFLAGS="-O3 -mavx -maes /arch:AVX"
+export CXXFLAGS="-O3 -mavx -maes /arch:AVX"
+export LDFLAGS="-Wl,-O3 -mavx -maes -O3"
 export RUSTFLAGS="-C target-feature=+avx"
 export VERBOSE=1
