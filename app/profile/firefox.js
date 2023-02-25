@@ -70,9 +70,6 @@ pref("extensions.langpacks.signatures.required", false);
 pref("xpinstall.signatures.required", true);
 pref("xpinstall.signatures.devInfoURL", "https://wiki.mozilla.org/Addons/Extension_Signing");
 
-// Enable the unified extensions UI by default.
-pref("extensions.unifiedExtensions.enabled", true);
-
 // Dictionary download preference
 pref("browser.dictionaries.download.url", "https://addons.mozilla.org/%LOCALE%/firefox/language-tools/");
 
@@ -408,7 +405,6 @@ pref("browser.urlbar.suggest.calculator",           false);
   pref("browser.urlbar.suggest.quickactions", true);
   pref("browser.urlbar.shortcuts.quickactions", true);
   pref("browser.urlbar.quickactions.showPrefs", true);
-  pref("browser.urlbar.quickactions.showInZeroPrefix", false);
 #endif
 
 // Feature gate pref for weather suggestions in the urlbar.
@@ -516,6 +512,8 @@ pref("browser.urlbar.resultMenu", true);
 #else
 pref("browser.urlbar.resultMenu", true);
 #endif
+// Allow the result menu button to be reached with the Tab key.
+pref("browser.urlbar.resultMenu.keyboardAccessible", true);
 
 // If true, we show tail suggestions when available.
 pref("browser.urlbar.richSuggestions.tail", true);
@@ -612,10 +610,6 @@ pref("browser.download.useDownloadDir", true);
 pref("browser.download.folderList", 1);
 pref("browser.download.manager.addToRecentDocs", true);
 pref("browser.download.manager.resumeOnWakeDelay", 10000);
-
-// This allows disabling the animated notifications shown by
-// the Downloads Indicator when a download starts or completes.
-pref("browser.download.animateNotifications", true);
 
 // This records whether or not the panel has been shown at least once.
 pref("browser.download.panel.shown", false);
@@ -1128,10 +1122,10 @@ pref("browser.sessionstore.idleDelay", 180); // 3 minutes
 // 0 = everywhere, 1 = unencrypted sites, 2 = nowhere
 pref("browser.sessionstore.privacy_level", 0);
 // how many tabs can be reopened (per window)
-pref("browser.sessionstore.max_tabs_undo", 100);
+pref("browser.sessionstore.max_tabs_undo", 255);
 // how many windows can be reopened (per session) - on non-OS X platforms this
 // pref may be ignored when dealing with pop-up windows to ensure proper startup
-pref("browser.sessionstore.max_windows_undo", 3);
+pref("browser.sessionstore.max_windows_undo", 16);
 // number of crashes that can occur before the about:sessionrestore page is displayed
 // (this pref has no effect if more than 6 hours have passed since the last crash)
 pref("browser.sessionstore.max_resumed_crashes", 1);
@@ -1278,7 +1272,11 @@ pref("browser.bookmarks.editDialog.maxRecentFolders", 7);
 
 // By default the Edit Bookmark dialog is instant-apply. This feature pref will allow to
 // just save on Accept, once the project is complete.
-pref("browser.bookmarks.editDialog.delayedApply.enabled", false);
+#ifdef NIGHTLY_BUILD
+  pref("browser.bookmarks.editDialog.delayedApply.enabled", true);
+#else
+  pref("browser.bookmarks.editDialog.delayedApply.enabled", false);
+#endif
 
 #if defined(XP_WIN) && defined(MOZ_SANDBOX)
   // This controls the strength of the Windows content process sandbox for
@@ -1287,6 +1285,9 @@ pref("browser.bookmarks.editDialog.delayedApply.enabled", false);
   // See - security/sandbox/win/src/sandboxbroker/sandboxBroker.cpp
   // SetSecurityLevelForContentProcess() for what the different settings mean.
   pref("security.sandbox.content.level", 6);
+
+  // Pref controlling if messages relevant to sandbox violations are logged.
+  pref("security.sandbox.logging.enabled", false);
 #endif
 
 #if defined(XP_MACOSX) && defined(MOZ_SANDBOX)
@@ -1313,6 +1314,9 @@ pref("browser.bookmarks.editDialog.delayedApply.enabled", false);
   // this pref overridden) if OOP WebGL is disabled. OOP WebGL is disabled
   // for some tests.
   pref("security.sandbox.content.mac.disconnect-windowserver", true);
+
+  // Pref controlling if messages relevant to sandbox violations are logged.
+  pref("security.sandbox.logging.enabled", false);
 #endif
 
 #if defined(XP_LINUX) && defined(MOZ_SANDBOX)
@@ -1344,18 +1348,11 @@ pref("browser.bookmarks.editDialog.delayedApply.enabled", false);
   pref("security.sandbox.content.level", 1);
 #endif
 
-#if defined(MOZ_SANDBOX)
+#if defined(MOZ_CONTENT_TEMP_DIR)
   // ID (a UUID when set by gecko) that is used to form the name of a
   // sandbox-writable temporary directory to be used by content processes
-  // when a temporary writable file is required in a level 1 sandbox.
+  // when a temporary writable file is required.
   pref("security.sandbox.content.tempDirSuffix", "");
-  pref("security.sandbox.plugin.tempDirSuffix", "");
-
-  // This pref determines if messages relevant to sandbox violations are
-  // logged.
-  #if defined(XP_WIN) || defined(XP_MACOSX)
-    pref("security.sandbox.logging.enabled", false);
-  #endif
 #endif
 
 // This pref governs whether we attempt to work around problems caused by
@@ -2029,6 +2026,10 @@ pref("browser.promo.focus.enabled", true);
 // Default to enabling pin promos to be shown where allowed.
 pref("browser.promo.pin.enabled", true);
 
+// Default to enabling cookie banner reduction promos to be shown where allowed.
+// Set to true for Fx113 (see bug 1808611)
+pref("browser.promo.cookiebanners.enabled", false);
+
 // Comma separated string of mozilla vpn supported platforms.
 pref("browser.contentblocking.report.vpn_platforms", "win,mac,linux");
 pref("browser.contentblocking.report.hide_vpn_banner", false);
@@ -2382,6 +2383,7 @@ pref("browser.toolbars.bookmarks.showOtherBookmarks", true);
 // quick access to sign-in and manage your Firefox Account.
 pref("identity.fxaccounts.toolbar.enabled", true);
 pref("identity.fxaccounts.toolbar.accessed", false);
+pref("identity.fxaccounts.toolbar.defaultVisible", false);
 
 // Prefs for different services supported by Firefox Account
 pref("identity.fxaccounts.service.monitorLoginUrl", "https://monitor.firefox.com/");
