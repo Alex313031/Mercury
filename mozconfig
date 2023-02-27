@@ -49,7 +49,7 @@ ac_add_options --disable-parental-controls
 ac_add_options --disable-crashreporter
 ac_add_options --disable-updater
 ac_add_options --without-wasm-sandboxed-libraries
-ac_add_options --enable-default-browser-agent
+ac_add_options --disable-default-browser-agent
 mk_add_options MOZ_CRASHREPORTER=0
 ac_add_options MOZ_CRASHREPORTER=0
 mk_add_options MOZ_DATA_REPORTING=0
@@ -67,11 +67,11 @@ export MOZ_TELEMETRY_REPORTING=
 export MOZ_REQUIRE_SIGNING=
 
 # Branding
-ac_add_options --with-app-name=Mercury
+ac_add_options --with-app-name=mercury
 ac_add_options --with-app-basename=Mercury
 ac_add_options --with-branding=browser/branding/mercury
 ac_add_options --with-l10n-base=$PWD/browser/locales/en-US
-ac_add_options --with-distribution-id=org.mozilla.mercury
+ac_add_options --with-distribution-id=org.github.mercury
 # -app=/home/alex/bin/Mercury/application.ini
 
 # Make flags (set to number of CPU cores)
