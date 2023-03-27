@@ -1529,6 +1529,12 @@ pref("browser.menu.showViewImageInfo", true);
 #if defined(XP_LINUX)
   pref("widget.gtk.overlay-scrollbars.enabled", false);
 #endif
+// Enable AVIF
+pref("image.avif.enabled", true);
+// Enable JPEG-XL
+pref("image.jxl.enabled", true);
+// Enable Widevine automatically
+pref("media.eme.enabled", true);
 // END MISC MERCURY SETTINGS
 
 // A preference which, if false, means sync will only apply incoming preference
