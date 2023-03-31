@@ -1512,9 +1512,6 @@ pref("services.sync.prefs.sync.ui.osk.enabled", true);
 pref("privacy.donottrackheader.enabled", true);
 pref("toolkit.telemetry.pioneer-new-studies-available", false);
 
-// CustomizableUI state of the browser's user interface
-user_pref("browser.uiCustomization.autoAdd", "{\"placements\":{\"widget-overflow-fixed-list\":[],\"unified-extensions-area\":[],\"nav-bar\":[\"back-button\",\"forward-button\",\"stop-reload-button\",\"home-button\",\"urlbar-container\",\"downloads-button\",\"developer-button\",\"fxa-toolbar-menu-button\"],\"toolbar-menubar\":[\"menubar-items\"],\"TabsToolbar\":[\"firefox-view-button\",\"tabbrowser-tabs\",\"new-tab-button\",\"alltabs-button\"],\"PersonalToolbar\":[\"import-button\",\"personal-bookmarks\"]},\"seen\":[\"developer-button\"],\"dirtyAreaCache\":[\"PersonalToolbar\"],\"currentVersion\":19,\"newElementCount\":0}");
-
 // Disable all new tab page stuff except for snippets.
 pref("browser.newtabpage.activity-stream.showSponsored", false);
 pref("browser.newtabpage.activity-stream.showSponsoredTopSites", false);
@@ -1782,6 +1779,9 @@ pref("dom.debug.propagate_gesture_events_through_content", false);
 
 // CustomizableUI debug logging.
 pref("browser.uiCustomization.debug", false);
+
+// CustomizableUI state of the browser's user interface
+pref("browser.uiCustomization.state", "");
 
 // If set to false, FxAccounts and Sync will be unavailable.
 // A restart is mandatory after flipping that preference.
