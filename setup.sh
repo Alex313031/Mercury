@@ -31,11 +31,12 @@ printf "${YEL}Copying Mercury source files over the Mozilla tree...\n" &&
 tput sgr0 &&
 
 cp -r -v mozconfig $HOME/mozilla-unified/ &&
-cp -r -v app/application.ini $HOME/mozilla-unified/ &&
 cp -r -v browser/. $HOME/mozilla-unified/browser/ &&
-cp -r -v toolkit/. $HOME/mozilla-unified/toolkit/ &&
 cp -r -v build/. $HOME/mozilla-unified/build/ &&
+cp -r -v toolkit/. $HOME/mozilla-unified/toolkit/ &&
 cp -r -v app/. $HOME/mozilla-unified/browser/app/ &&
+cp -r -v app/application.ini $HOME/mozilla-unified/ &&
+cp -r -v other-licenses/. $HOME/mozilla-unified/other-licenses/ &&
 
 printf "${GRE}Done!\n" &&
 printf "\n" &&
