@@ -25,7 +25,6 @@ ac_add_options --enable-optimize="-O3 -mavx -maes"
 ac_add_options --enable-rust-simd
 ac_add_options --enable-hardening
 # ac_add_options --disable-trace-logging
-# ac_add_options --disable-default-browser-agent
 MOZ_OPTIMIZE=1
 export MOZ_OPTIMIZE=1
 export STRIP_FLAGS="--strip-debug --strip-unneeded"
