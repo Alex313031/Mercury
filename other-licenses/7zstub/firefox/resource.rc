@@ -17,7 +17,7 @@ BEGIN
       BLOCK "040904b0"
       BEGIN
           VALUE "CompanyName", "Alex313031"
-          VALUE "FileDescription", "Mercury Browser"
+          VALUE "FileDescription", "Mercury Browser Installer"
           VALUE "FileVersion", MY_VERSION
           VALUE "InternalName", "7zSD.sfx"
           VALUE "LegalCopyright", "Alex313031"
