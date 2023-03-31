@@ -1285,9 +1285,6 @@ pref("browser.bookmarks.editDialog.maxRecentFolders", 7);
   // See - security/sandbox/win/src/sandboxbroker/sandboxBroker.cpp
   // SetSecurityLevelForContentProcess() for what the different settings mean.
   pref("security.sandbox.content.level", 6);
-
-  // Pref controlling if messages relevant to sandbox violations are logged.
-  pref("security.sandbox.logging.enabled", false);
 #endif
 
 #if defined(XP_MACOSX) && defined(MOZ_SANDBOX)
@@ -1314,9 +1311,6 @@ pref("browser.bookmarks.editDialog.maxRecentFolders", 7);
   // this pref overridden) if OOP WebGL is disabled. OOP WebGL is disabled
   // for some tests.
   pref("security.sandbox.content.mac.disconnect-windowserver", true);
-
-  // Pref controlling if messages relevant to sandbox violations are logged.
-  pref("security.sandbox.logging.enabled", false);
 #endif
 
 #if defined(XP_LINUX) && defined(MOZ_SANDBOX)
@@ -1348,11 +1342,18 @@ pref("browser.bookmarks.editDialog.maxRecentFolders", 7);
   pref("security.sandbox.content.level", 1);
 #endif
 
-#if defined(MOZ_CONTENT_TEMP_DIR)
+#if defined(MOZ_SANDBOX)
   // ID (a UUID when set by gecko) that is used to form the name of a
   // sandbox-writable temporary directory to be used by content processes
-  // when a temporary writable file is required.
+  // when a temporary writable file is required in a level 1 sandbox.
   pref("security.sandbox.content.tempDirSuffix", "");
+  pref("security.sandbox.plugin.tempDirSuffix", "");
+
+  // This pref determines if messages relevant to sandbox violations are
+  // logged.
+  #if defined(XP_WIN) || defined(XP_MACOSX)
+    pref("security.sandbox.logging.enabled", false);
+  #endif
 #endif
 
 // This pref governs whether we attempt to work around problems caused by
@@ -1401,7 +1402,7 @@ pref("services.sync.prefs.sync.browser.crashReports.unsubmittedCheck.autoSubmit2
 pref("services.sync.prefs.sync.browser.ctrlTab.sortByRecentlyUsed", true);
 pref("services.sync.prefs.sync.browser.discovery.enabled", false);
 pref("services.sync.prefs.sync.browser.download.useDownloadDir", true);
-pref("services.sync.prefs.sync.browser.firefox-view.feature-tour", true);
+pref("services.sync.prefs.sync.browser.firefox-view.feature-tour", false);
 pref("services.sync.prefs.sync.browser.formfill.enable", true);
 pref("services.sync.prefs.sync.browser.link.open_newwindow", true);
 pref("services.sync.prefs.sync.browser.menu.showViewImageInfo", true);
@@ -1510,6 +1511,9 @@ pref("services.sync.prefs.sync.ui.osk.enabled", true);
 // Enable Do Not Track by default.
 pref("privacy.donottrackheader.enabled", true);
 pref("toolkit.telemetry.pioneer-new-studies-available", false);
+
+// CustomizableUI state of the browser's user interface
+user_pref("browser.uiCustomization.state", "{\"placements\":{\"widget-overflow-fixed-list\":[],\"unified-extensions-area\":[],\"nav-bar\":[\"back-button\",\"forward-button\",\"stop-reload-button\",\"home-button\",\"urlbar-container\",\"downloads-button\",\"developer-button\",\"fxa-toolbar-menu-button\"],\"toolbar-menubar\":[\"menubar-items\"],\"TabsToolbar\":[\"firefox-view-button\",\"tabbrowser-tabs\",\"new-tab-button\",\"alltabs-button\"],\"PersonalToolbar\":[\"import-button\",\"personal-bookmarks\"]},\"seen\":[\"developer-button\"],\"dirtyAreaCache\":[\"PersonalToolbar\"],\"currentVersion\":19,\"newElementCount\":0}");
 
 // Disable all new tab page stuff except for snippets.
 pref("browser.newtabpage.activity-stream.showSponsored", false);
@@ -1779,9 +1783,6 @@ pref("dom.debug.propagate_gesture_events_through_content", false);
 // CustomizableUI debug logging.
 pref("browser.uiCustomization.debug", false);
 
-// CustomizableUI state of the browser's user interface
-pref("browser.uiCustomization.state", "");
-
 // If set to false, FxAccounts and Sync will be unavailable.
 // A restart is mandatory after flipping that preference.
 pref("identity.fxaccounts.enabled", true);
@@ -1906,9 +1907,6 @@ pref("media.gmp-provider.enabled", true);
 // Enable Dynamic First-Party Isolation by default.
 pref("network.cookie.cookieBehavior", 5 /* BEHAVIOR_REJECT_TRACKER_AND_PARTITION_FOREIGN */);
 
-// Target URL for the learn more link of the TCP in standard mode section.
-pref("privacy.restrict3rdpartystorage.preferences.learnMoreURLSuffix", "total-cookie-protection");
-
 // Enable Dynamic First-Party Isolation in the private browsing mode.
 pref("network.cookie.cookieBehavior.pbmode", 5 /* BEHAVIOR_REJECT_TRACKER_AND_PARTITION_FOREIGN */);
 
@@ -2032,10 +2030,6 @@ pref("browser.promo.focus.enabled", true);
 
 // Default to enabling pin promos to be shown where allowed.
 pref("browser.promo.pin.enabled", true);
-
-// Default to enabling cookie banner reduction promos to be shown where allowed.
-// Set to true for Fx113 (see bug 1808611)
-pref("browser.promo.cookiebanners.enabled", false);
 
 // Comma separated string of mozilla vpn supported platforms.
 pref("browser.contentblocking.report.vpn_platforms", "win,mac,linux");
@@ -2237,18 +2231,16 @@ pref("extensions.pocket.refresh.hideRecentSaves.enabled", false);
 pref("signon.management.page.fileImport.enabled", false);
 
 #ifdef NIGHTLY_BUILD
+pref("signon.management.page.os-auth.enabled", true);
+#else
 pref("signon.management.page.os-auth.enabled", false);
-
+#endif
 // "not available"  - feature is not available (will be removed after enabling on Release).
 // "available"      - user can see feature offer.
 // "offered"        - we have offered feature to user and they have not yet made a decision.
 // "enabled"        - user opted in to the feature.
 // "disabled"       - user opted out of the feature.
-pref("signon.firefoxRelay.feature", "not available");
-#else
-pref("signon.management.page.os-auth.enabled", false);
-pref("signon.firefoxRelay.feature", "not available");
-#endif
+pref("signon.firefoxRelay.feature", "available");
 pref("signon.management.page.breach-alerts.enabled", true);
 pref("signon.management.page.vulnerable-passwords.enabled", true);
 pref("signon.management.page.sort", "name");
