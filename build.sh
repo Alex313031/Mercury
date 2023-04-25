@@ -40,6 +40,6 @@ cd $HOME/mozilla-unified &&
 
 ./mach package -v &&
 
-printf "${GRE}${bold}Build Completed. ${YEL}${bold}You can find a tarball package of the release in.\n" &&
+printf "${GRE}${bold}Build Completed. ${YEL}${bold}You can find a tarball package of the release in:\n" &&
 printf "${PWD}/obj.../dist/Mercury....tar.bz2\n" &&
 tput sgr0
