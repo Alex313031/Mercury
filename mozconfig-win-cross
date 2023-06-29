@@ -107,10 +107,10 @@ export MOZ_REQUIRE_SIGNING=
 # Branding
 ac_add_options --with-app-name=mercury
 ac_add_options --with-app-basename=Mercury
-ac_add_options --with-branding=browser/branding/mercury
+# ac_add_options --with-branding=browser/branding/mercury
 ac_add_options --with-l10n-base="C:\mozilla-source\mozilla-unified\browser\locales\en-US"
 ac_add_options --with-distribution-id=org.github.mercury
-#-app=/home/alex/bin/Mercury/application.ini
+# -app=/home/alex/bin/Mercury/application.ini
 
 # Make flags (set to number of CPU cores)
 mk_add_options MOZ_MAKE_FLAGS="-j16"

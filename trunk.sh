@@ -43,9 +43,7 @@ hg purge &&
 
 hg pull &&
 
-hg update --clean -C default &&
-
-hg update --clean -C release &&
+hg update --clean -C esr115 &&
 
 ./mach bootstrap &&
 
