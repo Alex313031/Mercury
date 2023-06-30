@@ -20,13 +20,11 @@ displayHelp () {
 	printf "${bold}${GRE}Script to copy Mercury source files over the Mozilla source tree.${c0}\n" &&
 	printf "\n"
 }
-
 case $1 in
 	--help) displayHelp; exit 0;;
 esac
 
 printf "\n" &&
-
 printf "${YEL}Copying Mercury source files over the Mozilla tree...\n" &&
 tput sgr0 &&
 
@@ -56,7 +54,6 @@ alias hgrebase='hg update --clean' &&
 printf "\n" &&
 printf "${YEL}Look in this file to see the aliases and what they're for.\n" &&
 printf "\n" &&
-
 printf "${GRE}Enjoy Mercury!\n" &&
 printf "\n" &&
 tput sgr0 &&

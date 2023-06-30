@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Copyright (c) 2022 Alex313031.
+# Copyright (c) 2023 Alex313031.
 
 YEL='\033[1;33m' # Yellow
 RED='\033[1;31m' # Red
@@ -22,7 +22,6 @@ displayHelp () {
 	printf "${underline} ${c0}You can run export MOZ_MAKE_FLAGS="-j8" where -j is the number of CPU cores.\n" &&
 	printf "\n"
 }
-
 case $1 in
 	--help) displayHelp; exit 0;;
 esac

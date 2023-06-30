@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Copyright (c) 2022 Alex313031 and Midzer.
+# Copyright (c) 2023 Alex313031 and Midzer.
 
 YEL='\033[1;33m' # Yellow
 RED='\033[1;31m' # Red
@@ -17,10 +17,9 @@ try() { "$@" || die "${RED}Failed $*"; }
 # --help
 displayHelp () {
 	printf "\n" &&
-	printf "${bold}${GRE}Script to Rebase/Sync Mozilla repo on Linux.${c0}\n" &&
+	printf "${bold}${GRE}Script to Rebase/Sync the Mozilla repo on Linux.${c0}\n" &&
 	printf "\n"
 }
-
 case $1 in
 	--help) displayHelp; exit 0;;
 esac
@@ -28,12 +27,14 @@ esac
 printf "\n" &&
 printf "${bold}${GRE}Script to Rebase/Sync Mozilla repo on Linux.${c0}\n" &&
 printf "\n" &&
-printf "${YEL}Rebasing/Syncing with mozilla-unified Mercurial repository...\n" &&
-tput sgr0 &&
+printf "${YEL}Rebasing/Syncing with mozilla-unified Mercurial repository...${c0}\n" &&
+
+MERCURY_BRANCH="esr115"
+export MERCURY_BRANCH &&
 
 cd $HOME/mozilla-unified &&
 
-rm -r -v -f obj-x86_64-pc-linux-gnu &&
+rm -r -f ./obj-x86_64-pc-linux-gnu &&
 
 hg pull &&
 
@@ -43,7 +44,10 @@ hg purge &&
 
 hg pull &&
 
-hg update --clean -C esr115 &&
+printf "${YEL}Checking out the ${MERCURY_BRANCH} branch...\n" &&
+tput sgr0 &&
+
+hg update --clean -C $MERCURY_BRANCH &&
 
 ./mach bootstrap &&
 
