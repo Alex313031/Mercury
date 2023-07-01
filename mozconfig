@@ -64,9 +64,9 @@ export MOZ_REQUIRE_SIGNING=
 # Branding
 ac_add_options --with-app-name=mercury
 ac_add_options --with-app-basename=Mercury
-# ac_add_options --with-branding=browser/branding/mercury
+ac_add_options --with-branding=browser/branding/mercury
 ac_add_options --with-l10n-base=$PWD/browser/locales/en-US
-ac_add_options --with-distribution-id=org.github.mercury
+ac_add_options --with-distribution-id=com.alex313031.mercury
 # -app=/home/alex/bin/Mercury/application.ini
 
 # Make flags (set to number of CPU cores)
