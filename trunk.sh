@@ -45,16 +45,19 @@ hg purge &&
 
 hg pull &&
 
-printf "${YEL}Checking out the ${MERCURY_BRANCH} branch...\n" &&
-tput sgr0 &&
+printf "\n" &&
+printf "${GRE}Checking out the ${MERCURY_BRANCH} branch...${c0}\n" &&
 
 hg update --clean -C $MERCURY_BRANCH &&
+
+printf "\n" &&
+printf "${GRE}Running \`./mach bootstrap\`...${c0}\n" &&
 
 ./mach bootstrap &&
 
 printf "\n" &&
 
-printf "${GRE}Done! ${YEL}You can now run ./setup.sh\n"
+printf "${GRE}Done! ${YEL}You can now run ./setup.sh${c0}\n"
 tput sgr0
 
 exit 0
