@@ -7,5 +7,5 @@
  - GTK name is "Mercury-default" instead of "Mercury" | FIXED Feb. 12, 2023 by Me.
 
 **2023**
- - Titlebar does not respect dark mode on Windows 8+
- - PGO cannot run during native compile @gz83
+ - Titlebar does not respect dark mode on Windows 8+ | FIXED Jun. 30, 2023 by Me based on Librewolf patch.
+ - PGO cannot run during native compile @gz83 | FIXED upstream.
