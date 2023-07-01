@@ -103,6 +103,6 @@ export CFLAGS="-O3 -mavx -maes /O2 /clang:-O3 /arch:AVX"
 export CPPFLAGS="-O3 -mavx -maes /O2 /clang:-O3 /arch:AVX"
 export CXXFLAGS="-O3 -mavx -maes /O2 /clang:-O3 /arch:AVX"
 export LDFLAGS="-Wl,-O3 -mavx -maes"
-export MOZ_LTO_LDFLAGS="-mllvm:-polly"
+# export MOZ_LTO_LDFLAGS="-mllvm:-polly"
 export RUSTFLAGS="-C target-feature=+avx"
 export VERBOSE=1
