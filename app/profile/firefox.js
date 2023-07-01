@@ -1510,9 +1510,10 @@ pref("services.sync.prefs.sync.spellchecker.dictionary", true);
 pref("services.sync.prefs.sync.ui.osk.enabled", true);
 
 // MISC. MERCURY SETTINGS
-// Enable Do Not Track by default.
+// Enable Do Not Track and GPC by default.
 pref("privacy.donottrackheader.enabled", true);
 pref("privacy.globalprivacycontrol.enabled", true);
+//Disable more telemetry
 pref("toolkit.telemetry.pioneer-new-studies-available", false);
 // Disable Auto Update
 pref("app.update.auto", false);
@@ -1545,6 +1546,8 @@ pref("image.jxl.enabled", true);
 pref("media.eme.enabled", true);
 // Whether search engagement telemetry should be recorded.
 pref("browser.urlbar.searchEngagementTelemetry.enabled", false);
+// Make sure sites expecting Chromium or Firefox still work.
+pref("general.useragent.compatMode.firefox", true);
 // pref("browser.uiCustomization.autoAdd", "{\"placements\":{\"widget-overflow-fixed-list\":[],\"unified-extensions-area\":[],\"nav-bar\":[\"back-button\",\"forward-button\",\"stop-reload-button\",\"home-button\",\"urlbar-container\",\"downloads-button\",\"developer-button\",\"fxa-toolbar-menu-button\"],\"toolbar-menubar\":[\"menubar-items\"],\"TabsToolbar\":[\"tabbrowser-tabs\",\"new-tab-button\",\"alltabs-button\"],\"PersonalToolbar\":[\"import-button\",\"personal-bookmarks\"]},\"seen\":[\"developer-button\"],\"dirtyAreaCache\":[\"PersonalToolbar\"],\"currentVersion\":19,\"newElementCount\":0}");
 // END MISC MERCURY SETTINGS
 
