@@ -1,35 +1,28 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
-"use strict";
 
-var EXPORTED_SYMBOLS = ["CustomizableUI"];
-
-const { XPCOMUtils } = ChromeUtils.importESModule(
-  "resource://gre/modules/XPCOMUtils.sys.mjs"
-);
-const { AppConstants } = ChromeUtils.importESModule(
-  "resource://gre/modules/AppConstants.sys.mjs"
-);
+import { XPCOMUtils } from "resource://gre/modules/XPCOMUtils.sys.mjs";
+import { AppConstants } from "resource://gre/modules/AppConstants.sys.mjs";
+import { SearchWidgetTracker } from "resource:///modules/SearchWidgetTracker.sys.mjs";
 
 const lazy = {};
 
 ChromeUtils.defineESModuleGetters(lazy, {
+  AddonManager: "resource://gre/modules/AddonManager.sys.mjs",
+  AddonManagerPrivate: "resource://gre/modules/AddonManager.sys.mjs",
+  CustomizableWidgets: "resource:///modules/CustomizableWidgets.sys.mjs",
+  PanelMultiView: "resource:///modules/PanelMultiView.sys.mjs",
   PrivateBrowsingUtils: "resource://gre/modules/PrivateBrowsingUtils.sys.mjs",
   ShortcutUtils: "resource://gre/modules/ShortcutUtils.sys.mjs",
 });
 
 XPCOMUtils.defineLazyModuleGetters(lazy, {
-  AddonManager: "resource://gre/modules/AddonManager.jsm",
-  AddonManagerPrivate: "resource://gre/modules/AddonManager.jsm",
-  SearchWidgetTracker: "resource:///modules/SearchWidgetTracker.jsm",
-  CustomizableWidgets: "resource:///modules/CustomizableWidgets.jsm",
-  PanelMultiView: "resource:///modules/PanelMultiView.jsm",
   BrowserUsageTelemetry: "resource:///modules/BrowserUsageTelemetry.jsm",
   HomePage: "resource:///modules/HomePage.jsm",
 });
 
-XPCOMUtils.defineLazyGetter(lazy, "gWidgetsBundle", function() {
+XPCOMUtils.defineLazyGetter(lazy, "gWidgetsBundle", function () {
   const kUrl =
     "chrome://browser/locale/customizableui/customizableWidgets.properties";
   return Services.strings.createBundle(kUrl);
@@ -79,7 +72,7 @@ var ObsoleteBuiltinButtons = {
 };
 
 /**
- * gPalette is a map of every widget that CustomizableUI.jsm knows about, keyed
+ * gPalette is a map of every widget that CustomizableUI.sys.mjs knows about, keyed
  * on their IDs.
  */
 var gPalette = new Map();
@@ -284,7 +277,6 @@ var CustomizableUIInternal = {
       {
         type: CustomizableUI.TYPE_TOOLBAR,
         defaultPlacements: [
-          "firefox-view-button",
           "tabbrowser-tabs",
           "new-tab-button",
           "alltabs-button",
@@ -303,7 +295,7 @@ var CustomizableUIInternal = {
       true
     );
 
-    lazy.SearchWidgetTracker.init();
+    SearchWidgetTracker.init();
 
     Services.obs.addObserver(this, "browser-set-toolbar-visibility");
   },
@@ -452,9 +444,8 @@ var CustomizableUIInternal = {
       );
 
       if (savedPanelPlacements.length) {
-        gSavedState.placements[
-          CustomizableUI.AREA_FIXED_OVERFLOW_PANEL
-        ] = savedPanelPlacements;
+        gSavedState.placements[CustomizableUI.AREA_FIXED_OVERFLOW_PANEL] =
+          savedPanelPlacements;
       }
     }
 
@@ -600,9 +591,8 @@ var CustomizableUIInternal = {
         let persistedPageActionsData = JSON.parse(persistedPageActionsPref);
         // If Pocket was previously not in the url bar, let's not put it in the toolbar.
         // It'll still be an option to add from the customization page.
-        pocketPreviouslyInUrl = persistedPageActionsData.idsInUrlbar.includes(
-          "pocket"
-        );
+        pocketPreviouslyInUrl =
+          persistedPageActionsData.idsInUrlbar.includes("pocket");
       } catch (e) {}
       if (navbarPlacements && pocketPreviouslyInUrl) {
         // Pocket's new home is next to the downloads button, or the next best spot.
@@ -658,9 +648,8 @@ var CustomizableUIInternal = {
           builtInWidgets.push(widgetId);
         }
       }
-      gSavedState.placements[
-        CustomizableUI.AREA_FIXED_OVERFLOW_PANEL
-      ] = builtInWidgets;
+      gSavedState.placements[CustomizableUI.AREA_FIXED_OVERFLOW_PANEL] =
+        builtInWidgets;
       gSavedState.placements[CustomizableUI.AREA_ADDONS] = [
         ...extWidgets,
         ...addonsPlacements,
@@ -819,9 +808,8 @@ var CustomizableUIInternal = {
     ) {
       let id = aElement.getAttribute("customizationtarget");
       if (id) {
-        aElement._customizationTarget = aElement.ownerDocument.getElementById(
-          id
-        );
+        aElement._customizationTarget =
+          aElement.ownerDocument.getElementById(id);
       }
 
       if (!aElement._customizationTarget) {
@@ -3103,7 +3091,7 @@ var CustomizableUIInternal = {
       aWidget[aEventName] = null;
       return;
     }
-    aWidget[aEventName] = function(...aArgs) {
+    aWidget[aEventName] = function (...aArgs) {
       try {
         // Don't copy the function to the normalized widget object, instead
         // keep it on the original object provided to the API so that
@@ -3241,16 +3229,14 @@ var CustomizableUIInternal = {
 
   _resetUIState() {
     try {
-      gUIStateBeforeReset.drawInTitlebar = Services.prefs.getIntPref(
-        kPrefDrawInTitlebar
-      );
+      gUIStateBeforeReset.drawInTitlebar =
+        Services.prefs.getIntPref(kPrefDrawInTitlebar);
       gUIStateBeforeReset.uiCustomizationState = Services.prefs.getCharPref(
         kPrefCustomizationState
       );
       gUIStateBeforeReset.uiDensity = Services.prefs.getIntPref(kPrefUIDensity);
-      gUIStateBeforeReset.autoTouchMode = Services.prefs.getBoolPref(
-        kPrefAutoTouchMode
-      );
+      gUIStateBeforeReset.autoTouchMode =
+        Services.prefs.getBoolPref(kPrefAutoTouchMode);
       gUIStateBeforeReset.currentTheme = gSelectedTheme;
       gUIStateBeforeReset.autoHideDownloadsButton = Services.prefs.getBoolPref(
         kPrefAutoHideDownloadsButton
@@ -3571,9 +3557,10 @@ var CustomizableUIInternal = {
         // Toolbars need to deal with overflown widgets (if any) - so
         // specialcase them:
         if (props.get("type") == CustomizableUI.TYPE_TOOLBAR) {
-          currentPlacements = this._getCurrentWidgetsInContainer(
-            container
-          ).filter(removableOrDefault);
+          currentPlacements =
+            this._getCurrentWidgetsInContainer(container).filter(
+              removableOrDefault
+            );
         } else {
           currentPlacements = currentPlacements.filter(item => {
             let itemNode = container.getElementsByAttribute("id", item)[0];
@@ -3710,7 +3697,7 @@ var CustomizableUIInternal = {
 };
 Object.freeze(CustomizableUIInternal);
 
-var CustomizableUI = {
+export var CustomizableUI = {
   /**
    * Constant reference to the ID of the navigation toolbar.
    */
@@ -4626,7 +4613,7 @@ var CustomizableUI = {
    * @return true if the widget was provided by an extension, false otherwise.
    */
   isWebExtensionWidget(aWidgetId) {
-    let widget = this.getWidget(aWidgetId);
+    let widget = CustomizableUI.getWidget(aWidgetId);
     return widget?.webExtension || aWidgetId.endsWith("-browser-action");
   },
   /**
@@ -4914,6 +4901,7 @@ var CustomizableUI = {
     }
   },
 };
+
 Object.freeze(CustomizableUI);
 Object.freeze(CustomizableUI.windows);
 
@@ -4950,7 +4938,7 @@ function WidgetGroupWrapper(aWidget) {
 
   this.__defineGetter__("provider", () => CustomizableUI.PROVIDER_API);
 
-  this.__defineSetter__("disabled", function(aValue) {
+  this.__defineSetter__("disabled", function (aValue) {
     aValue = !!aValue;
     aWidget.disabled = aValue;
     for (let [, instance] of aWidget.instances) {
@@ -4980,7 +4968,7 @@ function WidgetGroupWrapper(aWidget) {
     return wrapper;
   };
 
-  this.__defineGetter__("instances", function() {
+  this.__defineGetter__("instances", function () {
     // Can't use gBuildWindows here because some areas load lazily:
     let placement = CustomizableUIInternal.getPlacementOfWidget(aWidget.id);
     if (!placement) {
@@ -4994,7 +4982,7 @@ function WidgetGroupWrapper(aWidget) {
     return Array.from(buildAreas, node => this.forWindow(node.ownerGlobal));
   });
 
-  this.__defineGetter__("areaType", function() {
+  this.__defineGetter__("areaType", function () {
     let areaProps = gAreas.get(aWidget.currentArea);
     return areaProps && areaProps.get("type");
   });
@@ -5026,11 +5014,11 @@ function WidgetSingleWrapper(aWidget, aNode) {
   }
 
   this.__defineGetter__("disabled", () => aNode.disabled);
-  this.__defineSetter__("disabled", function(aValue) {
+  this.__defineSetter__("disabled", function (aValue) {
     aNode.disabled = !!aValue;
   });
 
-  this.__defineGetter__("anchor", function() {
+  this.__defineGetter__("anchor", function () {
     let anchorId;
     // First check for an anchor for the area:
     let placement = CustomizableUIInternal.getPlacementOfWidget(aWidget.id);
@@ -5052,7 +5040,7 @@ function WidgetSingleWrapper(aWidget, aNode) {
     return aNode;
   });
 
-  this.__defineGetter__("overflowed", function() {
+  this.__defineGetter__("overflowed", function () {
     return aNode.getAttribute("overflowedItem") == "true";
   });
 
@@ -5106,7 +5094,7 @@ function XULWidgetGroupWrapper(aWidgetId) {
     return wrapper;
   };
 
-  this.__defineGetter__("areaType", function() {
+  this.__defineGetter__("areaType", function () {
     let placement = CustomizableUIInternal.getPlacementOfWidget(aWidgetId);
     if (!placement) {
       return null;
@@ -5116,7 +5104,7 @@ function XULWidgetGroupWrapper(aWidgetId) {
     return areaProps && areaProps.get("type");
   });
 
-  this.__defineGetter__("instances", function() {
+  this.__defineGetter__("instances", function () {
     return Array.from(gBuildWindows, wins => this.forWindow(wins[0]));
   });
 
@@ -5138,7 +5126,7 @@ function XULWidgetSingleWrapper(aWidgetId, aNode, aDocument) {
   // If we keep a strong ref, the weak ref will never die, so null it out:
   aDocument = null;
 
-  this.__defineGetter__("node", function() {
+  this.__defineGetter__("node", function () {
     // If we've set this to null (further down), we're sure there's nothing to
     // be gotten here, so bail out early:
     if (!weakDoc) {
@@ -5172,7 +5160,7 @@ function XULWidgetSingleWrapper(aWidgetId, aNode, aDocument) {
     return null;
   });
 
-  this.__defineGetter__("anchor", function() {
+  this.__defineGetter__("anchor", function () {
     let anchorId;
     // First check for an anchor for the area:
     let placement = CustomizableUIInternal.getPlacementOfWidget(aWidgetId);
@@ -5190,7 +5178,7 @@ function XULWidgetSingleWrapper(aWidgetId, aNode, aDocument) {
       : node;
   });
 
-  this.__defineGetter__("overflowed", function() {
+  this.__defineGetter__("overflowed", function () {
     let node = this.node;
     if (!node) {
       return false;
@@ -5671,9 +5659,8 @@ class OverflowableToolbar {
 
       if (child.getAttribute("overflows") != "false") {
         this.#overflowedInfo.set(child.id, targetContentWidth);
-        let { width: childWidth } = win.windowUtils.getBoundsWithoutFlushing(
-          child
-        );
+        let { width: childWidth } =
+          win.windowUtils.getBoundsWithoutFlushing(child);
         if (!childWidth) {
           this.#hiddenOverflowedNodes.add(child);
         }

@@ -2,6 +2,10 @@
 
 ## .mozconfig for Mercury Browser
 
+#. $topsrcdir/build/win64/mozconfig.vs2019
+#. "$topsrcdir/build/mozconfig.clang-cl"
+#. "$topsrcdir/build/mozconfig.lld-link"
+
 # Build only Mercury
 ac_add_options --enable-application=browser
 ac_add_options --disable-artifact-builds
@@ -39,9 +43,9 @@ ac_add_options --with-clang-path="$CC"
 ac_add_options --with-libclang-path="$TOOLTOOL_DIR/clang/lib"
 ac_add_options --enable-bootstrap
 ac_add_options --disable-update-agent
-ac_add_options --disable-dmd
-#ac_add_options --disable-signmar
-#ac_add_options --disable-verify-mar
+# ac_add_options --disable-dmd
+# ac_add_options --disable-signmar
+# ac_add_options --disable-verify-mar
 
 CROSS_COMPILE=1
 export MOZ_INCLUDE_SOURCE_INFO=1
@@ -63,7 +67,7 @@ ac_add_options --enable-optimize="-O3 -mavx -maes"
 ac_add_options --enable-rust-simd
 ac_add_options --enable-hardening
 # ac_add_options --disable-trace-logging
-# ac_add_options --disable-default-browser-agent
+mk_add_options MOZ_OPTIMIZE=1
 MOZ_OPTIMIZE=1
 export MOZ_OPTIMIZE=1
 export STRIP_FLAGS="--strip-debug --strip-unneeded"
@@ -89,27 +93,22 @@ ac_add_options --without-wasm-sandboxed-libraries
 ac_add_options --disable-bits-download
 ac_add_options --disable-default-browser-agent
 mk_add_options MOZ_CRASHREPORTER=0
-ac_add_options MOZ_CRASHREPORTER=0
 mk_add_options MOZ_DATA_REPORTING=0
-ac_add_options MOZ_DATA_REPORTING=0
 mk_add_options MOZ_SERVICES_HEALTHREPORT=0
-mk_add_options MOZ_TELEMETRY_REPORTING=
-ac_add_options MOZ_TELEMETRY_REPORTING=
+mk_add_options MOZ_TELEMETRY_REPORTING=0
 MOZ_CRASHREPORTER=0
 MOZ_DATA_REPORTING=0
-MOZ_TELEMETRY_REPORTING=
 MOZ_REQUIRE_SIGNING=
 export MOZ_CRASHREPORTER=0
 export MOZ_DATA_REPORTING=0
-export MOZ_TELEMETRY_REPORTING=
 export MOZ_REQUIRE_SIGNING=
 
 # Branding
 ac_add_options --with-app-name=mercury
 ac_add_options --with-app-basename=Mercury
-# ac_add_options --with-branding=browser/branding/mercury
+ac_add_options --with-branding=browser/branding/mercury
 ac_add_options --with-l10n-base="C:\mozilla-source\mozilla-unified\browser\locales\en-US"
-ac_add_options --with-distribution-id=org.github.mercury
+ac_add_options --with-distribution-id=com.alex313031.mercury
 # -app=/home/alex/bin/Mercury/application.ini
 
 # Make flags (set to number of CPU cores)
@@ -129,13 +128,14 @@ ac_add_options RUSTC_OPT_LEVEL="3"
 # Enable PGO/LTO
 export MOZ_LTO=1
 ac_add_options MOZ_LTO=1
-#export MOZ_PGO=1
-#ac_add_options MOZ_PGO=1
+# export MOZ_PGO=1
+# ac_add_options MOZ_PGO=1
 
 ## Compiler, Linker, and Rust flags
-export CFLAGS="-O3 -mavx -maes /arch:AVX"
-export CPPFLAGS="-O3 -mavx -maes /arch:AVX"
-export CXXFLAGS="-O3 -mavx -maes /arch:AVX"
-export LDFLAGS="-Wl,-O3 -mavx -maes -O3"
+export CFLAGS="-O3 -mavx -maes /clang:-O3 /arch:AVX"
+export CPPFLAGS="-O3 -mavx -maes /clang:-O3 /arch:AVX"
+export CXXFLAGS="-O3 -mavx -maes /clang:-O3 /arch:AVX"
+export LDFLAGS="-Wl,-O3 -mavx -maes"
+export MOZ_LTO_LDFLAGS="-Wl,-mllvm,-polly"
 export RUSTFLAGS="-C target-feature=+avx"
 export VERBOSE=1

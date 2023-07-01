@@ -12,7 +12,15 @@ MOZ_APP_UA_NAME=Mercury
 
 MOZ_APP_PROFILE=mercury
 
-MOZ_APP_REMOTINGNAME=Mercury
+MOZ_APP_REMOTINGNAME=com.alex313031.mercury
+
+MOZ_MACBUNDLE_ID=com.alex313031.mercury
+
+MOZ_DISTRIBUTION_ID=com.alex313031.mercury
+
+MOZ_MACBUNDLE_NAME="Mercury.app"
+
+MOZ_SOURCE_REPO=https://github.com/Alex313031/mercury
 
 MOZ_APP_VENDOR=Alex313031
 
