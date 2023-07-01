@@ -49,7 +49,7 @@ ac_add_options --disable-parental-controls
 ac_add_options --disable-crashreporter
 ac_add_options --disable-updater
 ac_add_options --without-wasm-sandboxed-libraries
-ac_add_options --disable-default-browser-agent
+# ac_add_options --disable-default-browser-agent
 mk_add_options MOZ_CRASHREPORTER=0
 mk_add_options MOZ_DATA_REPORTING=0
 mk_add_options MOZ_SERVICES_HEALTHREPORT=0

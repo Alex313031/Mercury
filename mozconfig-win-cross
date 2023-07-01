@@ -42,7 +42,7 @@ ac_add_options --enable-ccache="${TOOLTOOL_DIR}/sccache/sccache"
 ac_add_options --with-clang-path="$CC"
 ac_add_options --with-libclang-path="$TOOLTOOL_DIR/clang/lib"
 ac_add_options --enable-bootstrap
-ac_add_options --disable-update-agent
+# ac_add_options --disable-update-agent
 # ac_add_options --disable-dmd
 # ac_add_options --disable-signmar
 # ac_add_options --disable-verify-mar
