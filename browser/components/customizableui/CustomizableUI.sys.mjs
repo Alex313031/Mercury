@@ -605,18 +605,6 @@ var CustomizableUIInternal = {
       }
     }
 
-    // Add firefox-view if not present
-    if (currentVersion < 18) {
-      let tabstripPlacements =
-        gSavedState.placements[CustomizableUI.AREA_TABSTRIP];
-      if (
-        tabstripPlacements &&
-        !tabstripPlacements.includes("firefox-view-button")
-      ) {
-        tabstripPlacements.unshift("firefox-view-button");
-      }
-    }
-
     // Unified Extensions addon button migration, which puts any browser action
     // buttons in the overflow menu into the addons panel instead.
     if (currentVersion < 19) {
@@ -673,19 +661,6 @@ var CustomizableUIInternal = {
       // The profile was created with this version, so no need to migrate.
       Services.prefs.setIntPref(kPrefProtonToolbarVersion, VERSION);
       return;
-    }
-
-    // Remove the home button if it hasn't been used and is set to about:home
-    if (currentVersion < 1) {
-      let homePage = lazy.HomePage.get();
-      if (
-        placements.includes("home-button") &&
-        !Services.prefs.getBoolPref(kPrefHomeButtonUsed) &&
-        (homePage == "about:home" || homePage == "about:blank") &&
-        Services.policies.isAllowed("removeHomeButtonByDefault")
-      ) {
-        placements.splice(placements.indexOf("home-button"), 1);
-      }
     }
 
     // Remove the library button if it hasn't been used
