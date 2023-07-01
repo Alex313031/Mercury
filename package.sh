@@ -18,8 +18,8 @@ try() { "$@" || die "${RED}Failed $*"; }
 # --help
 displayHelp () {
 	printf "\n" &&
-	printf "${bold}${GRE}Script to build Mercury on Linux.${c0}\n" &&
-	printf "${underline}${YEL}Usage:${c0} build.sh\n" &&
+	printf "${bold}${GRE}Script to package Mercury on Linux.${c0}\n" &&
+	printf "${underline}${YEL}Usage:${c0} package.sh\n" &&
 	printf "You can also run ${CYA}export MOZ_MAKE_FLAGS=\"-j#\"${c0} where # is the number of jobs.\n" &&
 	printf "\n"
 }
@@ -28,7 +28,7 @@ case $1 in
 esac
 
 printf "\n" &&
-printf "${YEL}Building Mercury for Linux...\n" &&
+printf "${YEL}Packaging Mercury for Linux...\n" &&
 printf "${GRE}\n" &&
 
 # Build Thorium
@@ -36,7 +36,8 @@ export NINJA_SUMMARIZE_BUILD=1 &&
 
 cd $HOME/mozilla-unified &&
 
-./mach build -v &&
+./mach package -v &&
 
-printf "${GRE}${bold}Build Completed!\n" &&
+printf "${GRE}${bold}Done. ${YEL}${bold}You can find a tarball package of the release in:\n" &&
+printf "${PWD}/obj.../dist/Mercury....tar.bz2\n" &&
 tput sgr0
