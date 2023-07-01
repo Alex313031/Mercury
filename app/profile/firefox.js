@@ -1512,6 +1512,7 @@ pref("services.sync.prefs.sync.ui.osk.enabled", true);
 // MISC. MERCURY SETTINGS
 // Enable Do Not Track by default.
 pref("privacy.donottrackheader.enabled", true);
+pref("privacy.globalprivacycontrol.enabled", true);
 pref("toolkit.telemetry.pioneer-new-studies-available", false);
 // Disable Auto Update
 pref("app.update.auto", false);
