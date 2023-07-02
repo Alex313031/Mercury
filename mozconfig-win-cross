@@ -1,6 +1,6 @@
-## Copyright (c) 2022 Alex313031.
+## Copyright (c) 2023 Alex313031.
 
-## .mozconfig for Mercury Browser
+## .mozconfig for cross compiling Mercury Browser for Windows on Linux
 
 # Build only Mercury
 ac_add_options --enable-application=browser
@@ -99,8 +99,8 @@ ac_add_options RUSTC_OPT_LEVEL="3"
 # Enable PGO/LTO
 export MOZ_LTO=1
 ac_add_options MOZ_LTO=1
-# export MOZ_PGO=1
-# ac_add_options MOZ_PGO=1
+export MOZ_PGO=1
+ac_add_options MOZ_PGO=1
 
 ## Compiler, Linker, and Rust flags
 export CFLAGS="-mavx -maes /O2 /clang:-O3 /arch:AVX"

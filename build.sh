@@ -18,7 +18,7 @@ try() { "$@" || die "${RED}Failed $*"; }
 # --help
 displayHelp () {
 	printf "\n" &&
-	printf "${bold}${GRE}Script to build Mercury on Linux.${c0}\n" &&
+	printf "${bold}${GRE}Script to build Mercury Browser.${c0}\n" &&
 	printf "${underline}${YEL}Usage:${c0} build.sh\n" &&
 	printf "You can also run ${CYA}export MOZ_MAKE_FLAGS=\"-j#\"${c0} where # is the number of jobs.\n" &&
 	printf "\n"
@@ -28,7 +28,7 @@ case $1 in
 esac
 
 printf "\n" &&
-printf "${YEL}Building Mercury for Linux...\n" &&
+printf "${YEL}Building Mercury...\n" &&
 printf "${GRE}\n" &&
 
 # Build Thorium
@@ -39,4 +39,5 @@ cd $HOME/mozilla-unified &&
 ./mach build -v &&
 
 printf "${GRE}${bold}Build Completed!\n" &&
+printf "${GRE}${bold}You can now run \`./package.sh\` to generate installation packages.\n" &&
 tput sgr0

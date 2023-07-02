@@ -18,7 +18,7 @@ try() { "$@" || die "${RED}Failed $*"; }
 # --help
 displayHelp () {
 	printf "\n" &&
-	printf "${bold}${GRE}Script to package Mercury on Linux.${c0}\n" &&
+	printf "${bold}${GRE}Script to package Mercury Browser.${c0}\n" &&
 	printf "${underline}${YEL}Usage:${c0} package.sh\n" &&
 	printf "You can also run ${CYA}export MOZ_MAKE_FLAGS=\"-j#\"${c0} where # is the number of jobs.\n" &&
 	printf "\n"
@@ -28,7 +28,7 @@ case $1 in
 esac
 
 printf "\n" &&
-printf "${YEL}Packaging Mercury for Linux...\n" &&
+printf "${YEL}Packaging Mercury..\n" &&
 printf "${GRE}\n" &&
 
 # Build Thorium

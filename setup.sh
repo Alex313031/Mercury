@@ -19,6 +19,9 @@ try() { "$@" || die "${RED}Failed $*"; }
 displayHelp () {
 	printf "\n" &&
 	printf "${bold}${GRE}Script to copy Mercury source files over the Mozilla source tree.${c0}\n" &&
+	printf "${bold}${YEL}Use the --win flag to copy the Windows mozconfig${c0}\n" &&
+	printf "${bold}${YEL}Use the --cross flag to copy the Windows cross-compile mozconfig${c0}\n" &&
+	printf "${bold}${YEL}Use the --help flag to show this help${c0}\n" &&
 	printf "\n"
 }
 case $1 in
@@ -26,20 +29,38 @@ case $1 in
 esac
 
 printf "\n" &&
-printf "${YEL}Copying Mercury source files over the Mozilla tree...\n" &&
-tput sgr0 &&
+printf "${YEL}Copying Mercury source files over the Mozilla tree...${c0}\n" &&
 
-cp -r -v mozconfig $HOME/mozilla-unified/ &&
+cp -r -v app/. $HOME/mozilla-unified/browser/app/ &&
 cp -r -v browser/. $HOME/mozilla-unified/browser/ &&
 cp -r -v build/. $HOME/mozilla-unified/build/ &&
-cp -r -v toolkit/. $HOME/mozilla-unified/toolkit/ &&
-cp -r -v app/. $HOME/mozilla-unified/browser/app/ &&
-cp -r -v app/application.ini $HOME/mozilla-unified/ &&
+cp -r -v mozconfig $HOME/mozilla-unified/ &&
 cp -r -v other-licenses/. $HOME/mozilla-unified/other-licenses/ &&
+cp -r -v toolkit/. $HOME/mozilla-unified/toolkit/ &&
 
+copyWin () {
+	printf "\n" &&
+	printf "${GRE}Copying Windows (Native Build) mozconfig${c0}\n" &&
+	printf "\n" &&
+	cp -r -v mozconfig-win $HOME/mozilla-unified/mozconfig
+}
+case $1 in
+	--win) copyWin;
+esac
+
+copyWinCross () {
+	printf "\n" &&
+	printf "${GRE}Copying Windows (Cross Compile) mozconfig${c0}\n" &&
+	printf "\n" &&
+	cp -r -v mozconfig-win-cross $HOME/mozilla-unified/mozconfig
+}
+case $1 in
+	--cross) copyWinCross;
+esac
+
+printf "\n" &&
 printf "${GRE}Done!\n" &&
 printf "\n" &&
-
 printf "${YEL}Setting aliases\n" &&
 
 export NINJA_SUMMARIZE_BUILD=1 &&

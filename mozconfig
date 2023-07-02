@@ -1,6 +1,6 @@
 ## Copyright (c) 2023 Alex313031.
 
-## .mozconfig for Mercury Browser
+## .mozconfig for Mercury Browser (Linux)
 
 # Build only Mercury
 ac_add_options --enable-application=browser
