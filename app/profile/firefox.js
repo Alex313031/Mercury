@@ -1513,6 +1513,7 @@ pref("services.sync.prefs.sync.ui.osk.enabled", true);
 // Enable Do Not Track and GPC by default.
 pref("privacy.donottrackheader.enabled", true);
 pref("privacy.globalprivacycontrol.enabled", true);
+pref("privacy.globalprivacycontrol.functionality.enabled", true);
 //Disable more telemetry
 pref("toolkit.telemetry.pioneer-new-studies-available", false);
 // Disable Auto Update
