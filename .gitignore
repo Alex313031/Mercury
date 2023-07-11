@@ -1,0 +1,6 @@
+.DS_Store
+/dist/opt/Alex313031/mercury/*
+thumbs.db
+*.deb
+# Dolphin file manager
+.directory

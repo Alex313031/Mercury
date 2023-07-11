@@ -3,8 +3,8 @@ Version=1.0
 Name=Mercury
 Comment=Browse the World Wide Web
 GenericName=Web Browser
-Keywords=Internet;WWW;Browser;Web;Explorer
-Exec=/home/alex/bin/Mercury/mercury %u
+Keywords=Internet;WWW;Browser;Web;Explorer;Mercury
+Exec=/opt/Alex313031/mercury/mercury %u
 StartupWMClass=mercury
 Terminal=false
 X-MultipleArgs=true
@@ -17,12 +17,12 @@ Actions=NewWindow;NewPrivateWindow;TempUserDir;
 
 [Desktop Action NewWindow]
 Name=New Window
-Exec=/home/alex/bin/Mercury/mercury -new-window
+Exec=/opt/Alex313031/mercury/mercury -new-window
 
 [Desktop Action NewPrivateWindow]
 Name=New Private Window
-Exec=/home/alex/bin/Mercury/mercury -private-window
+Exec=/opt/Alex313031/mercury/mercury -private-window
 
 [Desktop Action TempUserDir]
-Name=Open With Temp User Dir
-Exec=/home/alex/bin/Mercury/mercury -profile /tmp/mercury/
+Name=Open With Temporary User Profile
+Exec=/opt/Alex313031/mercury/mercury -profile /tmp/mercury/

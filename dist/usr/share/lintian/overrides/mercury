@@ -1,0 +1,2 @@
+mercury binary: embedded-library opt/Alex313031/mercury/libxul.so: libjpeg
+mercury binary: embedded-library opt/Alex313031/mercury/libmozsqlite3.so: sqlite

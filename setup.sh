@@ -34,9 +34,9 @@ printf "${YEL}Copying Mercury source files over the Mozilla tree...${c0}\n" &&
 cp -r -v app/. $HOME/mozilla-unified/browser/app/ &&
 cp -r -v browser/. $HOME/mozilla-unified/browser/ &&
 cp -r -v build/. $HOME/mozilla-unified/build/ &&
-cp -r -v mozconfig $HOME/mozilla-unified/ &&
 cp -r -v other-licenses/. $HOME/mozilla-unified/other-licenses/ &&
 cp -r -v toolkit/. $HOME/mozilla-unified/toolkit/ &&
+cp -r -v mozconfig $HOME/mozilla-unified/ &&
 
 copyWin () {
 	printf "\n" &&

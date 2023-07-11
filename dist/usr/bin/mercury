@@ -1,0 +1,3 @@
+#!/bin/bash
+
+/opt/Alex313031/mercury/mercury $@

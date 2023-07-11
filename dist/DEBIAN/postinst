@@ -1,0 +1,22 @@
+#!/bin/sh
+
+set -e
+
+MOZ_APP_NAME=mercury
+MOZ_PKG_NAME=mercury
+
+if [ "$1" = "configure" ] || [ "$1" = "abort-upgrade" ] || [ "$1" = "abort-remove" ] ; then
+    update-alternatives --install /usr/bin/gnome-www-browser \
+        gnome-www-browser /usr/bin/$MOZ_APP_NAME 40
+
+    update-alternatives --install /usr/bin/x-www-browser \
+        x-www-browser /usr/bin/$MOZ_APP_NAME 40
+fi
+
+echo "Please restart all running instances of $MOZ_APP_NAME, or you will experience problems."
+
+if [ -d /var/run ] ; then
+    touch /var/run/$MOZ_APP_NAME-restart-required
+fi
+
+
