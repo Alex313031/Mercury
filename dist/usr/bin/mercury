@@ -1,3 +1,1 @@
-#!/bin/bash
-
-/usr/lib/mercury/mercury $@
+/usr/lib/mercury/mercury
