@@ -13,8 +13,6 @@ if [ "$1" = "configure" ] || [ "$1" = "abort-upgrade" ] || [ "$1" = "abort-remov
         x-www-browser /usr/bin/$MOZ_APP_NAME 40
 fi
 
-echo "Please restart all running instances of $MOZ_APP_NAME, or you will experience problems."
-
 if [ -d /var/run ] ; then
     touch /var/run/$MOZ_APP_NAME-restart-required
 fi
