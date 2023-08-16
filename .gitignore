@@ -3,5 +3,8 @@
 /dist/usr/lib/mercury/*
 thumbs.db
 *.deb
+*.exe
+*.tar
+*.bz2
 # Dolphin file manager
 .directory
