@@ -68,7 +68,7 @@ export MOZ_DATA_REPORTING=0
 export MOZ_REQUIRE_SIGNING=
 
 # Installer
-export WIN32_REDIST_DIR="/c/Program Files/Microsoft Visual Studio/2022/Community/VC/Redist/MSVC/14.34.31931/x64/Microsoft.VC143.CRT"
+export WIN32_REDIST_DIR="/c/Program Files/Microsoft Visual Studio/2022/Community/VC/Redist/MSVC/14.36.32532/x64/Microsoft.VC143.CRT"
 
 # Branding
 ac_add_options --with-app-name=mercury
