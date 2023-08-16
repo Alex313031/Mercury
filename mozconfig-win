@@ -27,7 +27,7 @@ ac_add_options --enable-install-strip
 ac_add_options --enable-clang-plugin
 ac_add_options --enable-lto
 ac_add_options --enable-wasm-avx
-ac_add_options --enable-optimize="-O3 -mavx -maes"
+ac_add_options --enable-optimize="-O2 -O3 -mavx -maes -Xclang -O3"
 ac_add_options --enable-rust-simd
 ac_add_options --enable-hardening
 # ac_add_options --disable-trace-logging
