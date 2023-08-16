@@ -39,6 +39,7 @@ buildStale () {
 	printf "${GRE}Building .deb package...${CYA}\n" &&
 
 	tar xvf ./*.tar.bz2 -C ./dist/usr/lib/ &&
+	printf "\n"
 	dpkg-deb -Zgzip --build --root-owner-group ./dist &&
 
 	printf "\n" &&
@@ -64,6 +65,7 @@ printf "\n" &&
 printf "${GRE}Building .deb package...${CYA}\n" &&
 
 tar xvf ./*.tar.bz2 -C ./dist/usr/lib/ &&
+printf "\n"
 dpkg-deb -Zgzip --build --root-owner-group ./dist &&
 
 printf "\n" &&
