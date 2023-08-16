@@ -1,0 +1,69 @@
+#!/bin/bash
+
+# Copyright (c) 2023 The Chromium Authors, Mozilla, and Alex313031. All rights reserved.
+# Use of this source code is governed by a license that can be found in the LICENSE file.
+
+# Let the wrapped binary know that it has been run through the wrapper.
+export MERCURY_WRAPPER="`readlink -f "$0"`"
+
+HERE="`dirname "$MERCURY_WRAPPER"`"
+
+# Always use our versions of libs.
+# This also makes RPMs find the compatibly-named library symlinks.
+if [[ -n "$LD_LIBRARY_PATH" ]]; then
+  LD_LIBRARY_PATH="$HERE:$HERE/lib:$LD_LIBRARY_PATH"
+else
+  LD_LIBRARY_PATH="$HERE:$HERE/lib"
+fi
+export LD_LIBRARY_PATH
+
+# APPNAME for GTK.
+APPNAME=mercury
+
+# Set XDG Title variable
+TITLE="Mercury"
+
+usage () {
+  echo "mercury-browser [-h|--help] [--temp-profile] [options] [URL]"
+  echo
+  echo "        -h or --help               This help screen"
+  echo "        --temp-profile             Start with a new and temporary profile"
+  echo
+  echo " Other supported options are:"
+  MANWIDTH=80 man mercury-browser | sed -e '1,/OPTIONS/d; /ENVIRONMENT/,$d'
+  echo " See 'man mercury-browser' for more details"
+}
+
+want_temp_profile=0
+
+while [ $# -gt 0 ]; do
+  case "$1" in
+    -h | --help | -help )
+      usage
+      exit 0 ;;
+    --temp-profile )
+      want_temp_profile=1
+      shift ;;
+    -- ) # Stop option prcessing
+      shift
+      break ;;
+    * )
+      break ;;
+  esac
+done
+
+# Allow users to override command-line options with a file.
+if [[ -f ~/.mercury/mercury-flags.conf ]]; then
+   MERCURY_USER_FLAGS="$(cat ~/.mercury/mercury-flags.conf)"
+fi
+
+# Launch executable
+if [ $want_temp_profile -eq 1 ] ; then
+  TEMP_PROFILE=`mktemp -d` &&
+  echo "Note: Using temporary profile: $TEMP_PROFILE"
+  /usr/lib/mercury/mercury --profile $TEMP_PROFILE $MERCURY_USER_FLAGS $@
+fi
+
+if [ $want_temp_profile -eq 0 ] ; then
+  /usr/lib/mercury/mercury $MERCURY_USER_FLAGS $@
+fi

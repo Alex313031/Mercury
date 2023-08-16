@@ -1,12 +1,15 @@
 #!/bin/sh
 
+# Copyright (c) 2023 Alex313031.
+
 set -e
 
 MOZ_APP_NAME=mercury
+MOZ_PKG_NAME=mercury-browser
 
 if [ "$1" = "remove" ] ; then
-    update-alternatives --remove gnome-www-browser /usr/bin/$MOZ_APP_NAME
-    update-alternatives --remove x-www-browser /usr/bin/$MOZ_APP_NAME
+    update-alternatives --remove gnome-www-browser /usr/bin/$MOZ_PKG_NAME
+    update-alternatives --remove x-www-browser /usr/bin/$MOZ_PKG_NAME
 fi
 
 

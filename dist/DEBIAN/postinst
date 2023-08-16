@@ -1,20 +1,22 @@
 #!/bin/sh
 
+# Copyright (c) 2023 Alex313031.
+
 set -e
 
 MOZ_APP_NAME=mercury
-MOZ_PKG_NAME=mercury
+MOZ_PKG_NAME=mercury-browser
 
 if [ "$1" = "configure" ] || [ "$1" = "abort-upgrade" ] || [ "$1" = "abort-remove" ] ; then
     update-alternatives --install /usr/bin/gnome-www-browser \
-        gnome-www-browser /usr/bin/$MOZ_APP_NAME 40
+        gnome-www-browser /usr/bin/$MOZ_PKG_NAME 40
 
     update-alternatives --install /usr/bin/x-www-browser \
-        x-www-browser /usr/bin/$MOZ_APP_NAME 40
+        x-www-browser /usr/bin/$MOZ_PKG_NAME 40
 fi
 
 if [ -d /var/run ] ; then
-    touch /var/run/$MOZ_APP_NAME-restart-required
+    touch /var/run/$MOZ_PKG_NAME-restart-required
 fi
 
 

@@ -28,16 +28,14 @@ case $1 in
 esac
 
 printf "\n" &&
-printf "${YEL}Building Mercury...\n" &&
-printf "${GRE}\n" &&
-
-# Build Thorium
-export NINJA_SUMMARIZE_BUILD=1 &&
+printf "${GRE}Building Mercury...\n" &&
+printf "${CYA}\n" &&
 
 cd $HOME/mozilla-unified &&
 
 ./mach build -v &&
 
+printf "\n" &&
 printf "${GRE}${bold}Build Completed!\n" &&
 printf "${GRE}${bold}You can now run \`./package.sh\` to generate installation packages.\n" &&
 tput sgr0

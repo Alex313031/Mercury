@@ -74,8 +74,6 @@ printf "${GRE}Done!\n" &&
 printf "\n" &&
 printf "${YEL}Setting aliases\n" &&
 
-export NINJA_SUMMARIZE_BUILD=1 &&
-
 export EDITOR=nano &&
 
 export VISUAL=nano &&

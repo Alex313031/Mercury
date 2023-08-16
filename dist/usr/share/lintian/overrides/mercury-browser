@@ -1,0 +1,3 @@
+mercury-browser binary: embedded-library usr/lib/mercury/libxul.so: libjpeg
+mercury-browser binary: embedded-library usr/lib/mercury/libmozsqlite3.so: sqlite
+mercury-browser binary: image-file-in-usr-lib
