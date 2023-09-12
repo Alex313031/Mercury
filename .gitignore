@@ -8,5 +8,6 @@ thumbs.db
 *.bz2
 *.zip
 /mercury/
+/release/
 # Dolphin file manager
 .directory
