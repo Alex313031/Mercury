@@ -7,7 +7,7 @@
  - Remove all debugging constructs and enable hardening by default.
  - Enable backspace to go back, Do Not Track, and GPU acceleration by default.
  - Disable Pocket, highlights, and suggested content on the new tab page.
- - Restore top bar to ~ESR78 state with home button developer button.
+ - Restore top bar to ~ESR78 state with home button and developer button.
 
 &ndash; Some help in creating these patches came from [LibreWolf](https://librewolf.net/), [Waterfox](https://www.waterfox.net/), [FireDragon](https://github.com/dr460nf1r3/firedragon-browser), [PlasmaFox](https://github.com/torvic9/plasmafox), and [GNU IceCat](https://www.gnu.org/software/gnuzilla/).
 
