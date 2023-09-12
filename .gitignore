@@ -6,6 +6,7 @@ thumbs.db
 *.exe
 *.tar
 *.bz2
+*.zip
 /mercury/
 # Dolphin file manager
 .directory
