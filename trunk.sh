@@ -46,6 +46,8 @@ cd ${HG_SRC_DIR} &&
 
 rm -r -f ./obj-x86_64-pc-linux-gnu &&
 
+rm -r -f ./obj-x86_64-pc-windows-msvc &&
+
 hg pull &&
 
 hg update --clean -C central &&
