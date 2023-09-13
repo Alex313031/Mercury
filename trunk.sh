@@ -25,6 +25,15 @@ case $1 in
 	--help) displayHelp; exit 0;;
 esac
 
+# mozilla source dir env variable
+if [ -z "${HG_SRC_DIR}" ]; then 
+    HG_SRC_DIR="$HOME/mozilla-unified"
+    export HG_SRC_DIR
+else 
+    HG_SRC_DIR="${HG_SRC_DIR}"
+    export HG_SRC_DIR
+fi
+
 printf "\n" &&
 printf "${bold}${GRE}Script to Rebase/Sync Mozilla repo on Linux.${c0}\n" &&
 printf "\n" &&
@@ -33,7 +42,7 @@ printf "${YEL}Rebasing/Syncing with mozilla-unified Mercurial repository...${c0}
 MERCURY_BRANCH="esr115"
 export MERCURY_BRANCH &&
 
-cd $HOME/mozilla-unified &&
+cd ${HG_SRC_DIR} &&
 
 rm -r -f ./obj-x86_64-pc-linux-gnu &&
 

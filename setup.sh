@@ -29,21 +29,30 @@ case $1 in
 	--help) displayHelp; exit 0;;
 esac
 
+# mozilla source dir env variable
+if [ -z "${HG_SRC_DIR}" ]; then 
+    HG_SRC_DIR="$HOME/mozilla-unified"
+    export HG_SRC_DIR
+else 
+    HG_SRC_DIR="${HG_SRC_DIR}"
+    export HG_SRC_DIR
+fi
+
 printf "\n" &&
 printf "${YEL}Copying Mercury source files over the Mozilla tree...${c0}\n" &&
 
-cp -r -v app/. $HOME/mozilla-unified/browser/app/ &&
-cp -r -v browser/. $HOME/mozilla-unified/browser/ &&
-cp -r -v build/. $HOME/mozilla-unified/build/ &&
-cp -r -v other-licenses/. $HOME/mozilla-unified/other-licenses/ &&
-cp -r -v toolkit/. $HOME/mozilla-unified/toolkit/ &&
-cp -r -v mozconfig $HOME/mozilla-unified/ &&
+cp -r -v app/. ${HG_SRC_DIR}/browser/app/ &&
+cp -r -v browser/. ${HG_SRC_DIR}/browser/ &&
+cp -r -v build/. ${HG_SRC_DIR}/build/ &&
+cp -r -v other-licenses/. ${HG_SRC_DIR}/other-licenses/ &&
+cp -r -v toolkit/. ${HG_SRC_DIR}/toolkit/ &&
+cp -r -v mozconfig ${HG_SRC_DIR} &&
 
 copyWin () {
 	printf "\n" &&
 	printf "${GRE}Copying Windows (Native Build) mozconfig${c0}\n" &&
 	printf "\n" &&
-	cp -r -v mozconfig-win $HOME/mozilla-unified/mozconfig
+	cp -r -v mozconfig-win ${HG_SRC_DIR}/mozconfig
 }
 case $1 in
 	--win) copyWin;
@@ -53,7 +62,7 @@ copyWinCross () {
 	printf "\n" &&
 	printf "${GRE}Copying Windows (Cross Compile) mozconfig${c0}\n" &&
 	printf "\n" &&
-	cp -r -v mozconfig-win-cross $HOME/mozilla-unified/mozconfig
+	cp -r -v mozconfig-win-cross ${HG_SRC_DIR}/mozconfig
 }
 case $1 in
 	--cross) copyWinCross;
@@ -63,7 +72,7 @@ copySSE41 () {
 	printf "\n" &&
 	printf "${GRE}Copying SSE4.1 mozconfig${c0}\n" &&
 	printf "\n" &&
-	cp -r -v mozconfig-sse4 $HOME/mozilla-unified/mozconfig
+	cp -r -v mozconfig-sse4 ${HG_SRC_DIR}/mozconfig
 }
 case $1 in
 	--sse4) copySSE41;
