@@ -1554,7 +1554,6 @@ pref("browser.uiCustomization.state", "{\"placements\":{\"widget-overflow-fixed-
 // pref("browser.uiCustomization.autoAdd", "{\"placements\":{\"widget-overflow-fixed-list\":[],\"unified-extensions-area\":[],\"nav-bar\":[\"back-button\",\"forward-button\",\"stop-reload-button\",\"home-button\",\"urlbar-container\",\"downloads-button\",\"developer-button\",\"fxa-toolbar-menu-button\",\"unified-extensions-button\"],\"toolbar-menubar\":[\"menubar-items\"],\"TabsToolbar\":[\"tabbrowser-tabs\",\"new-tab-button\",\"alltabs-button\"],\"PersonalToolbar\":[\"import-button\",\"personal-bookmarks\"]},\"seen\":[\"developer-button\"],\"dirtyAreaCache\":[\"PersonalToolbar\",\"nav-bar\",\"toolbar-menubar\",\"TabsToolbar\"],\"currentVersion\":19,\"newElementCount\":0}");
 
 // Betterfox Fastfox.js
-
 pref("nglayout.initialpaint.delay", 0); // default=5; used to be 250
 pref("nglayout.initialpaint.delay_in_oopif", 0); // default=5
 pref("content.notify.interval", 100000); // (.10s); default=120000 (.12s)
