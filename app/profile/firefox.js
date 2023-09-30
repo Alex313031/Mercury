@@ -67,7 +67,7 @@ pref("extensions.webextensions.remote", true);
 
 // Require signed add-ons by default
 pref("extensions.langpacks.signatures.required", false);
-pref("xpinstall.signatures.required", true);
+pref("xpinstall.signatures.required", false);
 pref("xpinstall.signatures.devInfoURL", "https://wiki.mozilla.org/Addons/Extension_Signing");
 
 // Dictionary download preference
