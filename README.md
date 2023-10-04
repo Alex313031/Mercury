@@ -1,8 +1,8 @@
 # Mercury Browser
 
-<img src="https://raw.githubusercontent.com/Alex313031/Mercury/main/logos/Mercury_256.png" width="192">
+<img src="https://raw.githubusercontent.com/Alex313031/Mercury/main/logos/Mercury_256.png" width="128">
 
-[Firefox](https://www.mozilla.org/en-US/firefox/) fork with compiler optimizations and patches from [Librewolf](https://gitlab.com/librewolf-community), [Waterfox](https://github.com/WaterfoxCo/Waterfox), and GNU [IceCat](https://www.gnu.org/software/gnuzilla/). \
+[Firefox](https://www.mozilla.org/en-US/firefox/) fork with compiler optimizations and patches from [Librewolf](https://gitlab.com/librewolf-community), [Waterfox](https://github.com/WaterfoxCo/Waterfox), and [Ghostery](https://github.com/ghostery/user-agent-desktop). \
 It aims to be the Firefox equivalent of my main project: [Thorium](https://github.com/Alex313031/Thorium) (a [Chromium](https://www.chromium.org/) fork).
 
 ## Patches <img src="https://raw.githubusercontent.com/Alex313031/Mercury/main/logos/patches.png" width="28">
