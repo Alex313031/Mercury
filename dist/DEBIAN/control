@@ -1,8 +1,8 @@
 Package: mercury-browser
-Version: 115.3.0esr
+Version: 115.4.0esr
 Architecture: amd64
 Maintainer: Alex313031 <alex313031@gmail.com>
-Installed-Size: 308000
+Installed-Size: 308100
 Depends: lsb-release, libasound2, libatk1.0-0, libc6, libcairo-gobject2, libcairo2, libdbus-1-3, libdbus-glib-1-2, libfontconfig1, libfreetype6, libgdk-pixbuf2.0-0, libglib2.0-0, libgtk-3-0, libharfbuzz0b, libpango-1.0-0, libpangocairo-1.0-0, libstdc++6, libx11-6, libx11-xcb1, libxcb-shm0, libxcb1, libxcomposite1, libxcursor1, libxdamage1, libxext6, libxfixes3, libxi6, libxrandr2, libxrender1, libxtst6
 Recommends: libcanberra0, libdbusmenu-glib4, libdbusmenu-gtk3-4, libvulkan1
 Suggests: fonts-lyx
