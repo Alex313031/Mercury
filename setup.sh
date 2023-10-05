@@ -46,8 +46,8 @@ cp -r -v browser/. ${HG_SRC_DIR}/browser/ &&
 cp -r -v build/. ${HG_SRC_DIR}/build/ &&
 cp -r -v devtools/. ${HG_SRC_DIR}/devtools/ &&
 cp -r -v ipc/. ${HG_SRC_DIR}/ipc/ &&
-cp -r -v other-licenses/. ${HG_SRC_DIR}/other-licenses/ &&
 cp -r -v netwerk/. ${HG_SRC_DIR}/netwerk/ &&
+cp -r -v other-licenses/. ${HG_SRC_DIR}/other-licenses/ &&
 cp -r -v toolkit/. ${HG_SRC_DIR}/toolkit/ &&
 cp -r -v mozconfig ${HG_SRC_DIR} &&
 
@@ -98,7 +98,6 @@ printf "\n" &&
 printf "${YEL}Look in this file to see the aliases and what they're for.\n" &&
 printf "\n" &&
 printf "${GRE}Enjoy Mercury!\n" &&
-printf "\n" &&
 tput sgr0 &&
 
 exit 0

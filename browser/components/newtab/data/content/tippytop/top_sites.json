@@ -1,5 +1,10 @@
 [
   {
+    "domains": ["addons.mozilla.org"],
+    "image_url": "images/firefoxaddons@2x.png",
+    "favicon_url": "favicons/firefoxaddons.ico"
+  },
+  {
     "domains": ["adidas.co.uk", "adidas.de", "adidas.fr"],
     "image_url": "images/adidas@2x.png",
     "favicon_url": "favicons/adidas.png"
@@ -178,10 +183,5 @@
     "domains": ["zhihu.com"],
     "image_url": "images/zhihu-com@2x.png",
     "favicon_url": "favicons/zhihu-com.ico"
-  },
-  {
-    "domains": ["addons.mozilla.org"],
-    "image_url": "images/firefoxaddons@2x.png",
-    "favicon_url": "favicons/firefoxaddons.ico"
   }
 ]
