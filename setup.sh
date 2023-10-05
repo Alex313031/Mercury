@@ -19,7 +19,9 @@ try() { "$@" || die "${RED}Failed $*"; }
 displayHelp () {
 	printf "\n" &&
 	printf "${bold}${GRE}Script to copy Mercury source files over the Mozilla source tree.${c0}\n" &&
+	printf "${bold}${YEL}Use the --avx2 flag to make an AVX2 build${c0}\n" &&
 	printf "${bold}${YEL}Use the --win flag to copy the Windows mozconfig${c0}\n" &&
+	printf "${bold}${YEL}Use the --win-avx2 flag to make an AVX2 Windows build${c0}\n" &&
 	printf "${bold}${YEL}Use the --cross flag to copy the Windows cross-compile mozconfig${c0}\n" &&
 	printf "${bold}${YEL}Use the --sse4 flag to compile with SSE4.1 (no AVX)${c0}\n" &&
 	printf "${bold}${YEL}Use the --help flag to show this help${c0}\n" &&
@@ -79,6 +81,26 @@ copySSE41 () {
 }
 case $1 in
 	--sse4) copySSE41;
+esac
+
+copyAVX2 () {
+	printf "\n" &&
+	printf "${GRE}Copying SSE4.1 mozconfig${c0}\n" &&
+	printf "\n" &&
+	cp -r -v mozconfig-avx2 ${HG_SRC_DIR}/mozconfig
+}
+case $1 in
+	--avx2) copyAVX2;
+esac
+
+copyWinAVX2 () {
+	printf "\n" &&
+	printf "${GRE}Copying SSE4.1 mozconfig${c0}\n" &&
+	printf "\n" &&
+	cp -r -v mozconfig-win-avx2 ${HG_SRC_DIR}/mozconfig
+}
+case $1 in
+	--win-avx2) copyWinAVX2;
 esac
 
 printf "\n" &&
