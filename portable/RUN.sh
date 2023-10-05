@@ -17,4 +17,4 @@ try() { "$@" || die "${RED}Failed $*"; }
 
 mkdir -p ./USER_DATA &&
 
-./mercury --profile "${PWD}/USER_DATA"
+./mercury/mercury --profile "${PWD}/USER_DATA"
