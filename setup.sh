@@ -51,13 +51,14 @@ cp -r -v ipc/. ${HG_SRC_DIR}/ipc/ &&
 cp -r -v netwerk/. ${HG_SRC_DIR}/netwerk/ &&
 cp -r -v other-licenses/. ${HG_SRC_DIR}/other-licenses/ &&
 cp -r -v toolkit/. ${HG_SRC_DIR}/toolkit/ &&
-cp -r -v mozconfig ${HG_SRC_DIR} &&
+cp -r -v infra/policies ${HG_SRC_DIR} &&
+cp -r -v infra/mozconfig ${HG_SRC_DIR} &&
 
 copyWin () {
 	printf "\n" &&
 	printf "${GRE}Copying Windows (Native Build) mozconfig${c0}\n" &&
 	printf "\n" &&
-	cp -r -v mozconfig-win ${HG_SRC_DIR}/mozconfig
+	cp -r -v infra/mozconfig-win ${HG_SRC_DIR}/mozconfig
 }
 case $1 in
 	--win) copyWin;
@@ -67,7 +68,7 @@ copyWinCross () {
 	printf "\n" &&
 	printf "${GRE}Copying Windows (Cross Compile) mozconfig${c0}\n" &&
 	printf "\n" &&
-	cp -r -v mozconfig-win-cross ${HG_SRC_DIR}/mozconfig
+	cp -r -v infra/mozconfig-win-cross ${HG_SRC_DIR}/mozconfig
 }
 case $1 in
 	--cross) copyWinCross;
@@ -77,7 +78,7 @@ copySSE41 () {
 	printf "\n" &&
 	printf "${GRE}Copying SSE4.1 mozconfig${c0}\n" &&
 	printf "\n" &&
-	cp -r -v mozconfig-sse4 ${HG_SRC_DIR}/mozconfig
+	cp -r -v infra/mozconfig-sse4 ${HG_SRC_DIR}/mozconfig
 }
 case $1 in
 	--sse4) copySSE41;
@@ -87,7 +88,7 @@ copyAVX2 () {
 	printf "\n" &&
 	printf "${GRE}Copying SSE4.1 mozconfig${c0}\n" &&
 	printf "\n" &&
-	cp -r -v mozconfig-avx2 ${HG_SRC_DIR}/mozconfig
+	cp -r -v infra/mozconfig-avx2 ${HG_SRC_DIR}/mozconfig
 }
 case $1 in
 	--avx2) copyAVX2;
@@ -97,7 +98,7 @@ copyWinAVX2 () {
 	printf "\n" &&
 	printf "${GRE}Copying SSE4.1 mozconfig${c0}\n" &&
 	printf "\n" &&
-	cp -r -v mozconfig-win-avx2 ${HG_SRC_DIR}/mozconfig
+	cp -r -v infra/mozconfig-win-avx2 ${HG_SRC_DIR}/mozconfig
 }
 case $1 in
 	--win-avx2) copyWinAVX2;
