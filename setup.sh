@@ -51,7 +51,7 @@ cp -r -v ipc/. ${HG_SRC_DIR}/ipc/ &&
 cp -r -v netwerk/. ${HG_SRC_DIR}/netwerk/ &&
 cp -r -v other-licenses/. ${HG_SRC_DIR}/other-licenses/ &&
 cp -r -v toolkit/. ${HG_SRC_DIR}/toolkit/ &&
-cp -r -v infra/policies ${HG_SRC_DIR} &&
+cp -r -v infra/policies.json ${HG_SRC_DIR} &&
 cp -r -v infra/mozconfig ${HG_SRC_DIR} &&
 
 copyWin () {
