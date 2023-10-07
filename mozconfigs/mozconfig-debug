@@ -1,0 +1,78 @@
+## Copyright (c) 2023 Alex313031.
+
+## .mozconfig for Mercury Browser (Linux)
+
+# Build only Mercury
+ac_add_options --enable-application=browser
+ac_add_options --disable-artifact-builds
+
+# Build for Linux
+ac_add_options --target=x86_64-pc-linux-gnu
+ac_add_options --enable-bootstrap
+export MOZ_INCLUDE_SOURCE_INFO=1
+
+# Optimization settings
+#ac_add_options --disable-tests
+ac_add_options --enable-clang-plugin
+ac_add_options --enable-wasm-avx
+ac_add_options --enable-optimize="-O3 -mavx -maes"
+ac_add_options --enable-rust-simd
+ac_add_options --enable-hardening
+# ac_add_options --disable-trace-logging
+
+# Media settings
+ac_add_options --enable-sandbox
+ac_add_options --enable-raw
+ac_add_options --enable-webrtc
+ac_add_options --enable-pulseaudio
+ac_add_options --enable-alsa
+ac_add_options --enable-jxl
+ac_add_options --enable-av1
+ac_add_options --enable-eme=widevine
+
+# Add-ons
+ac_add_options --allow-addon-sideload
+ac_add_options --with-unsigned-addon-scopes=app,system
+
+# Client settings
+ac_add_options --disable-parental-controls
+ac_add_options --disable-crashreporter
+ac_add_options --disable-updater
+ac_add_options --without-wasm-sandboxed-libraries
+# ac_add_options --disable-default-browser-agent
+export MOZ_SOURCE_CHANGESET=${changeset}
+mk_add_options MOZ_CRASHREPORTER=0
+mk_add_options MOZ_DATA_REPORTING=0
+mk_add_options MOZ_SERVICES_HEALTHREPORT=0
+mk_add_options MOZ_TELEMETRY_REPORTING=0
+MOZ_CRASHREPORTER=0
+MOZ_DATA_REPORTING=0
+MOZ_REQUIRE_SIGNING=
+export MOZ_CRASHREPORTER=0
+export MOZ_DATA_REPORTING=0
+export MOZ_REQUIRE_SIGNING=
+
+# Branding
+ac_add_options --with-app-name=mercury
+ac_add_options --with-app-basename=Mercury
+ac_add_options --with-branding=browser/branding/mercury
+ac_add_options --with-l10n-base=$PWD/browser/locales/en-US
+ac_add_options --with-distribution-id=com.alex313031.mercury
+# -app=/home/alex/bin/Mercury/application.ini
+
+# Make flags (set to number of CPU cores)
+mk_add_options MOZ_MAKE_FLAGS="-j16"
+export MOZ_MAKE_FLAGS="-j16"
+
+# Autoclobber
+mk_add_options AUTOCLOBBER=1
+export AUTOCLOBBER=1
+
+## Compiler, Linker, and Rust flags
+export CFLAGS="-O3 -mavx -maes"
+export CPPFLAGS="-O3 -mavx -maes"
+export CXXFLAGS="-O3 -mavx -maes"
+export LDFLAGS="-Wl,-O3 -mavx -maes"
+# export MOZ_LTO_LDFLAGS="-Wl,-mllvm,-polly"
+export RUSTFLAGS="-C target-feature=+avx"
+export VERBOSE=1

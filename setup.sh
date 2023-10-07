@@ -24,6 +24,8 @@ displayHelp () {
 	printf "${bold}${YEL}Use the --win-avx2 flag to make an AVX2 Windows build${c0}\n" &&
 	printf "${bold}${YEL}Use the --cross flag to copy the Windows cross-compile mozconfig${c0}\n" &&
 	printf "${bold}${YEL}Use the --sse4 flag to compile with SSE4.1 (no AVX)${c0}\n" &&
+	printf "${bold}${YEL}Use the --debug flag to make a debug Linux build${c0}\n" &&
+	printf "${bold}${YEL}Use the --win-debug flag to make a debug Windows build${c0}\n" &&
 	printf "${bold}${YEL}Use the --help flag to show this help${c0}\n" &&
 	printf "\n"
 }
@@ -48,17 +50,18 @@ cp -r -v browser/. ${HG_SRC_DIR}/browser/ &&
 cp -r -v build/. ${HG_SRC_DIR}/build/ &&
 cp -r -v devtools/. ${HG_SRC_DIR}/devtools/ &&
 cp -r -v ipc/. ${HG_SRC_DIR}/ipc/ &&
+cp -r -v moz.build ${HG_SRC_DIR}/ &&
 cp -r -v netwerk/. ${HG_SRC_DIR}/netwerk/ &&
+cp -r -v policies/ ${HG_SRC_DIR}/ &&
 cp -r -v other-licenses/. ${HG_SRC_DIR}/other-licenses/ &&
 cp -r -v toolkit/. ${HG_SRC_DIR}/toolkit/ &&
-cp -r -v infra/policies.json ${HG_SRC_DIR} &&
-cp -r -v infra/mozconfig ${HG_SRC_DIR} &&
+cp -r -v mozconfigs/mozconfig ${HG_SRC_DIR} &&
 
 copyWin () {
 	printf "\n" &&
 	printf "${GRE}Copying Windows (Native Build) mozconfig${c0}\n" &&
 	printf "\n" &&
-	cp -r -v infra/mozconfig-win ${HG_SRC_DIR}/mozconfig
+	cp -r -v mozconfigs/mozconfig-win ${HG_SRC_DIR}/mozconfig
 }
 case $1 in
 	--win) copyWin;
@@ -68,7 +71,7 @@ copyWinCross () {
 	printf "\n" &&
 	printf "${GRE}Copying Windows (Cross Compile) mozconfig${c0}\n" &&
 	printf "\n" &&
-	cp -r -v infra/mozconfig-win-cross ${HG_SRC_DIR}/mozconfig
+	cp -r -v mozconfigs/mozconfig-win-cross ${HG_SRC_DIR}/mozconfig
 }
 case $1 in
 	--cross) copyWinCross;
@@ -78,7 +81,7 @@ copySSE41 () {
 	printf "\n" &&
 	printf "${GRE}Copying SSE4.1 mozconfig${c0}\n" &&
 	printf "\n" &&
-	cp -r -v infra/mozconfig-sse4 ${HG_SRC_DIR}/mozconfig
+	cp -r -v mozconfigs/mozconfig-sse4 ${HG_SRC_DIR}/mozconfig
 }
 case $1 in
 	--sse4) copySSE41;
@@ -86,9 +89,9 @@ esac
 
 copyAVX2 () {
 	printf "\n" &&
-	printf "${GRE}Copying SSE4.1 mozconfig${c0}\n" &&
+	printf "${GRE}Copying AVX2 mozconfig${c0}\n" &&
 	printf "\n" &&
-	cp -r -v infra/mozconfig-avx2 ${HG_SRC_DIR}/mozconfig
+	cp -r -v mozconfigs/mozconfig-avx2 ${HG_SRC_DIR}/mozconfig
 }
 case $1 in
 	--avx2) copyAVX2;
@@ -96,12 +99,32 @@ esac
 
 copyWinAVX2 () {
 	printf "\n" &&
-	printf "${GRE}Copying SSE4.1 mozconfig${c0}\n" &&
+	printf "${GRE}Copying Win AVX2 mozconfig${c0}\n" &&
 	printf "\n" &&
-	cp -r -v infra/mozconfig-win-avx2 ${HG_SRC_DIR}/mozconfig
+	cp -r -v mozconfigs/mozconfig-win-avx2 ${HG_SRC_DIR}/mozconfig
 }
 case $1 in
 	--win-avx2) copyWinAVX2;
+esac
+
+copyDebug () {
+	printf "\n" &&
+	printf "${GRE}Copying debug mozconfig${c0}\n" &&
+	printf "\n" &&
+	cp -r -v mozconfigs/mozconfig-debug ${HG_SRC_DIR}/mozconfig
+}
+case $1 in
+	--debug) copyDebug;
+esac
+
+copyWinDebug () {
+	printf "\n" &&
+	printf "${GRE}Copying Win debug mozconfig${c0}\n" &&
+	printf "\n" &&
+	cp -r -v mozconfigs/mozconfig-win-debug ${HG_SRC_DIR}/mozconfig
+}
+case $1 in
+	--win-debug) copyWinDebug;
 esac
 
 printf "\n" &&
