@@ -20,9 +20,5 @@ printf "${YEL}Bootstrapping Mozilla Repo...\n" &&
 printf "${GRE}\n" &&
 tput sgr0 &&
 
-mkdir -p /c/mozilla-source/ &&
-cd /c/mozilla-source/ &&
-
-curl https://hg.mozilla.org/mozilla-central/raw-file/default/python/mozboot/bin/bootstrap.py -O &&
-python3 bootstrap.py
-
+[ -f bootstrap.py ] || curl https://hg.mozilla.org/mozilla-central/raw-file/default/python/mozboot/bin/bootstrap.py -O bootstrap.py
+python3 bootstrap.py "$@"
