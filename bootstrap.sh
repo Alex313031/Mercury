@@ -16,13 +16,34 @@ die() { yell "$*"; exit 111; }
 try() { "$@" || die "${RED}Failed $*"; }
 
 printf "\n" &&
-printf "${YEL}Bootstrapping Mozilla Repo...\n" &&
-printf "${GRE}\n" &&
-tput sgr0 &&
+printf "${bold}${GRE}Script to clone and initialize the Mozilla source tree.${c0}\n" &&
+printf "${bold}${YEL}Use the --win flag for Windows builds.${c0}\n" &&
+printf "${bold}${YEL}Use the --linux flag for Linux builds.${c0}\n" &&
+printf "\n"
 
-mkdir -p /c/mozilla-source/ &&
-cd /c/mozilla-source/ &&
+makeWinDir () {
+	mkdir -p /c/mozilla-source/ &&
+	cd /c/mozilla-source/ &&
+	printf "\n" &&
+	printf "${YEL}Bootstrapping Mozilla Repo...\n" &&
+	printf "\n" &&
+	tput sgr0 &&
+	curl https://hg.mozilla.org/mozilla-central/raw-file/default/python/mozboot/bin/bootstrap.py -O &&
+	python3 bootstrap.py
+}
+case $1 in
+	--win) makeWinDir; exit 0;;
+esac
 
-curl https://hg.mozilla.org/mozilla-central/raw-file/default/python/mozboot/bin/bootstrap.py -O &&
-python3 bootstrap.py
-
+makeLinuxDir () {
+	cd $HOME &&
+	printf "\n" &&
+	printf "${YEL}Bootstrapping Mozilla Repo...\n" &&
+	printf "\n" &&
+	tput sgr0 &&
+	curl https://hg.mozilla.org/mozilla-central/raw-file/default/python/mozboot/bin/bootstrap.py -O &&
+	python3 bootstrap.py
+}
+case $1 in
+	--linux) makeWinDir; exit 0;;
+esac
