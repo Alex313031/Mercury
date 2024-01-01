@@ -411,6 +411,54 @@ SectionEnd
 ################################################################################
 # Uninstall Sections
 
+/**
+ * Deletes the registry keys for a protocol handler but only if those registry
+ * keys were pointed to the installation being uninstalled.
+ * Does this with both the HKLM and the HKCU registry entries.
+ *
+ * @param   _PROTOCOL
+ *          The protocol to delete the registry keys for
+ */
+!macro DeleteProtocolRegistryIfSetToInstallation _PROTOCOL
+  Push $0
+  Push $1
+  ; Check if there is a protocol handler registered by fetching the DefaultIcon value
+  ; in the registry.
+  ; If there is something registered for the icon, it will be the path to the executable,
+  ; plus a comma and a number for the id of the resource for the icon.
+  ; Use StrCpy with -2 to remove the comma and the resource id so that
+  ; the whole path to the executable can be compared against what's being
+  ; uninstalled.
+
+  ; Do all of that twice, once for the local machine and once for the current user
+
+  ; Remove protocol handlers
+  ClearErrors
+  ${un.GetLongPath} "$INSTDIR\${FileMainEXE}" $1
+  ReadRegStr $0 HKLM "Software\Classes\${_PROTOCOL}\DefaultIcon" ""
+  ${If} $0 != ""
+    StrCpy $0 $0 -2
+    ${If} $0 == $1
+      DeleteRegKey HKLM "Software\Classes\${_PROTOCOL}"
+    ${EndIf}
+  ${EndIf}
+
+  ClearErrors
+  ReadRegStr $0 HKCU "Software\Classes\${_PROTOCOL}\DefaultIcon" ""
+  ${If} $0 != ""
+    StrCpy $0 $0 -2
+    ${If} $0 == $1
+      DeleteRegKey HKCU "Software\Classes\${_PROTOCOL}"
+    ${EndIf}
+  ${EndIf}
+
+  ClearErrors
+
+  Pop $0
+  Pop $1
+!macroend
+!define DeleteProtocolRegistryIfSetToInstallation '!insertmacro DeleteProtocolRegistryIfSetToInstallation'
+
 Section "Uninstall"
   SetDetailsPrint textonly
   DetailPrint $(STATUS_UNINSTALL_MAIN)
@@ -424,6 +472,15 @@ Section "Uninstall"
   ; from being set.
   Var /GLOBAL UnusedExecCatchReturn
   ExecWait '"$INSTDIR\${FileMainEXE}" --backgroundtask uninstall' $UnusedExecCatchReturn
+
+  ; Uninstall the default browser agent scheduled task and all other scheduled
+  ; tasks registered by Firefox.
+  ; This also removes the registry entries that the WDBA creates.
+  ; One of the scheduled tasks that this will remove is the Background Update
+  ; Task. Ideally, this will eventually be changed so that it doesn't rely on
+  ; the WDBA. See Bug 1710143.
+  ExecWait '"$INSTDIR\default-browser-agent.exe" uninstall $AppUserModelID'
+  ${RemoveDefaultBrowserAgentShortcut}
 
   ; Delete the app exe to prevent launching the app while we are uninstalling.
   ClearErrors
@@ -444,10 +501,8 @@ Section "Uninstall"
   ${un.DeleteShortcuts}
 
   ${If} "$AppUserModelID" != ""
-    ; Unregister resources associated with Win7 taskbar jump lists.
-    ${If} ${AtLeastWin7}
-      ApplicationID::UninstallJumpLists "$AppUserModelID"
-    ${EndIf}
+    ; Unregister resources associated with taskbar jump lists.
+    ApplicationID::UninstallJumpLists "$AppUserModelID"
     ; Remove the update sync manager's multi-instance lock file
     Call un.GetCommonDirectory
     Pop $0
@@ -455,9 +510,7 @@ Section "Uninstall"
   ${EndIf}
 
   ${If} "$AppUserModelIDPrivate" != ""
-    ${If} ${AtLeastWin7}
-      ApplicationID::UninstallJumpLists "$AppUserModelIDPrivate"
-    ${EndIf}
+    ApplicationID::UninstallJumpLists "$AppUserModelIDPrivate"
   ${EndIf}
 
   ; Clean up old maintenance service logs
@@ -514,6 +567,13 @@ Section "Uninstall"
 
   DeleteRegKey HKCU "Software\Clients\StartMenuInternet\${AppRegName}-$AppUserModelID"
   DeleteRegValue HKCU "Software\RegisteredApplications" "${AppRegName}-$AppUserModelID"
+
+  ; Clean up "launch on login" registry key for this installation.
+  DeleteRegValue HKCU "Software\Microsoft\Windows\CurrentVersion\Run" "Mozilla-${AppName}-$AppUserModelID"
+
+  ; Remove dual browser extension protocol handlers
+  ${DeleteProtocolRegistryIfSetToInstallation} "firefox"
+  ${DeleteProtocolRegistryIfSetToInstallation} "firefox-private"
 
   ; Remove old protocol handler and StartMenuInternet keys without install path
   ; hashes, but only if they're for this installation.  We've never supported
@@ -615,49 +675,38 @@ Section "Uninstall"
 !endif
 
   ; Remove Toast Notification registration.
-  ${If} ${AtLeastWin10}
-    ; Find any GUID used for this installation.
-    ClearErrors
-    ReadRegStr $0 HKLM "Software\Classes\AppUserModelId\${ToastAumidPrefix}$AppUserModelID" "CustomActivator"
+  ; Find any GUID used for this installation.
+  ClearErrors
+  ReadRegStr $0 HKLM "Software\Classes\AppUserModelId\${ToastAumidPrefix}$AppUserModelID" "CustomActivator"
 
-    DeleteRegValue HKLM "Software\Classes\AppUserModelId\${ToastAumidPrefix}$AppUserModelID" "CustomActivator"
-    DeleteRegValue HKLM "Software\Classes\AppUserModelId\${ToastAumidPrefix}$AppUserModelID" "DisplayName"
-    DeleteRegValue HKLM "Software\Classes\AppUserModelId\${ToastAumidPrefix}$AppUserModelID" "IconUri"
-    DeleteRegKey HKLM "Software\Classes\AppUserModelId\${ToastAumidPrefix}$AppUserModelID"
-    ${If} "$0" != ""
-      DeleteRegValue HKLM "Software\Classes\AppID\$0" "DllSurrogate"
-      DeleteRegKey HKLM "Software\Classes\AppID\$0"
-      DeleteRegValue HKLM "Software\Classes\CLSID\$0" "AppID"
-      DeleteRegValue HKLM "Software\Classes\CLSID\$0\InProcServer32" ""
-      DeleteRegKey HKLM "Software\Classes\CLSID\$0\InProcServer32"
-      DeleteRegKey HKLM "Software\Classes\CLSID\$0"
-    ${EndIf}
-
-    ClearErrors
-    ReadRegStr $0 HKCU "Software\Classes\AppUserModelId\${ToastAumidPrefix}$AppUserModelID" "CustomActivator"
-
-    DeleteRegValue HKCU "Software\Classes\AppUserModelId\${ToastAumidPrefix}$AppUserModelID" "CustomActivator"
-    DeleteRegValue HKCU "Software\Classes\AppUserModelId\${ToastAumidPrefix}$AppUserModelID" "DisplayName"
-    DeleteRegValue HKCU "Software\Classes\AppUserModelId\${ToastAumidPrefix}$AppUserModelID" "IconUri"
-    DeleteRegKey HKCU "Software\Classes\AppUserModelId\${ToastAumidPrefix}$AppUserModelID"
-    ${If} "$0" != ""
-      DeleteRegValue HKCU "Software\Classes\AppID\$0" "DllSurrogate"
-      DeleteRegKey HKCU "Software\Classes\AppID\$0"
-      DeleteRegValue HKCU "Software\Classes\CLSID\$0" "AppID"
-      DeleteRegValue HKCU "Software\Classes\CLSID\$0\InProcServer32" ""
-      DeleteRegKey HKCU "Software\Classes\CLSID\$0\InProcServer32"
-      DeleteRegKey HKCU "Software\Classes\CLSID\$0"
-    ${EndIf}
+  DeleteRegValue HKLM "Software\Classes\AppUserModelId\${ToastAumidPrefix}$AppUserModelID" "CustomActivator"
+  DeleteRegValue HKLM "Software\Classes\AppUserModelId\${ToastAumidPrefix}$AppUserModelID" "DisplayName"
+  DeleteRegValue HKLM "Software\Classes\AppUserModelId\${ToastAumidPrefix}$AppUserModelID" "IconUri"
+  DeleteRegKey HKLM "Software\Classes\AppUserModelId\${ToastAumidPrefix}$AppUserModelID"
+  ${If} "$0" != ""
+    DeleteRegValue HKLM "Software\Classes\AppID\$0" "DllSurrogate"
+    DeleteRegKey HKLM "Software\Classes\AppID\$0"
+    DeleteRegValue HKLM "Software\Classes\CLSID\$0" "AppID"
+    DeleteRegValue HKLM "Software\Classes\CLSID\$0\InProcServer32" ""
+    DeleteRegKey HKLM "Software\Classes\CLSID\$0\InProcServer32"
+    DeleteRegKey HKLM "Software\Classes\CLSID\$0"
   ${EndIf}
 
-  ; Uninstall the default browser agent scheduled task and all other scheduled
-  ; tasks registered by Firefox.
-  ; This also removes the registry entries that the WDBA creates.
-  ; One of the scheduled tasks that this will remove is the Background Update
-  ; Task. Ideally, this will eventually be changed so that it doesn't rely on
-  ; the WDBA. See Bug 1710143.
-  ExecWait '"$INSTDIR\default-browser-agent.exe" uninstall $AppUserModelID'
-  ${RemoveDefaultBrowserAgentShortcut}
+  ClearErrors
+  ReadRegStr $0 HKCU "Software\Classes\AppUserModelId\${ToastAumidPrefix}$AppUserModelID" "CustomActivator"
+
+  DeleteRegValue HKCU "Software\Classes\AppUserModelId\${ToastAumidPrefix}$AppUserModelID" "CustomActivator"
+  DeleteRegValue HKCU "Software\Classes\AppUserModelId\${ToastAumidPrefix}$AppUserModelID" "DisplayName"
+  DeleteRegValue HKCU "Software\Classes\AppUserModelId\${ToastAumidPrefix}$AppUserModelID" "IconUri"
+  DeleteRegKey HKCU "Software\Classes\AppUserModelId\${ToastAumidPrefix}$AppUserModelID"
+  ${If} "$0" != ""
+    DeleteRegValue HKCU "Software\Classes\AppID\$0" "DllSurrogate"
+    DeleteRegKey HKCU "Software\Classes\AppID\$0"
+    DeleteRegValue HKCU "Software\Classes\CLSID\$0" "AppID"
+    DeleteRegValue HKCU "Software\Classes\CLSID\$0\InProcServer32" ""
+    DeleteRegKey HKCU "Software\Classes\CLSID\$0\InProcServer32"
+    DeleteRegKey HKCU "Software\Classes\CLSID\$0"
+  ${EndIf}
 
   ${un.RemovePrecompleteEntries} "false"
 
@@ -681,9 +730,6 @@ Section "Uninstall"
   ${EndIf}
   ${If} ${FileExists} "$INSTDIR\postSigningData"
     Delete /REBOOTOK "$INSTDIR\postSigningData"
-  ${EndIf}
-  ${If} ${FileExists} "$INSTDIR\zoneIdProvenanceData"
-    Delete /REBOOTOK "$INSTDIR\zoneIdProvenanceData"
   ${EndIf}
 
   ; Explicitly remove empty webapprt dir in case it exists (bug 757978).
@@ -1116,15 +1162,10 @@ Function un.onGUIEnd
     ; If we were the default browser and we've now been uninstalled, we need
     ; to take steps to make sure the user doesn't see an "open with" dialog;
     ; they're helping us out by answering this survey, they don't need more
-    ; friction. Sometimes Windows 7 and 8 automatically switch the default to
-    ; IE, but it isn't reliable, so we'll manually invoke IE in that case.
+    ; friction.
     ; Windows 10 always seems to just clear the default browser, so for it
     ; we'll manually invoke Edge using Edge's custom URI scheme.
-    ${If} ${AtLeastWin10}
-      ExecInExplorer::Exec "microsoft-edge:$R1"
-    ${Else}
-      ExecInExplorer::Exec "iexplore.exe" /cmdargs "$R1"
-    ${EndIf}
+    ExecInExplorer::Exec "microsoft-edge:$R1"
   ${EndIf}
 
   ; Finally send the ping, there's no GUI to freeze in case it is slow.

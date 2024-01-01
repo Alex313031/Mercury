@@ -29,7 +29,7 @@ with Files("*configure*"):
     BUG_COMPONENT = ("Firefox Build System", "General")
 
 with Files("docs/**"):
-    BUG_COMPONENT = ("Firefox Build System", "Generated Documentation")
+    BUG_COMPONENT = ("Developer Infrastructure", "Source Documentation")
     SCHEDULES.exclusive = ["docs"]
 
 with Files("mach*"):
@@ -183,7 +183,7 @@ if CONFIG["MOZ_BUILD_APP"]:
 else:
     include("/toolkit/toolkit.mozbuild")
 
-OBJDIR_PP_FILES[".cargo"] += [".cargo/config.in"]
+OBJDIR_PP_FILES[".cargo"] += [CONFIG["MOZ_OVERRIDE_CARGO_CONFIG"] or ".cargo/config.in"]
 
 DEFINES["top_srcdir"] = TOPSRCDIR
 
@@ -196,6 +196,10 @@ SPHINX_TREES["testing-rust-code"] = "docs/testing-rust-code"
 SPHINX_TREES["writing-rust-code"] = "docs/writing-rust-code"
 
 SPHINX_TREES["bug-mgmt"] = "docs/bug-mgmt"
+
+SPHINX_TREES["glossary"] = "docs/glossary"
+
+SPHINX_TREES["overview"] = "docs/overview"
 
 SPHINX_TREES["setup"] = "docs/setup"
 

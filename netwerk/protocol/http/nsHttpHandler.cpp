@@ -103,7 +103,6 @@
 
 #if defined(XP_MACOSX)
 #  include <CoreServices/CoreServices.h>
-#  include "nsCocoaFeatures.h"
 #endif
 
 //-----------------------------------------------------------------------------
@@ -217,11 +216,7 @@ static nsCString ImageAcceptHeader() {
     mimeTypes.Append("image/jxl,");
   }
 
-  if (mozilla::StaticPrefs::image_webp_enabled()) {
-    mimeTypes.Append("image/webp,");
-  }
-
-  mimeTypes.Append("*/*");
+  mimeTypes.Append("image/webp,*/*");
 
   return mimeTypes;
 }
@@ -297,28 +292,8 @@ static const char* gCallbackPrefs[] = {
     "image.http.accept",
     "image.avif.enabled",
     "image.jxl.enabled",
-    "image.webp.enabled",
     nullptr,
 };
-
-static void GetFirefoxVersionForUserAgent(nsACString& aVersion) {
-  // If the "network.http.useragent.forceVersion" pref has a non-zero value,
-  // then override the User-Agent string's Firefox version. The value 0 means
-  // use the default Firefox version. If enterprise users rely on sites that
-  // aren't compatible with Firefox version 100's three-digit version number,
-  // enterprise admins can set this pref to a known-good version (like 99) in an
-  // enterprise policy file.
-  uint32_t forceVersion =
-      mozilla::StaticPrefs::network_http_useragent_forceVersion();
-  if (forceVersion == 0) {
-    // Use the default Firefox version.
-    aVersion.AssignLiteral(MOZILLA_UAVERSION);
-  } else {
-    // Use the pref's version.
-    aVersion.AppendInt(forceVersion);
-    aVersion.AppendLiteral(".0");
-  }
-}
 
 nsresult nsHttpHandler::Init() {
   nsresult rv;
@@ -362,26 +337,30 @@ nsresult nsHttpHandler::Init() {
     Telemetry::ScalarSet(Telemetry::ScalarID::NETWORKING_HTTPS_RR_PREFS_USAGE,
                          static_cast<uint32_t>(usageOfHTTPSRRPrefs.to_ulong()));
     mActivityDistributor = components::HttpActivityDistributor::Service();
+
+    auto initQLogDir = [&]() {
+      if (!StaticPrefs::network_http_http3_enable_qlog()) {
+        return EmptyCString();
+      }
+
+      nsCOMPtr<nsIFile> qlogDir;
+      nsresult rv =
+          NS_GetSpecialDirectory(NS_OS_TEMP_DIR, getter_AddRefs(qlogDir));
+      if (NS_WARN_IF(NS_FAILED(rv))) {
+        return EmptyCString();
+      }
+
+      nsAutoCString dirName("qlog_");
+      dirName.AppendInt(mProcessId);
+      rv = qlogDir->AppendNative(dirName);
+      if (NS_WARN_IF(NS_FAILED(rv))) {
+        return EmptyCString();
+      }
+
+      return qlogDir->HumanReadablePath();
+    };
+    mHttp3QlogDir = initQLogDir();
   }
-
-  auto initQLogDir = [&]() {
-    nsCOMPtr<nsIFile> qlogDir;
-    nsresult rv =
-        NS_GetSpecialDirectory(NS_OS_TEMP_DIR, getter_AddRefs(qlogDir));
-    if (NS_WARN_IF(NS_FAILED(rv))) {
-      return EmptyCString();
-    }
-
-    nsAutoCString dirName("qlog_");
-    dirName.AppendInt(mProcessId);
-    rv = qlogDir->AppendNative(dirName);
-    if (NS_WARN_IF(NS_FAILED(rv))) {
-      return EmptyCString();
-    }
-
-    return qlogDir->HumanReadablePath();
-  };
-  mHttp3QlogDir = initQLogDir();
 
   // monitor some preference changes
   Preferences::RegisterPrefixCallbacks(nsHttpHandler::PrefsChanged,
@@ -391,11 +370,7 @@ nsresult nsHttpHandler::Init() {
   Telemetry::ScalarSet(Telemetry::ScalarID::NETWORKING_HTTP3_ENABLED,
                        StaticPrefs::network_http_http3_enable());
 
-  nsAutoCString uaVersion;
-  GetFirefoxVersionForUserAgent(uaVersion);
-
-  mCompatFirefox.AssignLiteral("Firefox/");
-  mCompatFirefox.Append(uaVersion);
+  mCompatFirefox.AssignLiteral("Firefox/" MOZILLA_UAVERSION);
 
   nsCOMPtr<nsIXULAppInfo> appInfo =
       do_GetService("@mozilla.org/xre/app-info;1");
@@ -413,15 +388,7 @@ nsresult nsHttpHandler::Init() {
     mAppVersion.AssignLiteral(MOZ_APP_UA_VERSION);
   }
 
-  mMisc.AssignLiteral("rv:");
-  bool isFirefox = mAppName.EqualsLiteral("Firefox");
-  uint32_t forceVersion =
-      mozilla::StaticPrefs::network_http_useragent_forceRVOnly();
-  if (forceVersion && (isFirefox || mCompatFirefoxEnabled)) {
-    mMisc.Append(nsPrintfCString("%u.0", forceVersion));
-  } else {
-    mMisc.Append(uaVersion);
-  }
+  mMisc.AssignLiteral("rv:" MOZILLA_UAVERSION);
 
   // Generate the spoofed User Agent for fingerprinting resistance.
   nsRFPService::GetSpoofedUserAgent(mSpoofedUserAgent, true);
@@ -437,7 +404,7 @@ nsresult nsHttpHandler::Init() {
   mRequestContextService = RequestContextService::GetOrCreate();
 
 #if defined(ANDROID)
-  mProductSub.Assign(uaVersion);
+  mProductSub.AssignLiteral(MOZILLA_UAVERSION);
 #else
   mProductSub.AssignLiteral(LEGACY_UA_GECKO_TRAIL);
 #endif
@@ -836,7 +803,13 @@ void nsHttpHandler::BuildUserAgent() {
 }
 
 #ifdef XP_WIN
-#  define OSCPU_WINDOWS "Windows NT %ld.%ld"
+// Hardcode the reported Windows version to 10.0. This way, Microsoft doesn't
+// get to change Web compat-sensitive values without our veto. The compat-
+// sensitivity keeps going up as 10.0 stays as the current value for longer
+// and longer. If the system-reported version ever changes, we'll be able to
+// take our time to evaluate the Web compat impact instead of having to
+// scramble to react like happened with macOS changing from 10.x to 11.x.
+#  define OSCPU_WINDOWS "Windows NT 10.0"
 #  define OSCPU_WIN64 OSCPU_WINDOWS "; Win64; x64"
 #endif
 
@@ -881,14 +854,7 @@ void nsHttpHandler::InitUserAgentComponents() {
   rv = infoService->GetPropertyAsAString(u"release_version"_ns, androidVersion);
   if (NS_SUCCEEDED(rv)) {
     mPlatform += " ";
-    // If the 2nd character is a ".", we know the major version is a single
-    // digit. If we're running on a version below 4 we pretend to be on
-    // Android KitKat (4.4) to work around scripts sniffing for low versions.
-    if (androidVersion[1] == 46 && androidVersion[0] < 52) {
-      mPlatform += "4.4";
-    } else {
-      mPlatform += NS_LossyConvertUTF16toASCII(androidVersion);
-    }
+    mPlatform += NS_LossyConvertUTF16toASCII(androidVersion);
   }
 
   // Add the `Mobile` or `TV` token when running on device.
@@ -907,49 +873,31 @@ void nsHttpHandler::InitUserAgentComponents() {
 
   // Gather OS/CPU.
 #if defined(XP_WIN)
-  OSVERSIONINFO info = {sizeof(OSVERSIONINFO)};
-  if (!GetVersionEx(&info) || info.dwMajorVersion >= 10) {
-    // Cap the reported Windows version to 10.0. This way, Microsoft doesn't
-    // get to change Web compat-sensitive values without our veto. The
-    // compat-sensitivity keeps going up as 10.0 stays as the current value
-    // for longer and longer. If the system-reported version ever changes,
-    // we'll be able to take our time to evaluate the Web compat impact
-    // instead of having to scramble to react like happened with macOS
-    // changing from 10.x to 11.x.
-    info.dwMajorVersion = 10;
-    info.dwMinorVersion = 0;
-  }
 
-  const char* format;
 #  if defined _M_X64 || defined _M_AMD64
-  format = OSCPU_WIN64;
+  mOscpu.AssignLiteral(OSCPU_WIN64);
 #  elif defined(_ARM64_)
   // Report ARM64 Windows 11+ as x86_64 and Windows 10 as x86. Windows 11+
   // supports x86_64 emulation, but Windows 10 only supports x86 emulation.
-  format = IsWin11OrLater() ? OSCPU_WIN64 : OSCPU_WINDOWS;
+  if (IsWin11OrLater()) {
+    mOscpu.AssignLiteral(OSCPU_WIN64);
+  } else {
+    mOscpu.AssignLiteral(OSCPU_WINDOWS);
+  }
 #  else
   BOOL isWow64 = FALSE;
   if (!IsWow64Process(GetCurrentProcess(), &isWow64)) {
     isWow64 = FALSE;
   }
-  format = isWow64 ? OSCPU_WIN64 : OSCPU_WINDOWS;
+  if (isWow64) {
+    mOscpu.AssignLiteral(OSCPU_WIN64);
+  } else {
+    mOscpu.AssignLiteral(OSCPU_WINDOWS);
+  }
 #  endif
 
-  SmprintfPointer buf =
-      mozilla::Smprintf(format, info.dwMajorVersion, info.dwMinorVersion);
-  if (buf) {
-    mOscpu = buf.get();
-  }
 #elif defined(XP_MACOSX)
-  SInt32 majorVersion = nsCocoaFeatures::macOSVersionMajor();
-  SInt32 minorVersion = nsCocoaFeatures::macOSVersionMinor();
-
-  // Cap the reported macOS version at 10.15 (like Safari) to avoid breaking
-  // sites that assume the UA's macOS version always begins with "10.".
-  int uaVersion = (majorVersion >= 11 || minorVersion > 15) ? 15 : minorVersion;
-
-  // Always return an "Intel" UA string, even on ARM64 macOS like Safari does.
-  mOscpu = nsPrintfCString("Intel Mac OS X 10.%d", uaVersion);
+  mOscpu.AssignLiteral("Intel Mac OS X 10.15");
 #elif defined(XP_UNIX)
   struct utsname name {};
   int ret = uname(&name);
@@ -1724,9 +1672,9 @@ void nsHttpHandler::PrefsChanged(const char* pref) {
     }
   }
 
-  const bool imageAcceptPrefChanged =
-      PREF_CHANGED("image.http.accept") || PREF_CHANGED("image.avif.enabled") ||
-      PREF_CHANGED("image.jxl.enabled") || PREF_CHANGED("image.webp.enabled");
+  const bool imageAcceptPrefChanged = PREF_CHANGED("image.http.accept") ||
+                                      PREF_CHANGED("image.avif.enabled") ||
+                                      PREF_CHANGED("image.jxl.enabled");
 
   if (imageAcceptPrefChanged) {
     nsAutoCString userSetImageAcceptHeader;
@@ -2141,18 +2089,15 @@ nsHttpHandler::Observe(nsISupports* subject, const char* topic,
       mAltSvcCache->ClearAltServiceMappings();
     }
   } else if (!strcmp(topic, NS_NETWORK_LINK_TOPIC)) {
-    nsAutoCString converted = NS_ConvertUTF16toUTF8(data);
-    if (!strcmp(converted.get(), NS_NETWORK_LINK_DATA_CHANGED)) {
-      if (mConnMgr) {
-        rv = mConnMgr->PruneDeadConnections();
-        if (NS_FAILED(rv)) {
-          LOG(("    PruneDeadConnections failed (%08x)\n",
-               static_cast<uint32_t>(rv)));
-        }
-        rv = mConnMgr->VerifyTraffic();
-        if (NS_FAILED(rv)) {
-          LOG(("    VerifyTraffic failed (%08x)\n", static_cast<uint32_t>(rv)));
-        }
+    if (mConnMgr) {
+      rv = mConnMgr->PruneDeadConnections();
+      if (NS_FAILED(rv)) {
+        LOG(("    PruneDeadConnections failed (%08x)\n",
+             static_cast<uint32_t>(rv)));
+      }
+      rv = mConnMgr->VerifyTraffic();
+      if (NS_FAILED(rv)) {
+        LOG(("    VerifyTraffic failed (%08x)\n", static_cast<uint32_t>(rv)));
       }
     }
   } else if (!strcmp(topic, "application-background")) {

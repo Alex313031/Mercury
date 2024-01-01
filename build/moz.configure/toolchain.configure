@@ -53,13 +53,13 @@ with only_when(target_is_osx):
         env="MACOSX_DEPLOYMENT_TARGET",
         nargs=1,
         default=depends(target, developer_options)
-        # We continue to target 10.12 on Intel, but can target 11.0 for
+        # We continue to target 10.15 on Intel, but can target 11.0 for
         # aarch64 since the earliest hardware was released alongside 11.0.
-        # For local builds, we want to target 10.12 regardless of the
+        # For local builds, we want to target 10.15 regardless of the
         # underlying platform to catch any errors or warnings that wouldn't
         # show up when targeting 11.0, since these would later show up on
         # CI for Intel builds.
-        (lambda t, d: "11.0" if (t.cpu == "aarch64" and not d) else "10.12"),
+        (lambda t, d: "11.0" if (t.cpu == "aarch64" and not d) else "10.15"),
         help="Set the minimum MacOS version needed at runtime{|}",
     )
 
@@ -96,7 +96,7 @@ with only_when(host_is_osx | target_is_osx):
         return Version(obj["Version"])
 
     def sdk_min_version():
-        return "13.3"
+        return "14.0"
 
     @depends(
         "--with-macos-sdk",
@@ -104,6 +104,7 @@ with only_when(host_is_osx | target_is_osx):
         bootstrap_path(
             "MacOSX{}.sdk".format(sdk_min_version()),
             when=depends("--with-macos-sdk")(lambda x: not x),
+            allow_failure=True,
         ),
     )
     @imports(_from="__builtin__", _import="Exception")
@@ -1032,6 +1033,7 @@ def sysroot(host_or_target, target_sysroot=None):
         opt = "--with-host-sysroot"
         env = "HOST_SYSROOT"
         when = depends(host)(lambda h: h.kernel == "Linux")
+
         # Only bootstrap a host sysroot when using a bootstrapped target sysroot
         # or when the target doesn't use a bootstrapped sysroot in the first place.
         @depends(when, bootstrap_target_when, target_sysroot.bootstrapped)
@@ -1263,8 +1265,6 @@ def compiler(
                 flags.extend(("-isysroot", sysroot.path))
             else:
                 flags.extend(("--sysroot", sysroot.path))
-        if host_or_target.os == "OSX" and macos_target:
-            flags.append("-mmacosx-version-min=%s" % macos_target)
         if provided_compiler:
             wrapper.extend(provided_compiler.wrapper)
             flags.extend(provided_compiler.flags)
@@ -1276,6 +1276,9 @@ def compiler(
             host_or_target,
             android_version,
         )
+
+        if host_or_target.os == "OSX" and macos_target:
+            flags.append("-mmacosx-version-min=%s" % macos_target)
 
         # When not given an explicit compatibility version, clang-cl tries
         # to get one from MSVC, which might not even be the one used by the
@@ -1412,9 +1415,9 @@ def compiler(
 
         # If you want to bump the version check here ensure the version
         # is known for Xcode in get_compiler_info.
-        if info.type == "clang" and info.version < "7.0":
+        if info.type == "clang" and info.version < "8.0":
             raise FatalCheckError(
-                "Only clang/llvm 7.0 or newer is supported (found version %s)."
+                "Only clang/llvm 8.0 or newer is supported (found version %s)."
                 % info.version
             )
 
@@ -1633,7 +1636,7 @@ set_config("CXX_IS_ICECREAM", cxx_is_icecream)
 # The policy is as follows:
 # For Windows:
 # - the linker is picked via the LINKER environment variable per windows.configure,
-#   but ought to be llvm-lld in any case.
+#   but ought to be lld-link in any case.
 # For macOS:
 # - the linker is lld if the clang used is >= 15 (per LLVM version, not Xcode version).
 # - the linker is also lld on local developer builds if the clang used is >= 13 (per LLVM
@@ -1641,15 +1644,10 @@ set_config("CXX_IS_ICECREAM", cxx_is_icecream)
 # - otherwise the linker is ld64, either from XCode on macOS, or from cctools-ports when
 #   cross-compiling.
 # For other OSes:
-# - on local developer builds: lld is used if present. Otherwise gold is used if present
-#   otherwise, BFD ld is used.
-# - on release/official builds: whatever the compiler uses by default, except on Android
-#   (see enable_linker_default below). Usually what the compiler uses by default is BFD
-#   ld, except with the Android NDK compiler, where the default varies depending on the
-#   NDK version. The default also varies by platform and clang version.
-#   lld is not used by default on Linux and Android because it introduces layout changes
-#   that prevent elfhack from working. See e.g.
-#   https://bugzilla.mozilla.org/show_bug.cgi?id=1563654#c2.
+# - on local developer builds: lld if present and the compiler is clang. Otherwise gold
+#   is used if present otherwise, whatever the compiler uses by default.
+# - on release/official builds: whatever the compiler uses by default, except when the
+#   compiler is clang, in which case lld is preferred when it's new enough.
 @template
 def is_not_winnt_or_sunos(host_or_target):
     @depends(host_or_target)
@@ -1671,26 +1669,10 @@ def enable_gold(value):
         die("--disable-gold is deprecated, use --enable-linker=something_else instead")
 
 
-@depends(target, developer_options)
-def enable_linker_default(target, developer_options):
-    # Recent versions of clang default to lld when targetting Android, but we don't
-    # want that as the default for non developer builds (see above).
-    # So we want to force the default to whatever it was with older versions of clang,
-    # but with caveats/workarounds:
-    # - x86-64 gold has bugs in how it lays out .note.* sections. See bug 1573820.
-    # - x86-32 gold has a bug when assembly files are built. See bug 1651699.
-    # That leaves us with aarch64 and armv7, which respectively defaulted to
-    # bfd and gold.
-    # On developer builds, select_linker will pick lld if it's not the default.
-    if target.os == "Android" and not developer_options:
-        return "bfd" if target.cpu in ("x86", "x86_64", "aarch64") else "gold"
-
-
 option(
     "--enable-linker",
     nargs=1,
-    help="Select the linker {bfd, gold, ld64, lld, lld-*, mold}{|}",
-    default=enable_linker_default,
+    help="Select the linker {bfd, gold, ld64, lld, lld-*, mold}",
     when=is_linker_option_enabled,
 )
 
@@ -1730,7 +1712,6 @@ def select_linker_tmpl(host_or_target):
     @imports("os")
     @imports("shutil")
     def select_linker(linker, c_compiler, developer_options, toolchain_flags, target):
-
         if linker:
             linker = linker[0]
         else:
@@ -1807,38 +1788,40 @@ def select_linker_tmpl(host_or_target):
                     LINKER_FLAG=linker_flag,
                 )
 
-        result = try_linker(linker)
-        if result is None and linker:
-            die("Could not use {} as linker".format(linker))
+        result = None
+        if linker:
+            result = try_linker(linker)
+            if result is None:
+                die("Could not use {} as linker".format(linker))
 
         if (
-            linker is None
-            and target.kernel == "Darwin"
+            result is None
             and c_compiler.type == "clang"
             and (
-                (developer_options and c_compiler.version >= "13.0")
-                or c_compiler.version >= "15.0"
+                (
+                    target.kernel != "Darwin"
+                    and (
+                        developer_options
+                        or host_or_target_str == "host"
+                        or c_compiler.version >= "15.0"
+                    )
+                )
+                or (
+                    target.kernel == "Darwin"
+                    and (
+                        (developer_options and c_compiler.version >= "13.0")
+                        or c_compiler.version >= "15.0"
+                    )
+                )
             )
         ):
             result = try_linker("lld")
-        elif (
-            linker is None
-            and (
-                developer_options
-                or (host_or_target_str == "host" and c_compiler.type == "clang")
-            )
-            and (result is None or result.KIND in ("bfd", "gold"))
-        ):
-            # try and use lld if available.
-            tried = try_linker("lld")
-            if (result is None or result.KIND != "gold") and (
-                tried is None or tried.KIND != "lld"
-            ):
-                tried = try_linker("gold")
-                if tried is None or tried.KIND != "gold":
-                    tried = None
-            if tried:
-                result = tried
+
+        if result is None and developer_options:
+            result = try_linker("gold")
+
+        if result is None:
+            result = try_linker(None)
 
         if result is None:
             die("Failed to find an adequate linker")
@@ -1941,7 +1924,8 @@ def linker_ldflags_tmpl(host_or_target):
 linker_ldflags = linker_ldflags_tmpl(target)
 add_old_configure_assignment("LINKER_LDFLAGS", linker_ldflags)
 
-add_old_configure_assignment("HOST_LINKER_LDFLAGS", linker_ldflags_tmpl(host))
+host_linker_ldflags = linker_ldflags_tmpl(host)
+add_old_configure_assignment("HOST_LINKER_LDFLAGS", host_linker_ldflags)
 
 
 # There's a wrinkle with MinGW: linker configuration is not enabled, so
@@ -2351,6 +2335,7 @@ def ub_unsigned_overflow_san():
 
 add_old_configure_assignment("MOZ_UNSIGNED_OVERFLOW_SANITIZE", ub_unsigned_overflow_san)
 
+
 # Security Hardening
 # ==============================================================
 
@@ -2401,9 +2386,6 @@ def security_hardening_cflags(
         if compiler_is_gccish and optimize and not asan:
             flags.append("-U_FORTIFY_SOURCE")
             flags.append("-D_FORTIFY_SOURCE=2")
-            if mingw_clang:
-                # mingw-clang needs to link in ssp which is not done by default
-                ldflags.append("-lssp")
 
         # fstack-protector ------------------------------------
         # Enable only if hardening is not disabled and ASAN is
@@ -2415,7 +2397,7 @@ def security_hardening_cflags(
             if (
                 c_compiler.type == "clang"
                 and c_compiler.version >= "11.0.1"
-                and target.os not in ("WINNT", "OSX")
+                and target.os not in ("WINNT", "OSX", "OpenBSD")
                 and target.cpu in ("x86", "x86_64", "ppc64", "s390x")
             ):
                 flags.append("-fstack-clash-protection")
@@ -2504,6 +2486,7 @@ def cet_ldflags(c_compiler, target):
 
 set_config("MOZ_CETCOMPAT_LDFLAGS", cet_ldflags)
 
+
 # Frame pointers
 # ==============================================================
 @depends(c_compiler)
@@ -2554,6 +2537,15 @@ def frame_pointer_flags(enable, flags):
 
 
 set_config("MOZ_FRAMEPTR_FLAGS", frame_pointer_flags)
+
+
+# Stack unwinding without frame pointers
+# ==============================================================
+
+
+have_unwind = check_symbol(
+    "_Unwind_Backtrace", when=check_header("unwind.h", when=target_is_unix)
+)
 
 
 # Code Coverage
@@ -2789,6 +2781,7 @@ add_old_configure_assignment(
     "ENABLE_MOZSEARCH_PLUGIN", depends_if("--enable-mozsearch-plugin")(lambda _: True)
 )
 
+
 # Libstdc++ compatibility hacks
 # ==============================================================
 #
@@ -2856,9 +2849,9 @@ def enable_snapshot_fuzzing(value):
         return True
 
 
-@depends("--enable-fuzzing")
-def enable_fuzzing(value):
-    if value:
+@depends("--enable-fuzzing", enable_snapshot_fuzzing)
+def enable_fuzzing(value, snapshot_fuzzing):
+    if value or snapshot_fuzzing:
         return True
 
 
@@ -2970,6 +2963,7 @@ add_old_configure_assignment("LIBFUZZER_FLAGS", libfuzzer_flags.use_flags)
 # Shared library building
 # ==============================================================
 
+
 # XXX: The use of makefile constructs in these variables is awful.
 @depends(target, c_compiler)
 def make_shared_library(target, compiler):
@@ -3012,7 +3006,7 @@ def make_shared_library(target, compiler):
 
     cc = ["$(CC)", "$(COMPUTED_C_LDFLAGS)"]
     cxx = ["$(CXX)", "$(COMPUTED_CXX_LDFLAGS)"]
-    flags = ["$(PGO_CFLAGS)", "$(DSO_LDOPTS)"]
+    flags = ["$(DSO_LDOPTS)"]
     output = ["-o", "$@"]
 
     if target.kernel == "Darwin":
@@ -3079,9 +3073,61 @@ def ar_config(c_compiler, toolchain_prefix=None):
 
 target_ar_config = ar_config(c_compiler, toolchain_prefix)
 
-check_prog("AR", target_ar_config.names, paths=clang_search_path)
+target_ar = check_prog("AR", target_ar_config.names, paths=clang_search_path)
 
 set_config("AR_FLAGS", target_ar_config.flags)
+
+
+@depends(c_compiler, extra_toolchain_flags, target_ar, target_ar_config)
+@checking("whether ar supports response files")
+@imports("os")
+@imports(_from="tempfile", _import="mkstemp")
+@imports(_from="__builtin__", _import="FileNotFoundError")
+@imports(_from="mozbuild.configure.util", _import="LineIO")
+def ar_supports_response_files(c_compiler, extra_toolchain_flags, ar, ar_config):
+    lib_path = list_path = None
+    try:
+        fd, obj_path = mkstemp(prefix="conftest.", suffix=".o")
+        os.close(fd)
+        if (
+            try_invoke_compiler(
+                # No configure_cache because it would not create the
+                # expected output file.
+                None,
+                [c_compiler.compiler] + c_compiler.flags,
+                c_compiler.language,
+                "void foo() {}",
+                ["-c", "-o", obj_path] + (extra_toolchain_flags or []),
+                wrapper=c_compiler.wrapper,
+                onerror=lambda: None,
+            )
+            is not None
+        ):
+            fd, list_path = mkstemp(prefix="conftest.", suffix=".list")
+            with os.fdopen(fd, "w") as list:
+                list.write(obj_path)
+                log.debug("Creating `%s` with content:", list_path)
+                log.debug("| %s", obj_path)
+            fd, lib_path = mkstemp(prefix="conftest.", suffix=".a")
+            os.close(fd)
+            os.remove(lib_path)
+            ar_command = (
+                [ar]
+                + [x.replace("$@", lib_path) for x in ar_config.flags]
+                + ["@" + list_path]
+            )
+            result = check_cmd_output(*ar_command, onerror=lambda: None)
+            return result is not None
+    finally:
+        for cleanup_path in (obj_path, list_path, lib_path):
+            if cleanup_path:
+                try:
+                    os.remove(cleanup_path)
+                except FileNotFoundError:
+                    pass
+
+
+set_config("AR_SUPPORTS_RESPONSE_FILE", True, when=ar_supports_response_files)
 
 host_ar_config = ar_config(host_c_compiler)
 
@@ -3192,5 +3238,6 @@ set_config("SSSE3_FLAGS", ["-mssse3"])
 set_config("SSE4_1_FLAGS", ["-msse4.1"])
 set_config("SSE4_2_FLAGS", ["-msse4.2"])
 set_config("FMA_FLAGS", ["-mfma"])
+set_config("AES_FLAGS", ["-maes"])
 set_config("AVX_FLAGS", ["-mavx"])
 set_config("AVX2_FLAGS", ["-mavx2"])

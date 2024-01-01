@@ -18,10 +18,12 @@
 
 ## Patch URLs for me to use when rebasing.
 
-https://github.com/librewolf-community/source/blob/main/patches/ui-patches/firefox-view.patch
+https://gitlab.com/librewolf-community/browser/source/-/blob/main/patches/ui-patches/firefox-view.patch
 
-https://github.com/librewolf-community/source/blob/main/patches/windows-theming-bug.patch
+https://gitlab.com/librewolf-community/browser/source/-/blob/main/patches/allow-JXL-in-non-nightly-browser.patch
 
-https://github.com/ghostery/user-agent-desktop/tree/main/patches
+https://gitlab.com/librewolf-community/browser/source/-/blob/main/patches/windows-theming-bug.patch
+
+https://gitlab.com/librewolf-community/browser/source/-/tree/main/patches
 
 https://github.com/ghostery/user-agent-desktop/blob/main/patches/0018-Ghostery-Theme.patch

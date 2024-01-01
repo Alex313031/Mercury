@@ -62,7 +62,6 @@
 #endif
 #ifdef MOZ_DEFAULT_BROWSER_AGENT
 @RESPATH@/defaultagent.ini
-@RESPATH@/defaultagent_localized.ini
 #endif
 #if defined(MOZ_UPDATE_AGENT) || defined(MOZ_DEFAULT_BROWSER_AGENT)
 @RESPATH@/locale.ini
@@ -90,10 +89,10 @@
 #endif
 #ifdef XP_MACOSX
 @BINPATH@/@MOZ_CHILD_PROCESS_NAME@.app/
-#else
-@BINPATH@/@MOZ_CHILD_PROCESS_NAME@
+@BINPATH@/@MOZ_EME_PROCESS_NAME@.app/
 #endif
 #ifdef XP_WIN
+@BINPATH@/@MOZ_CHILD_PROCESS_NAME@
 #if MOZ_PACKAGE_MSVC_DLLS
 @BINPATH@/@MSVC_C_RUNTIME_DLL@
 #ifdef MSVC_C_RUNTIME_1_DLL
@@ -101,16 +100,17 @@
 #endif
 @BINPATH@/@MSVC_CXX_RUNTIME_DLL@
 #endif
-#if MOZ_PACKAGE_WIN_UCRT_DLLS
-@BINPATH@/api-ms-win-*.dll
-@BINPATH@/ucrtbase.dll
-#endif
 #endif
 #ifdef MOZ_GTK
 @BINPATH@/glxtest
 @BINPATH@/@DLL_PREFIX@mozgtk@DLL_SUFFIX@
 #ifdef MOZ_WAYLAND
 @BINPATH@/@DLL_PREFIX@mozwayland@DLL_SUFFIX@
+#endif
+#ifdef MOZ_ENABLE_V4L2
+@BINPATH@/v4l2test
+#endif
+#ifdef MOZ_ENABLE_VAAPI
 @BINPATH@/vaapitest
 #endif
 #endif
@@ -119,13 +119,10 @@
 ; build because we haven't run the relevant parts of configure, so we guess
 ; here and trust what came from our source build.
 #if defined(MOZ_ARTIFACT_BUILDS) && defined(XP_WIN)
-@BINPATH@/api-ms-win-*.dll
-@BINPATH@/ucrtbase.dll
 @BINPATH@/vcruntime*.dll
 @BINPATH@/msvcp*.dll
 @BINPATH@/libEGL.dll
 @BINPATH@/libGLESv2.dll
-@BINPATH@/d3dcompiler_47.dll
 #endif
 
 [browser]
@@ -152,6 +149,7 @@
 @BINPATH@/@DLL_PREFIX@mozsqlite3@DLL_SUFFIX@
 #endif
 @BINPATH@/@DLL_PREFIX@lgpllibs@DLL_SUFFIX@
+@BINPATH@/@DLL_PREFIX@gkcodecs@DLL_SUFFIX@
 #ifdef MOZ_FFVPX
 @BINPATH@/@DLL_PREFIX@mozavutil@DLL_SUFFIX@
 @BINPATH@/@DLL_PREFIX@mozavcodec@DLL_SUFFIX@
@@ -211,10 +209,6 @@
 #ifdef MOZ_ANGLE_RENDERER
 @BINPATH@/libEGL.dll
 @BINPATH@/libGLESv2.dll
-
-#ifdef MOZ_D3DCOMPILER_VISTA_DLL
-@BINPATH@/@MOZ_D3DCOMPILER_VISTA_DLL@
-#endif
 #endif # MOZ_ANGLE_RENDERER
 
 ; [Browser Chrome Files]
@@ -458,23 +452,7 @@ bin/libfreebl_64int_3.so
 @BINPATH@/default-browser-agent@BIN_SUFFIX@
 #endif
 
-#ifdef MOZ_EME_WIN32_ARTIFACT
-i686/plugin-container.exe
-i686/xul.dll
-i686/nss3.dll
-i686/mozglue.dll
-i686/lgpllibs.dll
-i686/msvcp140.dll
-i686/vcruntime140.dll
-i686/vcruntime140_1.dll
-i686/gmp-clearkey/0.1/clearkey.dll
-[eme destdir="i686"]
-; We assume the file we generate locally is the same as what was in the win32
-; build, which, practically speaking, is the case.
-@BINPATH@/gmp-clearkey/0.1/manifest.json
-#endif
-
 #ifdef MOZ_ARTIFACT_BUILDS
 ; Test workers unpack artifact build packages and need `jogfile.json`
-@BINPATH@/jogfile.json
+@RESPATH@/jogfile.json
 #endif
