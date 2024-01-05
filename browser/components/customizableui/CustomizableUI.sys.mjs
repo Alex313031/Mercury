@@ -252,7 +252,6 @@ var CustomizableUIInternal = {
       "developer-button",
       "fxa-toolbar-menu-button",
     ].filter(name => name);
-    ].filter(name => name);
 
     this.registerArea(
       CustomizableUI.AREA_NAVBAR,
