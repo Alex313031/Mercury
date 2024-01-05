@@ -19,11 +19,14 @@ try() { "$@" || die "${RED}Failed $*"; }
 displayHelp () {
 	printf "\n" &&
 	printf "${bold}${GRE}Script to copy Mercury source files over the Mozilla source tree.${c0}\n" &&
-	printf "${bold}${YEL}Use the --avx2 flag to make an AVX2 build${c0}\n" &&
 	printf "${bold}${YEL}Use the --win flag to copy the Windows mozconfig${c0}\n" &&
-	printf "${bold}${YEL}Use the --win-avx2 flag to make an AVX2 Windows build${c0}\n" &&
 	printf "${bold}${YEL}Use the --cross flag to copy the Windows cross-compile mozconfig${c0}\n" &&
-	printf "${bold}${YEL}Use the --sse4 flag to compile with SSE4.1 (no AVX)${c0}\n" &&
+	printf "${bold}${YEL}Use the --sse3 flag to make an SSE3 build${c0}\n" &&
+	printf "${bold}${YEL}Use the --win-sse3 flag to make an SSE3 Windows build${c0}\n" &&
+	printf "${bold}${YEL}Use the --sse4 flag to make an SSE4.1 build${c0}\n" &&
+	printf "${bold}${YEL}Use the --win-sse4 flag to make an SSE4.1 Windows build${c0}\n" &&
+	printf "${bold}${YEL}Use the --avx2 flag to make an AVX2 build${c0}\n" &&
+	printf "${bold}${YEL}Use the --win-avx2 flag to make an AVX2 Windows build${c0}\n" &&
 	printf "${bold}${YEL}Use the --debug flag to make a debug Linux build${c0}\n" &&
 	printf "${bold}${YEL}Use the --win-debug flag to make a debug Windows build${c0}\n" &&
 	printf "${bold}${YEL}Use the --help flag to show this help${c0}\n" &&
@@ -77,6 +80,26 @@ case $1 in
 	--cross) copyWinCross;
 esac
 
+copySSE3 () {
+	printf "\n" &&
+	printf "${GRE}Copying SSE3 mozconfig${c0}\n" &&
+	printf "\n" &&
+	cp -r -v mozconfigs/mozconfig-sse3 ${HG_SRC_DIR}/mozconfig
+}
+case $1 in
+	--sse3) copySSE3;
+esac
+
+copyWinSSE3 () {
+	printf "\n" &&
+	printf "${GRE}Copying Windows SSE3 mozconfig${c0}\n" &&
+	printf "\n" &&
+	cp -r -v mozconfigs/mozconfig-win-sse3 ${HG_SRC_DIR}/mozconfig
+}
+case $1 in
+	--win-sse3) copyWinSSE3;
+esac
+
 copySSE41 () {
 	printf "\n" &&
 	printf "${GRE}Copying SSE4.1 mozconfig${c0}\n" &&
@@ -85,6 +108,16 @@ copySSE41 () {
 }
 case $1 in
 	--sse4) copySSE41;
+esac
+
+copyWinSSE41 () {
+	printf "\n" &&
+	printf "${GRE}Copying Windows SSE4.1 mozconfig${c0}\n" &&
+	printf "\n" &&
+	cp -r -v mozconfigs/mozconfig-win-sse4 ${HG_SRC_DIR}/mozconfig
+}
+case $1 in
+	--win-sse4) copyWinSSE41;
 esac
 
 copyAVX2 () {
@@ -99,7 +132,7 @@ esac
 
 copyWinAVX2 () {
 	printf "\n" &&
-	printf "${GRE}Copying Win AVX2 mozconfig${c0}\n" &&
+	printf "${GRE}Copying Windows AVX2 mozconfig${c0}\n" &&
 	printf "\n" &&
 	cp -r -v mozconfigs/mozconfig-win-avx2 ${HG_SRC_DIR}/mozconfig
 }
@@ -119,7 +152,7 @@ esac
 
 copyWinDebug () {
 	printf "\n" &&
-	printf "${GRE}Copying Win debug mozconfig${c0}\n" &&
+	printf "${GRE}Copying Windows debug mozconfig${c0}\n" &&
 	printf "\n" &&
 	cp -r -v mozconfigs/mozconfig-win-debug ${HG_SRC_DIR}/mozconfig
 }
