@@ -18,7 +18,7 @@ try() { "$@" || die "${RED}Failed $*"; }
 # --help
 displayHelp () {
 	printf "\n" &&
-	printf "${bold}${GRE}Script to Rebase/Sync the Mozilla repo on Linux.${c0}\n" &&
+	printf "${bold}${GRE}Script to Rebase/Sync the Mozilla repo.${c0}\n" &&
 	printf "\n"
 }
 case $1 in
@@ -35,7 +35,7 @@ else
 fi
 
 printf "\n" &&
-printf "${bold}${GRE}Script to Rebase/Sync Mozilla repo on Linux.${c0}\n" &&
+printf "${bold}${GRE}Script to Rebase/Sync Mozilla repo.${c0}\n" &&
 printf "\n" &&
 printf "${YEL}Rebasing/Syncing with mozilla-unified Mercurial repository...${c0}\n" &&
 
