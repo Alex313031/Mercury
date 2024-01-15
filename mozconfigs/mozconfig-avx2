@@ -8,6 +8,7 @@ ac_add_options --disable-artifact-builds
 
 # Build for Linux
 ac_add_options --target=x86_64-pc-linux-gnu
+ac_add_options --enable-default-toolkit=cairo-gtk3-wayland
 ac_add_options --enable-bootstrap
 export MOZ_INCLUDE_SOURCE_INFO=1
 
@@ -22,6 +23,7 @@ ac_add_options --enable-install-strip
 ac_add_options --enable-clang-plugin
 ac_add_options --enable-lto
 ac_add_options --enable-wasm-avx
+ac_add_options --enable-avx2
 ac_add_options --enable-optimize="-O3 -march=x86-64-v3"
 ac_add_options --enable-rust-simd
 ac_add_options --enable-hardening
