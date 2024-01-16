@@ -1110,8 +1110,8 @@ pref("browser.history_swipe_animation.disabled", false);
   // who want to keep using this feature, let's enable it with alt+wheel.  This
   // is better for consistency with macOS users.
   pref("mousewheel.with_shift.action", 4);
-  pref("mousewheel.with_alt.action", 2);
   pref("mousewheel.with_control.action",3);
+  pref("mousewheel.with_alt.action", 2);
   pref("mousewheel.with_meta.action", 1); // win key on Win, Super/Hyper on Linux
 #endif
 
