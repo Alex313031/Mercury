@@ -4,6 +4,8 @@
 
  - Increase performance
 
+ - Proton UI > https://github.com/black7375/Firefox-UI-Fix
+
 ## Versions Calendar
 
 https://whattrainisitnow.com/calendar/
