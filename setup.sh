@@ -29,6 +29,8 @@ displayHelp () {
 	printf "${bold}${YEL}Use the --win-avx2 flag to make an AVX2 Windows build${c0}\n" &&
 	printf "${bold}${YEL}Use the --debug flag to make a debug Linux build${c0}\n" &&
 	printf "${bold}${YEL}Use the --win-debug flag to make a debug Windows build${c0}\n" &&
+	printf "${bold}${YEL}Use the --macos flag to make a MacOS x64 build${c0}\n" &&
+	printf "${bold}${YEL}Use the --macos-arm flag to make a MacOS arm64 build${c0}\n" &&
 	printf "${bold}${YEL}Use the --help flag to show this help${c0}\n" &&
 	printf "\n"
 }
@@ -158,6 +160,26 @@ copyWinDebug () {
 }
 case $1 in
 	--win-debug) copyWinDebug;
+esac
+
+copyMac () {
+	printf "\n" &&
+	printf "${GRE}Copying MacOS x64 mozconfig${c0}\n" &&
+	printf "\n" &&
+	cp -r -v mozconfigs/mozconfig-macos-x64 ${HG_SRC_DIR}/mozconfig
+}
+case $1 in
+	--mac) copyMac;
+esac
+
+copyMacArm () {
+	printf "\n" &&
+	printf "${GRE}Copying MacOS ARM64 mozconfig${c0}\n" &&
+	printf "\n" &&
+	cp -r -v mozconfigs/mozconfig-macos-arm64 ${HG_SRC_DIR}/mozconfig
+}
+case $1 in
+	--mac-arm) copyMacArm;
 esac
 
 printf "\n" &&
