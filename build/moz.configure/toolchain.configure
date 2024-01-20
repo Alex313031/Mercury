@@ -1739,7 +1739,7 @@ def select_linker_tmpl(host_or_target):
             die("Unsupported linker " + linker)
 
         # Check the kind of linker
-        version_check = ["-Wl, --version"]
+        version_check = ["-Wl,--version"]
         cmd_base = c_compiler.wrapper + [c_compiler.compiler] + c_compiler.flags
 
         def try_linker(linker):
