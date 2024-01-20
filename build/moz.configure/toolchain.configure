@@ -722,9 +722,13 @@ def rust_search_path(rust_path, search_order, original_path):
 # Prepend the mozilla-build msys2 path, since otherwise we can get mismatched
 # cygwin dll errors during configure if we get called from another msys2
 # environment, see bug 1801826.
-@depends(mozillabuild_bin_paths, clang_search_path, target, original_path)
+@depends(
+    mozillabuild_bin_paths, clang_search_path, rust_search_path, target, original_path
+)
 @imports("os")
-def altered_path(mozillabuild_bin_paths, clang_search_path, target, original_path):
+def altered_path(
+    mozillabuild_bin_paths, clang_search_path, rust_search_path, target, original_path
+):
     altered_path = mozillabuild_bin_paths
     if target.kernel == "Darwin":
         # The rust compiler wants to execute dsymutil, but it does so in a
@@ -733,6 +737,8 @@ def altered_path(mozillabuild_bin_paths, clang_search_path, target, original_pat
         path = clang_search_path
     else:
         path = original_path
+    # cargo needs the rust search path to find cargo-$subcommand.
+    path += rust_search_path
     for p in path:
         if p not in altered_path:
             altered_path.append(p)
@@ -1733,7 +1739,7 @@ def select_linker_tmpl(host_or_target):
             die("Unsupported linker " + linker)
 
         # Check the kind of linker
-        version_check = ["-Wl,--version"]
+        version_check = ["-Wl, --version"]
         cmd_base = c_compiler.wrapper + [c_compiler.compiler] + c_compiler.flags
 
         def try_linker(linker):
