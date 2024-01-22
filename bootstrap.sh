@@ -45,5 +45,5 @@ makeLinuxDir () {
 	python3 bootstrap.py
 }
 case $1 in
-	--linux) makeWinDir; exit 0;;
+	--linux) makeLinuxDir; exit 0;;
 esac
