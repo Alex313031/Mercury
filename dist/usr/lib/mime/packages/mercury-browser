@@ -1,0 +1,6 @@
+text/html; /usr/bin/mercury-browser %s; description=HTML Text; test=test -n "$DISPLAY";  nametemplate=%s.html; priority=5
+text/xml; /usr/bin/mercury-browser %s; description=XML Text; test=test -n "$DISPLAY";  nametemplate=%s.xml; priority=5
+image/png;  /usr/bin/mercury-browser %s; description=PNG Image; test=test -n "$DISPLAY";  nametemplate=%s.png; priority=2
+image/jpeg;  /usr/bin/mercury-browser %s; description=JPEG Image; test=test -n "$DISPLAY";  nametemplate=%s.jpeg; priority=2
+image/gif;  /usr/bin/mercury-browser %s; description=GIF Image; test=test -n "$DISPLAY";  nametemplate=%s.gif; priority=2
+application/pdf;  /usr/bin/mercury-browser %s; description=PDF Document; test=test -n "$DISPLAY";  nametemplate=%s.pdf; priority=2
