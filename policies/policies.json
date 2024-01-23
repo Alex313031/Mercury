@@ -3,7 +3,7 @@
     "HardwareAcceleration": true,
     "Extensions": {
       "Install": [
-        "https://addons.mozilla.org/firefox/downloads/file/4121906/ublock_origin-1.54.0.xpi"
+        "https://addons.mozilla.org/firefox/downloads/file/4121906/ublock_origin-1.55.0.xpi"
       ],
       "Uninstall": [
         "bing@search.mozilla.org",

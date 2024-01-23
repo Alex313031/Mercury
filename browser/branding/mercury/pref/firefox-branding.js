@@ -24,7 +24,7 @@ pref("app.update.url.details", "https://nightly.mozilla.org");
 pref("app.update.checkInstallTime.days", 63);
 
 // Give the user x seconds to reboot before showing a badge on the hamburger
-// button. default=immediately
+// button. default=4 days
 pref("app.update.badgeWaitTime", 345600);
 
 // Number of usages of the web console.

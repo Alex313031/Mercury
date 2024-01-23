@@ -514,7 +514,7 @@ nsresult nsHttpHandler::InitConnectionMgr() {
     mConnMgr = new HttpConnectionMgrParent();
     RefPtr<nsHttpHandler> self = this;
     auto task = [self]() {
-      HttpConnectionMgrParent* parent =
+      RefPtr<HttpConnectionMgrParent> parent =
           self->mConnMgr->AsHttpConnectionMgrParent();
       Unused << SocketProcessParent::GetSingleton()
                     ->SendPHttpConnectionMgrConstructor(
@@ -677,7 +677,8 @@ nsresult nsHttpHandler::GetIOService(nsIIOService** result) {
 }
 
 void nsHttpHandler::NotifyObservers(nsIChannel* chan, const char* event) {
-  LOG(("nsHttpHandler::NotifyObservers [chan=%p event=\"%s\"]\n", chan, event));
+  LOG(("nsHttpHandler::NotifyObservers [this=%p chan=%p event=\"%s\"]\n", this,
+       chan, event));
   nsCOMPtr<nsIObserverService> obsService = services::GetObserverService();
   if (obsService) obsService->NotifyObservers(chan, event, nullptr);
 }
@@ -824,7 +825,7 @@ void nsHttpHandler::InitUserAgentComponents() {
   // Gather platform.
   mPlatform.AssignLiteral(
 #if defined(ANDROID)
-      "Android"
+      "Android 10"
 #elif defined(XP_WIN)
       "Windows"
 #elif defined(XP_MACOSX)
@@ -849,13 +850,6 @@ void nsHttpHandler::InitUserAgentComponents() {
       do_GetService("@mozilla.org/system-info;1");
   MOZ_ASSERT(infoService, "Could not find a system info service");
   nsresult rv;
-  // Add the Android version number to the Fennec platform identifier.
-  nsAutoString androidVersion;
-  rv = infoService->GetPropertyAsAString(u"release_version"_ns, androidVersion);
-  if (NS_SUCCEEDED(rv)) {
-    mPlatform += " ";
-    mPlatform += NS_LossyConvertUTF16toASCII(androidVersion);
-  }
 
   // Add the `Mobile` or `TV` token when running on device.
   bool isTV;
