@@ -15,8 +15,11 @@ def moz_optimize(option):
     flags = None
 
     if len(option):
-        val = "2"
         flags = option[0]
+        if "-O0" in flags:
+            val = None
+        else:
+            val = "3"
     elif option:
         val = "1"
     else:

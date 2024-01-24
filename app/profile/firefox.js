@@ -143,6 +143,82 @@ pref("app.update.notifyDuringDownload", false);
   pref("app.update.auto", false);
 #endif
 
+// MISC. MERCURY SETTINGS
+// Enable Do Not Track and GPC by default.
+pref("privacy.donottrackheader.enabled", true);
+pref("privacy.globalprivacycontrol.enabled", true);
+// Disable more telemetry
+pref("toolkit.telemetry.enabled", false);
+pref("toolkit.telemetry.pioneer-new-studies-available", false);
+// Disable Auto Update
+pref("app.update.auto", false);
+// Allow WebAudio to play automatically.
+pref("media.autoplay.block-webaudio", false);
+// Disable all new tab page stuff except for snippets.
+pref("browser.newtabpage.activity-stream.showSponsored", false);
+pref("browser.newtabpage.activity-stream.showSponsoredTopSites", false);
+pref("browser.newtabpage.activity-stream.topSitesRows", 2);
+pref("browser.newtabpage.activity-stream.section.highlights.includePocket", false);
+pref("browser.newtabpage.activity-stream.feeds.section.highlights", false);
+pref("browser.newtabpage.activity-stream.feeds.snippets", true);
+// Enable AutoScrolling and Smooth Scroll by default
+pref("general.autoScroll", true);
+pref("general.smoothScroll", true);
+// Force enable GPU accelerated compositing.
+pref("layers.acceleration.force-enabled", true);
+// Always show menu bar and view image info.
+// pref("ui.key.menuAccessKeyFocuses", false);
+pref("browser.menu.showViewImageInfo", true);
+// Disable overlay scrollbars on Linux.
+#if defined(XP_LINUX)
+  pref("widget.gtk.overlay-scrollbars.enabled", false);
+#endif
+// Enable AVIF
+pref("image.avif.enabled", true);
+// Enable JPEG-XL
+pref("image.jxl.enabled", true);
+// Enable Widevine automatically
+pref("media.eme.enabled", true);
+// Whether search engagement telemetry should be recorded.
+pref("browser.urlbar.searchEngagementTelemetry.enabled", false);
+// Make sure sites expecting Chromium or Firefox still work.
+pref("general.useragent.compatMode.firefox", true);
+// CustomizableUI state of the browser's user interface
+pref("browser.uiCustomization.state", "{\"placements\":{\"widget-overflow-fixed-list\":[],\"unified-extensions-area\":[],\"nav-bar\":[\"back-button\",\"forward-button\",\"stop-reload-button\",\"home-button\",\"urlbar-container\",\"downloads-button\",\"developer-button\",\"fxa-toolbar-menu-button\",\"unified-extensions-button\"],\"toolbar-menubar\":[\"menubar-items\"],\"TabsToolbar\":[\"tabbrowser-tabs\",\"new-tab-button\",\"alltabs-button\"],\"PersonalToolbar\":[\"import-button\",\"personal-bookmarks\"]},\"seen\":[\"developer-button\"],\"dirtyAreaCache\":[\"PersonalToolbar\",\"nav-bar\",\"toolbar-menubar\",\"TabsToolbar\"],\"currentVersion\":19,\"newElementCount\":0}");
+// pref("browser.uiCustomization.autoAdd", "{\"placements\":{\"widget-overflow-fixed-list\":[],\"unified-extensions-area\":[],\"nav-bar\":[\"back-button\",\"forward-button\",\"stop-reload-button\",\"home-button\",\"urlbar-container\",\"downloads-button\",\"developer-button\",\"fxa-toolbar-menu-button\",\"unified-extensions-button\"],\"toolbar-menubar\":[\"menubar-items\"],\"TabsToolbar\":[\"tabbrowser-tabs\",\"new-tab-button\",\"alltabs-button\"],\"PersonalToolbar\":[\"import-button\",\"personal-bookmarks\"]},\"seen\":[\"developer-button\"],\"dirtyAreaCache\":[\"PersonalToolbar\",\"nav-bar\",\"toolbar-menubar\",\"TabsToolbar\"],\"currentVersion\":19,\"newElementCount\":0}");
+
+// Betterfox Fastfox.js
+pref("nglayout.initialpaint.delay", 0); // default=5; used to be 250
+pref("nglayout.initialpaint.delay_in_oopif", 0); // default=5
+pref("content.notify.interval", 100000); // (.10s); default=120000 (.12s)
+pref("layout.css.grid-template-masonry-value.enabled", true);
+pref("dom.enable_web_task_scheduling", true);
+pref("layout.css.has-selector.enabled", true);
+pref("gfx.canvas.accelerated.cache-items", 4096); // default=2048; alt=8192
+pref("gfx.canvas.accelerated.cache-size", 512); // default=256; alt=1024
+pref("gfx.content.skia-font-cache-size", 20); // default=5; Chrome=20
+pref("media.memory_cache_max_size", 65536); // default=8192; AF=65536; alt=131072
+pref("media.cache_readahead_limit", 7200); // 120 min; default=60; stop reading ahead when our buffered data is this many seconds ahead of the current playback
+pref("media.cache_resume_threshold", 3600); // 60 min; default=30; when a network connection is suspended, don't resume it until the amount of buffered data falls below this threshold
+pref("image.mem.decode_bytes_at_a_time", 32768); // default=16384; alt=65536; chunk size for calls to the image decoders
+pref("network.buffer.cache.size", 262144); // 256 kb; default=32768 (32 kb)
+pref("network.buffer.cache.count", 128); // default=24
+pref("network.http.max-connections", 1800); // default=900
+pref("network.http.max-persistent-connections-per-server", 10); // default=6; download connections; anything above 10 is excessive
+pref("network.http.max-urgent-start-excessive-connections-per-host", 5); // default=3
+pref("network.websocket.max-connections", 400); // default=200
+pref("network.http.pacing.requests.enabled", false);
+pref("network.dnsCacheEntries", 10000); // default=400
+pref("network.dnsCacheExpiration", 86400); // keep entries for 1 day; alt=3600 (1 hour)
+pref("network.dns.max_high_priority_threads", 8); // default=5
+pref("network.ssl_tokens_cache_capacity", 20480); // default=2048; more TLS token caching (fast reconnects)
+pref("network.http.speculative-parallel-limit", 0);
+pref("network.dns.disablePrefetch", true);
+pref("network.prefetch-next", false);
+pref("network.predictor.enabled", false);
+pref("network.predictor.enable-prefetch", false);
+// END MISC MERCURY SETTINGS
+
 // If set to true, the Update Service will apply updates in the background
 // when it finishes downloading them.
 pref("app.update.staging.enabled", true);
@@ -1589,83 +1665,6 @@ pref("services.sync.prefs.sync.signon.management.page.breach-alerts.enabled", tr
 pref("services.sync.prefs.sync.signon.rememberSignons", true);
 pref("services.sync.prefs.sync.spellchecker.dictionary", true);
 pref("services.sync.prefs.sync.ui.osk.enabled", true);
-
-// MISC. MERCURY SETTINGS
-// Enable Do Not Track and GPC by default.
-pref("privacy.donottrackheader.enabled", true);
-pref("privacy.globalprivacycontrol.enabled", true);
-// Disable more telemetry
-pref("toolkit.telemetry.enabled", false);
-pref("toolkit.telemetry.pioneer-new-studies-available", false);
-// Disable Auto Update
-pref("app.update.auto", false);
-// Allow WebAudio to play automatically.
-pref("media.autoplay.block-webaudio", false);
-// Disable all new tab page stuff except for snippets.
-pref("browser.newtabpage.activity-stream.showSponsored", false);
-pref("browser.newtabpage.activity-stream.showSponsoredTopSites", false);
-pref("browser.newtabpage.activity-stream.topSitesRows", 2);
-pref("browser.newtabpage.activity-stream.section.highlights.includePocket", false);
-pref("browser.newtabpage.activity-stream.feeds.section.highlights", false);
-pref("browser.newtabpage.activity-stream.feeds.snippets", true);
-// Enable AutoScrolling and Smooth Scroll by default
-pref("general.autoScroll", true);
-pref("general.smoothScroll", true);
-// Force enable GPU accelerated compositing.
-pref("layers.acceleration.force-enabled", true);
-// Always show menu bar and view image info.
-// pref("ui.key.menuAccessKeyFocuses", false);
-pref("browser.menu.showViewImageInfo", true);
-// Disable overlay scrollbars on Linux.
-#if defined(XP_LINUX)
-  pref("widget.gtk.overlay-scrollbars.enabled", false);
-#endif
-// Enable AVIF
-pref("image.avif.enabled", true);
-// Enable JPEG-XL
-pref("image.jxl.enabled", true);
-// Enable Widevine automatically
-pref("media.eme.enabled", true);
-// Whether search engagement telemetry should be recorded.
-pref("browser.urlbar.searchEngagementTelemetry.enabled", false);
-// Make sure sites expecting Chromium or Firefox still work.
-pref("general.useragent.compatMode.firefox", true);
-// CustomizableUI state of the browser's user interface
-pref("browser.uiCustomization.state", "{\"placements\":{\"widget-overflow-fixed-list\":[],\"unified-extensions-area\":[],\"nav-bar\":[\"back-button\",\"forward-button\",\"stop-reload-button\",\"home-button\",\"urlbar-container\",\"downloads-button\",\"developer-button\",\"fxa-toolbar-menu-button\",\"unified-extensions-button\"],\"toolbar-menubar\":[\"menubar-items\"],\"TabsToolbar\":[\"tabbrowser-tabs\",\"new-tab-button\",\"alltabs-button\"],\"PersonalToolbar\":[\"import-button\",\"personal-bookmarks\"]},\"seen\":[\"developer-button\"],\"dirtyAreaCache\":[\"PersonalToolbar\",\"nav-bar\",\"toolbar-menubar\",\"TabsToolbar\"],\"currentVersion\":19,\"newElementCount\":0}");
-// pref("browser.uiCustomization.autoAdd", "{\"placements\":{\"widget-overflow-fixed-list\":[],\"unified-extensions-area\":[],\"nav-bar\":[\"back-button\",\"forward-button\",\"stop-reload-button\",\"home-button\",\"urlbar-container\",\"downloads-button\",\"developer-button\",\"fxa-toolbar-menu-button\",\"unified-extensions-button\"],\"toolbar-menubar\":[\"menubar-items\"],\"TabsToolbar\":[\"tabbrowser-tabs\",\"new-tab-button\",\"alltabs-button\"],\"PersonalToolbar\":[\"import-button\",\"personal-bookmarks\"]},\"seen\":[\"developer-button\"],\"dirtyAreaCache\":[\"PersonalToolbar\",\"nav-bar\",\"toolbar-menubar\",\"TabsToolbar\"],\"currentVersion\":19,\"newElementCount\":0}");
-
-// Betterfox Fastfox.js
-pref("nglayout.initialpaint.delay", 0); // default=5; used to be 250
-pref("nglayout.initialpaint.delay_in_oopif", 0); // default=5
-pref("content.notify.interval", 100000); // (.10s); default=120000 (.12s)
-pref("layout.css.grid-template-masonry-value.enabled", true);
-pref("dom.enable_web_task_scheduling", true);
-pref("layout.css.has-selector.enabled", true);
-pref("gfx.canvas.accelerated.cache-items", 4096); // default=2048; alt=8192
-pref("gfx.canvas.accelerated.cache-size", 512); // default=256; alt=1024
-pref("gfx.content.skia-font-cache-size", 20); // default=5; Chrome=20
-pref("media.memory_cache_max_size", 65536); // default=8192; AF=65536; alt=131072
-pref("media.cache_readahead_limit", 7200); // 120 min; default=60; stop reading ahead when our buffered data is this many seconds ahead of the current playback
-pref("media.cache_resume_threshold", 3600); // 60 min; default=30; when a network connection is suspended, don't resume it until the amount of buffered data falls below this threshold
-pref("image.mem.decode_bytes_at_a_time", 32768); // default=16384; alt=65536; chunk size for calls to the image decoders
-pref("network.buffer.cache.size", 262144); // 256 kb; default=32768 (32 kb)
-pref("network.buffer.cache.count", 128); // default=24
-pref("network.http.max-connections", 1800); // default=900
-pref("network.http.max-persistent-connections-per-server", 10); // default=6; download connections; anything above 10 is excessive
-pref("network.http.max-urgent-start-excessive-connections-per-host", 5); // default=3
-pref("network.websocket.max-connections", 400); // default=200
-pref("network.http.pacing.requests.enabled", false);
-pref("network.dnsCacheEntries", 10000); // default=400
-pref("network.dnsCacheExpiration", 86400); // keep entries for 1 day; alt=3600 (1 hour)
-pref("network.dns.max_high_priority_threads", 8); // default=5
-pref("network.ssl_tokens_cache_capacity", 20480); // default=2048; more TLS token caching (fast reconnects)
-pref("network.http.speculative-parallel-limit", 0);
-pref("network.dns.disablePrefetch", true);
-pref("network.prefetch-next", false);
-pref("network.predictor.enabled", false);
-pref("network.predictor.enable-prefetch", false);
-
-// END MISC MERCURY SETTINGS
 
 // A preference which, if false, means sync will only apply incoming preference
 // changes if there's already a local services.sync.prefs.sync.* control pref.

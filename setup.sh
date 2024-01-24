@@ -50,17 +50,17 @@ fi
 printf "\n" &&
 printf "${YEL}Copying Mercury source files over the Mozilla tree...${c0}\n" &&
 
-cp -r -v app/. ${HG_SRC_DIR}/browser/app/ &&
-cp -r -v browser/. ${HG_SRC_DIR}/browser/ &&
-cp -r -v build/. ${HG_SRC_DIR}/build/ &&
-cp -r -v devtools/. ${HG_SRC_DIR}/devtools/ &&
-cp -r -v ipc/. ${HG_SRC_DIR}/ipc/ &&
-cp -r -v moz.build ${HG_SRC_DIR}/ &&
-cp -r -v netwerk/. ${HG_SRC_DIR}/netwerk/ &&
-cp -r -v other-licenses/. ${HG_SRC_DIR}/other-licenses/ &&
-cp -r -v policies/ ${HG_SRC_DIR}/ &&
-cp -r -v toolkit/. ${HG_SRC_DIR}/toolkit/ &&
-cp -r -v mozconfigs/mozconfig ${HG_SRC_DIR} &&
+cp -r -v ./app/. ${HG_SRC_DIR}/browser/app/ &&
+cp -r -v ./browser/. ${HG_SRC_DIR}/browser/ &&
+cp -r -v ./build/. ${HG_SRC_DIR}/build/ &&
+cp -r -v ./devtools/. ${HG_SRC_DIR}/devtools/ &&
+cp -r -v ./ipc/. ${HG_SRC_DIR}/ipc/ &&
+cp -r -v ./moz.build ${HG_SRC_DIR}/ &&
+cp -r -v ./netwerk/. ${HG_SRC_DIR}/netwerk/ &&
+cp -r -v ./other-licenses/. ${HG_SRC_DIR}/other-licenses/ &&
+cp -r -v ./policies/ ${HG_SRC_DIR}/ &&
+cp -r -v ./toolkit/. ${HG_SRC_DIR}/toolkit/ &&
+cp -r -v ./mozconfigs/mozconfig ${HG_SRC_DIR} &&
 
 copyWin () {
 	printf "\n" &&
