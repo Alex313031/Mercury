@@ -1,4 +1,4 @@
-## Document to show what to choose when running ./mach bootstrap or during the initial mozilla clone
+## Document to show what to choose when running ./mach bootstrap or during the initial mozilla clone.
 
 1. Please choose the version of Firefox you want to build (see note above):  
  &ndash; Choose "2. Firefox for Desktop" NOT Artifact Mode
@@ -12,7 +12,7 @@
  &ndash; Put your real first and last name  
 
 4. What is your e&ndash;mail address?  
- &ndash; Put your email address you want to use
+ &ndash; Put the email address you want to use
 
 5. checking the "tweakdefaults" section
    Would you like to enable these features (Yn)?  
