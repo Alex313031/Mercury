@@ -512,6 +512,9 @@ pref("browser.urlbar.suggest.recentsearches",       true);
 pref("browser.urlbar.richSuggestions.featureGate", true);
 pref("browser.search.param.search_rich_suggestions", "fen");
 
+// Feature gate pref for weather suggestions in the urlbar.
+pref("browser.urlbar.weather.featureGate", false);
+
 // Enable clipboard suggestions in Nightly.
 #ifdef NIGHTLY_BUILD
 pref("browser.urlbar.clipboard.featureGate", true);
@@ -723,7 +726,7 @@ pref("browser.urlbar.pocket.featureGate", false);
 
 // If `browser.urlbar.pocket.featureGate` is true, this controls whether Pocket
 // suggestions are turned on.
-pref("browser.urlbar.suggest.pocket", true);
+pref("browser.urlbar.suggest.pocket", false);
 
 pref("browser.altClickSave", true);
 
@@ -981,7 +984,7 @@ pref("browser.tabs.tooltipsShowPidAndActiveness", false);
 #endif
 
 pref("browser.tabs.firefox-view", false);
-pref("browser.tabs.firefox-view-next", true);
+pref("browser.tabs.firefox-view-next", false);
 pref("browser.tabs.firefox-view-newIcon", true);
 pref("browser.tabs.firefox-view.logLevel", "Warn");
 pref("browser.tabs.firefox-view.notify-for-tabs", false);
@@ -1775,6 +1778,7 @@ pref("browser.newtabpage.activity-stream.discoverystream.spoc-topsites-positions
 // but Contile positions are a 1-based index, so we end up adding 1 to these before using them.
 pref("browser.newtabpage.activity-stream.discoverystream.contile-topsites-positions", "0,1");
 pref("browser.newtabpage.activity-stream.discoverystream.widget-positions", "");
+
 pref("browser.newtabpage.activity-stream.discoverystream.spocs-endpoint", "");
 pref("browser.newtabpage.activity-stream.discoverystream.spocs-endpoint-query", "");
 pref("browser.newtabpage.activity-stream.discoverystream.sponsored-collections.enabled", false);
