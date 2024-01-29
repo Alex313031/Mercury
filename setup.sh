@@ -127,6 +127,7 @@ copyAVX2 () {
 	printf "\n" &&
 	printf "${GRE}Copying AVX2 mozconfig${c0}\n" &&
 	printf "\n" &&
+	cp -v mozconfigs/context.py ${HG_SRC_DIR}/python/mozbuild/mozbuild/frontend/ &&
 	cp -r -v mozconfigs/mozconfig-avx2 ${HG_SRC_DIR}/mozconfig
 }
 case $1 in
@@ -137,6 +138,7 @@ copyWinAVX2 () {
 	printf "\n" &&
 	printf "${GRE}Copying Windows AVX2 mozconfig${c0}\n" &&
 	printf "\n" &&
+	cp -v mozconfigs/context.py ${HG_SRC_DIR}/python/mozbuild/mozbuild/frontend/ &&
 	cp -r -v mozconfigs/mozconfig-win-avx2 ${HG_SRC_DIR}/mozconfig
 }
 case $1 in
