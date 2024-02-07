@@ -40,9 +40,6 @@ printf "\n" &&
 printf "${YEL}Packaging Mercury..\n" &&
 printf "${GRE}\n" &&
 
-# Build Mercury
-export NINJA_SUMMARIZE_BUILD=1 &&
-
 cd ${HG_SRC_DIR} &&
 
 ./mach package -v &&
