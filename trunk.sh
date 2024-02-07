@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Copyright (c) 2023 Alex313031.
+# Copyright (c) 2024 Alex313031.
 
 YEL='\033[1;33m' # Yellow
 CYA='\033[1;96m' # Cyan
@@ -64,7 +64,5 @@ printf "${GRE}Running \`./mach bootstrap\`...${c0}\n" &&
 
 printf "\n" &&
 
-printf "${GRE}Done! ${YEL}You can now run ./setup.sh${c0}\n"
+printf "${GRE}Done! ${YEL}You can now run ./setup.sh${c0}\n" &&
 tput sgr0
-
-exit 0
