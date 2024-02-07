@@ -17,8 +17,9 @@ try() { "$@" || die "${RED}Failed $*"; }
 
 printf "\n" &&
 printf "${bold}${GRE}Script to clone and initialize the Mozilla source tree.${c0}\n" &&
-printf "${bold}${YEL}Use the --win flag for Windows builds.${c0}\n" &&
-printf "${bold}${YEL}Use the --linux flag for Linux builds.${c0}\n" &&
+printf "${bold}${YEL}Use the --win flag for Windows.${c0}\n" &&
+printf "${bold}${YEL}Use the --linux flag for Linux.${c0}\n" &&
+printf "${bold}${YEL}Use the --mac flag for MacOS.${c0}\n" &&
 printf "\n"
 
 makeWinDir () {
@@ -46,4 +47,17 @@ makeLinuxDir () {
 }
 case $1 in
 	--linux) makeLinuxDir; exit 0;;
+esac
+
+makeMacDir () {
+	cd $HOME &&
+	printf "\n" &&
+	printf "${YEL}Bootstrapping Mozilla Repo...\n" &&
+	printf "\n" &&
+	tput sgr0 &&
+	curl https://hg.mozilla.org/mozilla-central/raw-file/default/python/mozboot/bin/bootstrap.py -O &&
+	python3 bootstrap.py
+}
+case $1 in
+	--mac) makeMacDir; exit 0;;
 esac
