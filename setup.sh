@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Copyright (c) 2023 Alex313031.
+# Copyright (c) 2024 Alex313031.
 
 YEL='\033[1;33m' # Yellow
 CYA='\033[1;96m' # Cyan
@@ -31,6 +31,7 @@ displayHelp () {
 	printf "${bold}${YEL}Use the --win-debug flag to make a debug Windows build${c0}\n" &&
 	printf "${bold}${YEL}Use the --macos flag to make a MacOS x64 build${c0}\n" &&
 	printf "${bold}${YEL}Use the --macos-arm flag to make a MacOS arm64 build${c0}\n" &&
+	printf "${bold}${YEL}Use the --arm64 flag to make a Linux arm64 build${c0}\n" &&
 	printf "${bold}${YEL}Use the --help flag to show this help${c0}\n" &&
 	printf "\n"
 }
@@ -169,6 +170,7 @@ copyMac () {
 	printf "\n" &&
 	printf "${GRE}Copying MacOS x64 mozconfig${c0}\n" &&
 	printf "\n" &&
+	cp -v mozconfigs/context.py ${HG_SRC_DIR}/python/mozbuild/mozbuild/frontend/ &&
 	cp -r -v mozconfigs/mozconfig-macos-x64 ${HG_SRC_DIR}/mozconfig
 }
 case $1 in
@@ -183,6 +185,17 @@ copyMacArm () {
 }
 case $1 in
 	--mac-arm) copyMacArm;
+esac
+
+copyLinuxArm64 () {
+	printf "\n" &&
+	printf "${GRE}Copying Linux ARM64 mozconfig${c0}\n" &&
+	printf "\n" &&
+	cp -v mozconfigs/context.py ${HG_SRC_DIR}/python/mozbuild/mozbuild/frontend/ &&
+	cp -r -v mozconfigs/mozconfig-arm64 ${HG_SRC_DIR}/mozconfig
+}
+case $1 in
+	--arm64) copyLinuxArm64;
 esac
 
 printf "\n" &&
@@ -202,6 +215,4 @@ printf "\n" &&
 printf "${YEL}Look in this file to see the aliases and what they're for.\n" &&
 printf "\n" &&
 printf "${GRE}Enjoy Mercury!\n" &&
-tput sgr0 &&
-
-exit 0
+tput sgr0
