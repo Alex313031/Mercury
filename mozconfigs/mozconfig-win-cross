@@ -34,7 +34,7 @@ ac_add_options --enable-install-strip
 ac_add_options --enable-clang-plugin
 ac_add_options --enable-lto
 ac_add_options --enable-wasm-avx
-ac_add_options --enable-optimize="-O3 -mavx -maes /O2 /clang:-O3 /arch:AVX"
+ac_add_options --enable-optimize="-mavx -maes /O2 /clang:-O3 /arch:AVX"
 ac_add_options --enable-rust-simd
 ac_add_options --enable-hardening
 #ac_add_options --disable-trace-logging
