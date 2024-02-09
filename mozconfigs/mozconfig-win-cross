@@ -62,7 +62,7 @@ ac_add_options --disable-updater
 ac_add_options --disable-maintenance-service
 ac_add_options --without-wasm-sandboxed-libraries
 ac_add_options --disable-bits-download
-ac_add_options --disable-default-browser-agent
+#ac_add_options --disable-default-browser-agent
 export MOZ_SOURCE_CHANGESET=${changeset}
 mk_add_options MOZ_CRASHREPORTER=0
 mk_add_options MOZ_DATA_REPORTING=0
