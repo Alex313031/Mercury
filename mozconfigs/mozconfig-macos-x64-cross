@@ -1,14 +1,16 @@
 ## Copyright (c) 2024 Alex313031.
 
-## .mozconfig for Mercury Browser for MacOS ARM64
+## .mozconfig for Mercury Browser for MacOS x64 (Cross-Compile)
 
 # Build only Mercury
 ac_add_options --enable-application=browser
 ac_add_options --disable-artifact-builds
 
 # Build for MacOS
-#ac_add_options --target=aarch64-apple-darwin
+ac_add_options --target=x86_64-apple-darwin
+ac_add_options --with-toolchain-prefix=x86_64-apple-darwin
 ac_add_options --enable-bootstrap
+CROSS_COMPILE=1
 export MOZ_INCLUDE_SOURCE_INFO=1
 
 # Optimization settings
@@ -21,7 +23,9 @@ ac_add_options --disable-tests
 #ac_add_options --enable-install-strip
 ac_add_options --enable-clang-plugin
 ac_add_options --enable-lto
-ac_add_options --enable-optimize="-O3 -march=armv8.3-a+simd"
+ac_add_options --enable-wasm-avx
+#ac_add_options --enable-avx2
+ac_add_options --enable-optimize="-O3 -march=x86-64-v3"
 ac_add_options --enable-rust-simd
 ac_add_options --enable-hardening
 #ac_add_options --disable-trace-logging
@@ -88,10 +92,10 @@ ac_add_options MOZ_LTO=1
 #ac_add_options MOZ_PGO=1
 
 # Compiler, Linker, and Rust flags
-export CFLAGS="-O3 -march=armv8.3-a+simd"
-export CPPFLAGS="-O3 -march=armv8.3-a+simd"
-export CXXFLAGS="-O3 -march=armv8.3-a+simd"
-export LDFLAGS="-Wl,-O3 -march=armv8.3-a+simd"
+export CFLAGS="-O3 -march=x86-64-v3"
+export CPPFLAGS="-O3 -march=x86-64-v3"
+export CXXFLAGS="-O3 -march=x86-64-v3"
+export LDFLAGS="-Wl,-O3 -march=x86-64-v3"
 #export MOZ_LTO_LDFLAGS="-Wl,-mllvm,-polly"
-export RUSTFLAGS="-C target-feature=+v8.3a"
+export RUSTFLAGS="-C target-feature=+avx2"
 export VERBOSE=1

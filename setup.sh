@@ -32,6 +32,8 @@ displayHelp () {
 	printf "${bold}${YEL}Use the --win-debug flag to make a debug Windows build${c0}\n" &&
 	printf "${bold}${YEL}Use the --macos flag to make a MacOS x64 build${c0}\n" &&
 	printf "${bold}${YEL}Use the --macos-arm flag to make a MacOS arm64 build${c0}\n" &&
+	printf "${bold}${YEL}Use the --macos-cross flag to to copy the MacOS x64 cross-compile mozconfig${c0}\n" &&
+	printf "${bold}${YEL}Use the --macos-arm-cross flag to to copy the MacOS arm64 cross-compile mozconfig${c0}\n" &&
 	printf "${bold}${YEL}Use the --arm64 flag to make a Linux arm64 build${c0}\n" &&
 	printf "${bold}${YEL}Use the --help flag to show this help${c0}\n" &&
 	printf "\n"
@@ -197,6 +199,27 @@ copyMacArm () {
 }
 case $1 in
 	--mac-arm) copyMacArm;
+esac
+
+copyMacCross () {
+	printf "\n" &&
+	printf "${GRE}Copying MacOS x64 (Cross Compile) mozconfig${c0}\n" &&
+	printf "\n" &&
+	cp -v mozconfigs/context.py ${HG_SRC_DIR}/python/mozbuild/mozbuild/frontend/ &&
+	cp -v mozconfigs/mozconfig-macos-x64-cross ${HG_SRC_DIR}/mozconfig
+}
+case $1 in
+	--mac-cross) copyMacCross;
+esac
+
+copyMacArmCross () {
+	printf "\n" &&
+	printf "${GRE}Copying MacOS ARM64 (Cross Compile) mozconfig${c0}\n" &&
+	printf "\n" &&
+	cp -v mozconfigs/mozconfig-macos-arm64-cross ${HG_SRC_DIR}/mozconfig
+}
+case $1 in
+	--mac-arm-cross) copyMacArmCross;
 esac
 
 copyLinuxArm64 () {

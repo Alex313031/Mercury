@@ -1,6 +1,6 @@
 ## Copyright (c) 2024 Alex313031.
 
-## .mozconfig for Mercury Browser (MacOS ARM64)
+## .mozconfig for Mercury Browser for MacOS ARM64 (Cross-Compile)
 
 # Build only Mercury
 ac_add_options --enable-application=browser
