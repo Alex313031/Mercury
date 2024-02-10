@@ -44,9 +44,7 @@ export MERCURY_BRANCH &&
 
 cd ${HG_SRC_DIR} &&
 
-rm -r -f ./obj-x86_64-pc-linux-gnu &&
-
-rm -r -f ./obj-x86_64-pc-windows-msvc &&
+rm -r -f ./obj-* &&
 
 hg purge &&
 
