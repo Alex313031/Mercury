@@ -30,10 +30,10 @@ displayHelp () {
 	printf "${bold}${YEL}Use the --win-avx2 flag to make an AVX2 Windows build${c0}\n" &&
 	printf "${bold}${YEL}Use the --debug flag to make a debug Linux build${c0}\n" &&
 	printf "${bold}${YEL}Use the --win-debug flag to make a debug Windows build${c0}\n" &&
-	printf "${bold}${YEL}Use the --macos flag to make a MacOS x64 build${c0}\n" &&
-	printf "${bold}${YEL}Use the --macos-arm flag to make a MacOS arm64 build${c0}\n" &&
-	printf "${bold}${YEL}Use the --macos-cross flag to to copy the MacOS x64 cross-compile mozconfig${c0}\n" &&
-	printf "${bold}${YEL}Use the --macos-arm-cross flag to to copy the MacOS arm64 cross-compile mozconfig${c0}\n" &&
+	printf "${bold}${YEL}Use the --mac flag to make a MacOS x64 build${c0}\n" &&
+	printf "${bold}${YEL}Use the --mac-arm flag to make a MacOS arm64 build${c0}\n" &&
+	printf "${bold}${YEL}Use the --mac-cross flag to to copy the MacOS x64 cross-compile mozconfig${c0}\n" &&
+	printf "${bold}${YEL}Use the --mac-arm-cross flag to to copy the MacOS arm64 cross-compile mozconfig${c0}\n" &&
 	printf "${bold}${YEL}Use the --arm64 flag to make a Linux arm64 build${c0}\n" &&
 	printf "${bold}${YEL}Use the --help flag to show this help${c0}\n" &&
 	printf "\n"
