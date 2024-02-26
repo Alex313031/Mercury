@@ -99,7 +99,7 @@ with only_when(host_is_osx | target_is_osx):
         return Version(obj["Version"])
 
     def sdk_min_version():
-        return "14.0"
+        return "14.2"
 
     @depends(
         "--with-macos-sdk",
@@ -628,14 +628,15 @@ def vc_compiler_paths_for_version(host, env, vc_path, winsysroot):
         }
 
 
-@depends(target, vc_compiler_paths_for_version, when=is_windows)
-def vc_compiler_path(target, paths):
+@depends(target, host, vc_compiler_paths_for_version, when=is_windows)
+def vc_compiler_path(target, host, paths):
+    cpu = target.cpu if target.os == "WINNT" else host.cpu
     vc_target = {
         "x86": "x86",
         "x86_64": "x64",
         "arm": "arm",
         "aarch64": "arm64",
-    }.get(target.cpu)
+    }.get(cpu)
     if not paths:
         return
     return paths.get(vc_target)
@@ -1640,6 +1641,31 @@ def cxx_is_icecream(info, ccache_prefix):
 set_config("CXX_IS_ICECREAM", cxx_is_icecream)
 
 
+# Libstdc++ compatibility hacks
+# ==============================================================
+#
+@depends(target, host)
+def target_or_host_is_linux(target, host):
+    return any(t.os == "GNU" and t.kernel == "Linux" for t in (target, host))
+
+
+option(
+    "--enable-stdcxx-compat",
+    env="MOZ_STDCXX_COMPAT",
+    help="Enable compatibility with older libstdc++",
+    when=target_or_host_is_linux,
+)
+
+
+@depends("--enable-stdcxx-compat", when=target_or_host_is_linux)
+def stdcxx_compat(value):
+    if value:
+        return True
+
+
+set_config("MOZ_STDCXX_COMPAT", True, when=stdcxx_compat)
+
+
 # Linker detection
 # ==============================================================
 # The policy is as follows:
@@ -1702,6 +1728,7 @@ def select_linker_tmpl(host_or_target):
             developer_options,
             extra_toolchain_flags,
             target,
+            stdcxx_compat,
             when=is_linker_option_enabled,
         )
         host_or_target_str = "target"
@@ -1712,6 +1739,7 @@ def select_linker_tmpl(host_or_target):
             developer_options,
             dependable(None),
             host,
+            stdcxx_compat,
             when=is_not_winnt_or_sunos(host_or_target),
         )
         host_or_target_str = "host"
@@ -1720,7 +1748,9 @@ def select_linker_tmpl(host_or_target):
     @checking(f"for {host_or_target_str} linker", lambda x: x.KIND)
     @imports("os")
     @imports("shutil")
-    def select_linker(linker, c_compiler, developer_options, toolchain_flags, target):
+    def select_linker(
+        linker, c_compiler, developer_options, toolchain_flags, target, stdcxx_compat
+    ):
         if linker:
             linker = linker[0]
         else:
@@ -1826,7 +1856,7 @@ def select_linker_tmpl(host_or_target):
         ):
             result = try_linker("lld")
 
-        if result is None and developer_options:
+        if result is None and developer_options and not stdcxx_compat:
             result = try_linker("gold")
 
         if result is None:
@@ -1834,6 +1864,9 @@ def select_linker_tmpl(host_or_target):
 
         if result is None:
             die("Failed to find an adequate linker")
+
+        if stdcxx_compat and result.KIND == "gold":
+            die("--enable-stdcxx-compat is not compatible with the gold linker")
 
         # If an explicit linker was given, error out if what we found is different.
         if linker and not linker.startswith(result.KIND):
@@ -2295,19 +2328,25 @@ option(
 )
 
 
-@depends_if("--enable-undefined-sanitizer")
-def ubsan(options):
+@depends("--enable-undefined-sanitizer", moz_optimize.optimize)
+def ubsan(options, optimize):
+    if not options:
+        return
+
     default_checks = [
         "bool",
         "bounds",
         "enum",
         "function",
         "integer-divide-by-zero",
-        "object-size",
         "pointer-overflow",
         "return",
         "vla-bound",
     ]
+
+    # adding object-size generates a warning if -O0 is set
+    if optimize:
+        default_checks.append("object-size")
 
     checks = options if len(options) else default_checks
 
@@ -2790,30 +2829,8 @@ add_old_configure_assignment(
     "ENABLE_MOZSEARCH_PLUGIN", depends_if("--enable-mozsearch-plugin")(lambda _: True)
 )
 
-
-# Libstdc++ compatibility hacks
+# Use the old libstdc++ ABI
 # ==============================================================
-#
-@depends(target, host)
-def target_or_host_is_linux(target, host):
-    return any(t.os == "GNU" and t.kernel == "Linux" for t in (target, host))
-
-
-option(
-    "--enable-stdcxx-compat",
-    env="MOZ_STDCXX_COMPAT",
-    help="Enable compatibility with older libstdc++",
-    when=target_or_host_is_linux,
-)
-
-
-@depends("--enable-stdcxx-compat", when=target_or_host_is_linux)
-def stdcxx_compat(value):
-    if value:
-        return True
-
-
-set_config("MOZ_STDCXX_COMPAT", True, when=stdcxx_compat)
 add_flag(
     "-D_GLIBCXX_USE_CXX11_ABI=0",
     cxx_compiler,
@@ -3250,3 +3267,16 @@ set_config("FMA_FLAGS", ["-mfma"])
 set_config("AES_FLAGS", ["-maes"])
 set_config("AVX_FLAGS", ["-mavx"])
 set_config("AVX2_FLAGS", ["-mavx2"])
+set_config(
+    "AVXVNNI_FLAGS",
+    ["-mavxvnni"],
+    try_compile(check_msg="for -mavxvnni support", flags=["-mavxvnni"]),
+)
+set_config(
+    "AVX512BW_FLAGS",
+    ["-mavx512bw", "-mavx512f", "-mavx512dq", "-mavx512cd"],
+    try_compile(
+        check_msg="for -mavx512bw support",
+        flags=["-mavx512bw", "-mavx512f", "-mavx512dq", "-mavx512cd"],
+    ),
+)
