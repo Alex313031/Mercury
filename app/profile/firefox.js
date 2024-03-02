@@ -811,7 +811,7 @@ pref("browser.search.separatePrivateDefault.ui.enabled", false);
 pref("browser.search.separatePrivateDefault.ui.banner.max", 0);
 
 // Enables search SERP telemetry (impressions, engagements and abandonment)
-pref("browser.search.serpEventTelemetry.enabled", true);
+pref("browser.search.serpEventTelemetry.enabled", false);
 
 // Enables search SERP telemetry page categorization.
 pref("browser.search.serpEventTelemetryCategorization.enabled", false);
@@ -831,7 +831,7 @@ pref("browser.shopping.experience2023.optedIn", 0);
 // Activates the new experimental shopping sidebar.
 // True by default. This is handled by ShoppingUtils.handleAutoActivateOnProduct
 // to auto-activate the sidebar for non-opted-in users up to 2 times.
-pref("browser.shopping.experience2023.active", true);
+pref("browser.shopping.experience2023.active", false);
 
 // Enables ad exposure telemetry for users opted in to the shopping experience:
 // when this pref is true, each time a product is analyzed, we record if an ad
@@ -852,7 +852,7 @@ pref("browser.shopping.experience2023.ads.enabled", false);
 pref("browser.shopping.experience2023.ads.userEnabled", true);
 
 // Saves if shopping survey is enabled.
-pref("browser.shopping.experience2023.survey.enabled", true);
+pref("browser.shopping.experience2023.survey.enabled", false);
 
 // Saves if shopping survey is seen.
 pref("browser.shopping.experience2023.survey.hasSeen", false);
@@ -866,7 +866,7 @@ pref("browser.shopping.experience2023.survey.pdpVisits", 0);
 pref("browser.shopping.experience2023.autoOpen.enabled", false);
 
 // Opens the shopping sidebar automatically when viewing a PDP.
-pref("browser.shopping.experience2023.autoOpen.userEnabled", true);
+pref("browser.shopping.experience2023.autoOpen.userEnabled", false);
 
 // Number of times the sidebar has been closed in a session
 pref("browser.shopping.experience2023.sidebarClosedCount", 0);
@@ -1454,7 +1454,7 @@ pref("app.support.baseURL", "https://support.mozilla.org/1/firefox/%VERSION%/%OS
 // base url for web-based feedback pages
 pref("app.feedback.baseURL", "https://ideas.mozilla.org/");
 
-pref("security.certerrors.recordEventTelemetry", true);
+pref("security.certerrors.recordEventTelemetry", false);
 pref("security.certerrors.permanentOverride", true);
 pref("security.certerrors.mitm.priming.enabled", true);
 pref("security.certerrors.mitm.priming.endpoint", "https://mitmdetection.services.mozilla.com/");
@@ -1733,7 +1733,7 @@ pref("browser.topsites.contile.enabled", false);
 pref("browser.topsites.contile.endpoint", "https://contile.services.mozilla.com/v1/tiles");
 
 // Whether to enable the Share-of-Voice feature for Sponsored Topsites via Contile.
-pref("browser.topsites.contile.sov.enabled", true);
+pref("browser.topsites.contile.sov.enabled", false);
 
 // The base URL for the Quick Suggest anonymizing proxy. To make a request to
 // the proxy, include a campaign ID in the path.
@@ -1917,8 +1917,8 @@ pref("pdfjs.handleOctetStream", true);
 // Is the sidebar positioned ahead of the content browser
 pref("sidebar.position_start", true);
 
-pref("security.protectionspopup.recordEventTelemetry", true);
-pref("security.app_menu.recordEventTelemetry", true);
+pref("security.protectionspopup.recordEventTelemetry", false);
+pref("security.app_menu.recordEventTelemetry", false);
 
 // Block insecure active content on https pages
 pref("security.mixed_content.block_active_content", true);
