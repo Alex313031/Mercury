@@ -1,0 +1,1 @@
+gfx.x11-egl.force-enabled

@@ -8,7 +8,7 @@ ac_add_options --disable-artifact-builds
 
 # Build for Linux
 ac_add_options --target=x86_64-pc-linux-gnu
-ac_add_options --enable-default-toolkit=cairo-gtk3-wayland
+ac_add_options --enable-default-toolkit=cairo-gtk3-x11-wayland
 ac_add_options --enable-bootstrap
 export MOZ_INCLUDE_SOURCE_INFO=1
 
