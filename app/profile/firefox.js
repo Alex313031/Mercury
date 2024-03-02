@@ -156,11 +156,13 @@ pref("toolkit.telemetry.pioneer-new-studies-available", false);
 pref("app.update.auto", false);
 // Allow WebAudio to play automatically.
 pref("media.autoplay.block-webaudio", false);
-// Disable all new tab page stuff except for snippets.
+// Disable all annoying new tab page stuff except for top sites.
+pref("browser.pocket.enabled", false);
 pref("browser.newtabpage.activity-stream.showSponsored", false);
 pref("browser.newtabpage.activity-stream.showSponsoredTopSites", false);
 pref("browser.newtabpage.activity-stream.topSitesRows", 2);
 pref("browser.newtabpage.activity-stream.section.highlights.includePocket", false);
+pref("browser.newtabpage.activity-stream.feeds.system.topstories", false);
 pref("browser.newtabpage.activity-stream.feeds.section.highlights", false);
 pref("browser.newtabpage.activity-stream.feeds.snippets", true);
 // Enable AutoScrolling and Smooth Scroll by default
@@ -1605,9 +1607,9 @@ pref("services.sync.prefs.sync.browser.newtabpage.activity-stream.showSponsored"
 pref("services.sync.prefs.sync.browser.newtabpage.activity-stream.showSponsoredTopSites", false);
 pref("services.sync.prefs.sync.browser.newtabpage.activity-stream.feeds.topsites", true);
 pref("services.sync.prefs.sync.browser.newtabpage.activity-stream.topSitesRows", true);
-pref("services.sync.prefs.sync.browser.newtabpage.activity-stream.feeds.section.topstories", true);
-pref("services.sync.prefs.sync.browser.newtabpage.activity-stream.section.topstories.rows", true);
-pref("services.sync.prefs.sync.browser.newtabpage.activity-stream.feeds.section.highlights", true);
+pref("services.sync.prefs.sync.browser.newtabpage.activity-stream.feeds.section.topstories", false);
+pref("services.sync.prefs.sync.browser.newtabpage.activity-stream.section.topstories.rows", false);
+pref("services.sync.prefs.sync.browser.newtabpage.activity-stream.feeds.section.highlights", false);
 // Some linux distributions disable all highlights by default.
 pref("services.sync.prefs.sync-seen.browser.newtabpage.activity-stream.section.highlights", false);
 pref("services.sync.prefs.sync.browser.newtabpage.activity-stream.section.highlights.includeVisited", true);
@@ -2385,13 +2387,13 @@ pref("browser.migrate.preferences-entrypoint.enabled", true);
 
 pref("browser.device-migration.help-menu.hidden", false);
 
-pref("extensions.pocket.api", "api.getpocket.com");
+pref("extensions.pocket.api", "");
 pref("extensions.pocket.bffApi", "firefox-api-proxy.cdn.mozilla.net");
 pref("extensions.pocket.bffRecentSaves", false);
 pref("extensions.pocket.enabled", false);
-pref("extensions.pocket.oAuthConsumerKey", "40249-e88c401e1b1f2242d9e441c4");
-pref("extensions.pocket.oAuthConsumerKeyBff", "94110-6d5ff7a89d72c869766af0e0");
-pref("extensions.pocket.site", "getpocket.com");
+pref("extensions.pocket.oAuthConsumerKey", "");
+pref("extensions.pocket.oAuthConsumerKeyBff", "");
+pref("extensions.pocket.site", "");
 
 // Enable Pocket button home panel for non link pages.
 pref("extensions.pocket.showHome", false);
