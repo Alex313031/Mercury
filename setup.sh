@@ -65,6 +65,7 @@ cp -r -v ./other-licenses/. ${HG_SRC_DIR}/other-licenses/ &&
 mkdir -p -v ${HG_SRC_DIR}/policies &&
 cp -r -v ./policies/. ${HG_SRC_DIR}/policies/ &&
 cp -r -v ./toolkit/. ${HG_SRC_DIR}/toolkit/ &&
+cp -r -v ./testing/. ${HG_SRC_DIR}/testing/ &&
 cp -r -v ./mozconfigs/mozconfig ${HG_SRC_DIR} &&
 
 copyWin () {
