@@ -1008,7 +1008,7 @@ pref("browser.tabs.tooltipsShowPidAndActiveness", true);
 pref("browser.tabs.tooltipsShowPidAndActiveness", false);
 #endif
 
-pref("browser.tabs.cardPreview.enabled", false);
+pref("browser.tabs.cardPreview.enabled", true);
 pref("browser.tabs.cardPreview.delayMs", 1000);
 pref("browser.tabs.cardPreview.showThumbnails", true);
 
