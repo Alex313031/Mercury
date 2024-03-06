@@ -51,6 +51,7 @@ MOZ_REQUIRE_SIGNING=
 export MOZ_CRASHREPORTER=0
 export MOZ_DATA_REPORTING=0
 export MOZ_REQUIRE_SIGNING=
+export MOZ_TELEMETRY_REPORTING=
 
 # Branding
 ac_add_options --with-app-name=mercury

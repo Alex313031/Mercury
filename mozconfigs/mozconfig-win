@@ -26,11 +26,13 @@ ac_add_options --enable-strip
 ac_add_options --enable-install-strip
 ac_add_options --enable-clang-plugin
 ac_add_options --enable-lto=cross
+ac_add_options --enable-profile-use=cross
 ac_add_options --enable-wasm-avx
 ac_add_options --enable-optimize="-O2 -O3 -msse3 -mssse3 -msse4.1 -msse4.2 -mavx -maes -Xclang -O3"
 ac_add_options --enable-rust-simd
 ac_add_options --enable-hardening
 #ac_add_options --disable-trace-logging
+export MOZILLA_OFFICIAL=1
 mk_add_options MOZ_OPTIMIZE=1
 MOZ_OPTIMIZE=1
 export MOZ_OPTIMIZE=1
@@ -67,6 +69,7 @@ MOZ_REQUIRE_SIGNING=
 export MOZ_CRASHREPORTER=0
 export MOZ_DATA_REPORTING=0
 export MOZ_REQUIRE_SIGNING=
+export MOZ_TELEMETRY_REPORTING=
 
 # Installer
 export WIN32_REDIST_DIR="/c/Program Files/Microsoft Visual Studio/2022/Community/VC/Redist/MSVC/14.38.33130/x64/Microsoft.VC143.CRT"
@@ -104,6 +107,6 @@ export CFLAGS="-O3 -msse3 -mssse3 -msse4.1 -msse4.2 -mavx -maes /clang:-O3 /arch
 export CPPFLAGS="-O3 -msse3 -mssse3 -msse4.1 -msse4.2 -mavx -maes /clang:-O3 /arch:AVX"
 export CXXFLAGS="-O3 -msse3 -mssse3 -msse4.1 -msse4.2 -mavx -maes /clang:-O3 /arch:AVX"
 export LDFLAGS="-Wl,-O3 -msse3 -mssse3 -msse4.1 -msse4.2 -mavx -maes"
-#export MOZ_LTO_LDFLAGS="-mllvm:-polly"
+POLLY="-mllvm -polly -mllvm -polly-2nd-level-tiling -mllvm -polly-loopfusion-greedy -mllvm -polly-pattern-matching-based-opts -mllvm -polly-position=before-vectorizer -mllvm -polly-vectorizer=stripmine"
 export RUSTFLAGS="-C target-feature=+avx"
 export VERBOSE=1

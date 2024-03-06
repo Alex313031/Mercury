@@ -27,6 +27,7 @@ ac_add_options --enable-optimize="-O3 -march=x86-64-v3"
 ac_add_options --enable-rust-simd
 ac_add_options --enable-hardening
 #ac_add_options --disable-trace-logging
+export MOZILLA_OFFICIAL=1
 mk_add_options MOZ_OPTIMIZE=1
 MOZ_OPTIMIZE=1
 export MOZ_OPTIMIZE=1
@@ -60,6 +61,7 @@ MOZ_REQUIRE_SIGNING=
 export MOZ_CRASHREPORTER=0
 export MOZ_DATA_REPORTING=0
 export MOZ_REQUIRE_SIGNING=
+export MOZ_TELEMETRY_REPORTING=
 
 # Branding
 ac_add_options --with-app-name=mercury
