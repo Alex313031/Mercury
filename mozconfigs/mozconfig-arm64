@@ -22,7 +22,6 @@ ac_add_options --enable-strip
 ac_add_options --enable-install-strip
 ac_add_options --enable-clang-plugin
 ac_add_options --enable-lto=cross
-ac_add_options --enable-profile-use=cross
 ac_add_options --enable-optimize="-O3 -march=armv8-a+simd -mtune=cortex-a72"
 ac_add_options --enable-rust-simd
 ac_add_options --enable-hardening
@@ -56,10 +55,7 @@ export MOZ_SOURCE_CHANGESET=${changeset}
 mk_add_options MOZ_CRASHREPORTER=0
 mk_add_options MOZ_DATA_REPORTING=0
 mk_add_options MOZ_SERVICES_HEALTHREPORT=0
-mk_add_options MOZ_TELEMETRY_REPORTING=0
-MOZ_CRASHREPORTER=0
-MOZ_DATA_REPORTING=0
-MOZ_REQUIRE_SIGNING=
+mk_add_options MOZ_TELEMETRY_REPORTING=
 export MOZ_CRASHREPORTER=0
 export MOZ_DATA_REPORTING=0
 export MOZ_REQUIRE_SIGNING=

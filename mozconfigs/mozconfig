@@ -22,7 +22,6 @@ ac_add_options --enable-strip
 ac_add_options --enable-install-strip
 ac_add_options --enable-clang-plugin
 ac_add_options --enable-lto=cross
-ac_add_options --enable-profile-use=cross
 ac_add_options --enable-wasm-avx
 ac_add_options --enable-optimize="-O3 -msse3 -mssse3 -msse4.1 -msse4.2 -mavx -maes"
 ac_add_options --enable-rust-simd
@@ -58,10 +57,7 @@ export MOZ_SOURCE_CHANGESET=${changeset}
 mk_add_options MOZ_CRASHREPORTER=0
 mk_add_options MOZ_DATA_REPORTING=0
 mk_add_options MOZ_SERVICES_HEALTHREPORT=0
-mk_add_options MOZ_TELEMETRY_REPORTING=0
-MOZ_CRASHREPORTER=0
-MOZ_DATA_REPORTING=0
-MOZ_REQUIRE_SIGNING=
+mk_add_options MOZ_TELEMETRY_REPORTING=
 export MOZ_CRASHREPORTER=0
 export MOZ_DATA_REPORTING=0
 export MOZ_REQUIRE_SIGNING=
@@ -98,7 +94,7 @@ ac_add_options MOZ_PGO=1
 if test "$GEN_PGO"; then
     ac_add_options --enable-profile-generate
 elif test "$USE_PGO"; then
-    ac_add_options --enable-profile-use
+    ac_add_options --enable-profile-use=cross
 fi
 
 # Compiler, Linker, and Rust flags
