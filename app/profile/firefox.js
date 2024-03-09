@@ -965,8 +965,8 @@ pref("browser.tabs.opentabfor.middleclick", true);
 pref("browser.tabs.loadDivertedInBackground", false);
 pref("browser.tabs.loadBookmarksInBackground", false);
 pref("browser.tabs.loadBookmarksInTabs", false);
-pref("browser.tabs.tabClipWidth", 140);
-pref("browser.tabs.tabMinWidth", 76);
+pref("browser.tabs.tabClipWidth", 100);
+pref("browser.tabs.tabMinWidth", 50);
 // Users running in any of the following language codes will have the
 // secondary text on tabs hidden due to size constraints and readability
 // of the text at small font sizes.
