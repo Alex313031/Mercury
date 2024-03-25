@@ -94,5 +94,5 @@ export CPPFLAGS="-O3 -march=armv8.3-a+simd"
 export CXXFLAGS="-O3 -march=armv8.3-a+simd"
 export LDFLAGS="-Wl,-O3 -march=armv8.3-a+simd"
 #export MOZ_LTO_LDFLAGS="-Wl,-mllvm,-polly"
-export RUSTFLAGS="-C target-feature=+v8.3a"
+export RUSTFLAGS="-C target-feature=+v8.3a -C codegen-units=1"
 export VERBOSE=1

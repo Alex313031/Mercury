@@ -95,5 +95,5 @@ export CPPFLAGS="-O3 -ffp-contract=fast -march=armv8-a+simd -mtune=cortex-a72"
 export CXXFLAGS="-O3 -ffp-contract=fast -march=armv8-a+simd -mtune=cortex-a72"
 export LDFLAGS="-Wl,-O3 -Wl,-mllvm,-fp-contract=fast -march=armv8-a+simd"
 #export MOZ_LTO_LDFLAGS="-Wl,-mllvm,-polly"
-export RUSTFLAGS="-C target-feature=+neon"
+export RUSTFLAGS="-C target-feature=+neon -C codegen-units=1"
 export VERBOSE=1

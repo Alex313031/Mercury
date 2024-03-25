@@ -110,5 +110,5 @@ export CPPFLAGS="-O3 -msse3 -mssse3 -msse4.1 -msse4.2 -mavx -maes /clang:-O3 /ar
 export CXXFLAGS="-O3 -msse3 -mssse3 -msse4.1 -msse4.2 -mavx -maes /clang:-O3 /arch:AVX"
 export LDFLAGS="-Wl,-O3 -msse3 -mssse3 -msse4.1 -msse4.2 -mavx -maes"
 POLLY="-mllvm -polly -mllvm -polly-2nd-level-tiling -mllvm -polly-loopfusion-greedy -mllvm -polly-pattern-matching-based-opts -mllvm -polly-position=before-vectorizer -mllvm -polly-vectorizer=stripmine"
-export RUSTFLAGS="-C target-feature=+avx"
+export RUSTFLAGS="-C target-feature=+avx -C codegen-units=1"
 export VERBOSE=1

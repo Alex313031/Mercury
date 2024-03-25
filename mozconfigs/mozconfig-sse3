@@ -103,5 +103,5 @@ export CPPFLAGS="-O3 -msse3"
 export CXXFLAGS="-O3 -msse3"
 export LDFLAGS="-Wl,-O3 -msse3"
 #export MOZ_LTO_LDFLAGS="-Wl,-mllvm,-polly"
-export RUSTFLAGS="-C target-feature=+sse3"
+export RUSTFLAGS="-C target-feature=+sse3 -C codegen-units=1"
 export VERBOSE=1

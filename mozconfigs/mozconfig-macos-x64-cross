@@ -96,5 +96,5 @@ export CPPFLAGS="-O3 -march=x86-64-v3"
 export CXXFLAGS="-O3 -march=x86-64-v3"
 export LDFLAGS="-Wl,-O3 -march=x86-64-v3"
 #export MOZ_LTO_LDFLAGS="-Wl,-mllvm,-polly"
-export RUSTFLAGS="-C target-feature=+avx2"
+export RUSTFLAGS="-C target-feature=+avx2 -C codegen-units=1"
 export VERBOSE=1

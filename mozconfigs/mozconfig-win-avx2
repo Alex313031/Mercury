@@ -110,5 +110,5 @@ export CPPFLAGS="-O3 -march=x86-64-v3 /clang:-O3 /clang:-ffp-contract=fast /arch
 export CXXFLAGS="-O3 -march=x86-64-v3 /clang:-O3 /clang:-ffp-contract=fast /arch:AVX2"
 export LDFLAGS="-Wl,-O3 -march=x86-64-v3"
 POLLY="-mllvm -polly -mllvm -polly-2nd-level-tiling -mllvm -polly-loopfusion-greedy -mllvm -polly-pattern-matching-based-opts -mllvm -polly-position=before-vectorizer -mllvm -polly-vectorizer=stripmine"
-export RUSTFLAGS="-C target-feature=+avx2"
+export RUSTFLAGS="-C target-cpu=haswell -C target-feature=+avx2 -C codegen-units=1"
 export VERBOSE=1
