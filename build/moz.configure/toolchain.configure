@@ -71,6 +71,24 @@ with only_when(target_is_osx):
         return value[0]
 
 
+@imports("plistlib")
+@imports(_from="__builtin__", _import="open")
+@imports(_from="__builtin__", _import="Exception")
+def get_sdk_version(sdk):
+    with open(os.path.join(sdk, "SDKSettings.plist"), "rb") as plist:
+        obj = plistlib.load(plist)
+    if not obj:
+        raise Exception(
+            "Error parsing SDKSettings.plist in the SDK directory: %s" % sdk
+        )
+    if "Version" not in obj:
+        raise Exception(
+            "Error finding Version information in SDKSettings.plist from the SDK: %s"
+            % sdk
+        )
+    return Version(obj["Version"])
+
+
 with only_when(host_is_osx | target_is_osx):
     # MacOS SDK
     # =========
@@ -81,31 +99,14 @@ with only_when(host_is_osx | target_is_osx):
         help="Location of platform SDK to use",
     )
 
-    @imports("plistlib")
-    @imports(_from="__builtin__", _import="open")
-    @imports(_from="__builtin__", _import="Exception")
-    def get_sdk_version(sdk):
-        with open(os.path.join(sdk, "SDKSettings.plist"), "rb") as plist:
-            obj = plistlib.load(plist)
-        if not obj:
-            raise Exception(
-                "Error parsing SDKSettings.plist in the SDK directory: %s" % sdk
-            )
-        if "Version" not in obj:
-            raise Exception(
-                "Error finding Version information in SDKSettings.plist from the SDK: %s"
-                % sdk
-            )
-        return Version(obj["Version"])
-
-    def sdk_min_version():
+    def mac_sdk_min_version():
         return "14.2"
 
     @depends(
         "--with-macos-sdk",
         host,
         bootstrap_path(
-            "MacOSX{}.sdk".format(sdk_min_version()),
+            "MacOSX{}.sdk".format(mac_sdk_min_version()),
             when=depends("--with-macos-sdk")(lambda x: not x),
             allow_failure=True,
         ),
@@ -155,10 +156,10 @@ with only_when(host_is_osx | target_is_osx):
                 "tools are selected during the Xcode/Developer Tools installation."
                 % sdk
             )
-        if version < Version(sdk_min_version()):
+        if version < Version(mac_sdk_min_version()):
             die(
                 'SDK version "%s" is too old. Please upgrade to at least %s. Try '
-                "updating your system Xcode." % (version, sdk_min_version())
+                "updating your system Xcode." % (version, mac_sdk_min_version())
             )
         return sdk
 
@@ -193,6 +194,105 @@ with only_when(target_is_osx):
         return os.path.join(sdk or "/", "System/Library/PrivateFrameworks")
 
     set_config("MACOS_PRIVATE_FRAMEWORKS_DIR", macos_private_frameworks)
+
+
+with only_when(target_is_ios):
+    # iOS deployment target version
+    # ==============================================================
+    # This needs to happen before any compilation test is done.
+
+    option(
+        "--enable-ios-target",
+        env="IPHONEOS_DEPLOYMENT_TARGET",
+        nargs=1,
+        default="17.4",
+        help="Set the minimum iOS version needed at runtime",
+    )
+
+    @depends_if("--enable-ios-target")
+    def ios_target(value):
+        return value[0]
+
+
+with only_when(target_is_ios):
+    # MacOS SDK
+    # =========
+    option(
+        "--with-ios-sdk",
+        env="IPHONEOS_SDK_DIR",
+        nargs=1,
+        help="Location of platform SDK to use",
+    )
+
+    def ios_sdk_min_version():
+        return "17.4"
+
+    @depends(target)
+    def ios_sdk_name(target):
+        return "iPhone{}{}.sdk".format(
+            "Simulator" if target.raw_os == "ios-sim" else "OS",
+            ios_sdk_min_version(),
+        )
+
+    @depends(
+        "--with-ios-sdk",
+        host,
+        target,
+        bootstrap_path(ios_sdk_name, when=depends("--with-ios-sdk")(lambda x: not x)),
+    )
+    @imports(_from="__builtin__", _import="Exception")
+    @imports(_from="os.path", _import="isdir")
+    @imports(_from="os", _import="listdir")
+    def ios_sdk(sdk, host, target, bootstrapped):
+        if bootstrapped:
+            sdk = [bootstrapped]
+        if sdk:
+            sdk = sdk[0]
+            try:
+                version = get_sdk_version(sdk)
+            except Exception as e:
+                die(e)
+        elif host.os == "OSX":
+            sdk_name = "iphonesimulator" if target.raw_os == "ios-sim" else "iphoneos"
+            sdk = check_cmd_output(
+                "xcrun", "--show-sdk-path", "--sdk", sdk_name, onerror=lambda: ""
+            ).rstrip()
+            if not sdk:
+                die(
+                    "Could not find the iOS SDK. Please use --with-ios-sdk to give "
+                    "the path to a iOS SDK."
+                )
+            # Scan the parent directory xcrun returns for the most recent SDK.
+            sdk_dir = os.path.dirname(sdk)
+            versions = []
+            for d in listdir(sdk_dir):
+                if d.lower().startswith(sdk_name):
+                    try:
+                        sdk = os.path.join(sdk_dir, d)
+                        versions.append((get_sdk_version(sdk), sdk))
+                    except Exception:
+                        pass
+            version, sdk = max(versions)
+        else:
+            die(
+                "Need an iOS SDK when targeting iOS. Please use --with-ios-sdk "
+                "to give the path to a iOS SDK."
+            )
+
+        if not isdir(sdk):
+            die(
+                "SDK not found in %s. When using --with-ios-sdk, you must specify a "
+                "valid SDK. SDKs are installed when the optional cross-development "
+                "tools are selected during the Xcode installation." % sdk
+            )
+        if version < Version(ios_sdk_min_version()):
+            die(
+                'SDK version "%s" is too old. Please upgrade to at least %s. Try '
+                "updating your system Xcode." % (version, ios_sdk_min_version())
+            )
+        return sdk
+
+    set_config("IPHONEOS_SDK_DIR", ios_sdk)
 
 
 # GC rooting and hazard analysis.
@@ -467,7 +567,11 @@ def check_compiler(configure_cache, compiler, language, target, android_version)
             if "--target=arm64-apple-darwin" not in compiler:
                 flags.append("--target=arm64-apple-darwin")
             has_target = True
-
+        elif target.os == "iOS":
+            target_flag = "--target=%s" % toolchain
+            if target_flag not in compiler:
+                flags.append(target_flag)
+            has_target = True
         elif (
             not info.kernel
             or info.kernel != target.kernel
@@ -673,14 +777,6 @@ def vc_compiler_version(vc_compiler_path):
 
 
 @depends_if(vc_compiler_version)
-def is_vs2019_or_more(vc_compiler_version):
-    return vc_compiler_version >= Version("19.20")
-
-
-add_old_configure_assignment("IS_VS2019_OR_MORE", is_vs2019_or_more)
-
-
-@depends_if(vc_compiler_version)
 def msvs_version(vc_compiler_version):
     # clang-cl emulates the same version scheme as cl. And MSVS_VERSION needs to
     # be set for GYP on Windows.
@@ -688,8 +784,7 @@ def msvs_version(vc_compiler_version):
         return "2022"
     if vc_compiler_version >= Version("19.20"):
         return "2019"
-    if vc_compiler_version >= Version("19.10"):
-        return "2017"
+    configure_error("Only Visual Studio 2019 or newer are supported")
 
     return ""
 
@@ -702,12 +797,11 @@ clang_search_path = bootstrap_search_path("clang/bin")
 
 @depends(
     bootstrap_search_path("rustc/bin", when="MOZ_AUTOMATION"),
-    bootstrap_search_path_order,
     original_path,
 )
 @imports("os")
 @imports(_from="os", _import="environ")
-def rust_search_path(rust_path, search_order, original_path):
+def rust_search_path(rust_path, original_path):
     result = list(rust_path or original_path)
     # Also add the rustup install directory for cargo/rustc.
     cargo_home = environ.get("CARGO_HOME", "")
@@ -716,10 +810,7 @@ def rust_search_path(rust_path, search_order, original_path):
     else:
         cargo_home = os.path.expanduser(os.path.join("~", ".cargo"))
     rustup_path = os.path.join(cargo_home, "bin")
-    if search_order == "prepend":
-        result.insert(0, rustup_path)
-    else:
-        result.append(rustup_path)
+    result.insert(0, rustup_path)
     return result
 
 
@@ -1078,18 +1169,21 @@ def sysroot(host_or_target, target_sysroot=None):
         sysroot_input,
         host_or_target,
         macos_sdk,
+        ios_sdk,
         bootstrap_path(
             depends(host_or_target)(lambda t: "sysroot-{}".format(t.toolchain)),
             when=bootstrap_sysroot,
         ),
     )
     @imports("os")
-    def sysroot(sysroot_input, host_or_target, macos_sdk, path):
+    def sysroot(sysroot_input, host_or_target, macos_sdk, ios_sdk, path):
         version = None
         if sysroot_input:
             path = sysroot_input[0]
-        elif host_or_target.kernel == "Darwin" and macos_sdk:
+        elif host_or_target.os == "OSX" and macos_sdk:
             path = macos_sdk
+        elif host_or_target.os == "iOS" and ios_sdk:
+            path = ios_sdk
         if path:
             # Find the version of libstdc++ headears in the sysroot
             include = os.path.join(path, "usr/include/c++")
@@ -1242,6 +1336,7 @@ def compiler(
         host_or_target,
         sysroot,
         macos_target,
+        ios_target,
         android_version,
         vc_compiler_version,
         multiarch_dir,
@@ -1259,6 +1354,7 @@ def compiler(
         host_or_target,
         sysroot,
         macos_target,
+        ios_target,
         android_version,
         vc_compiler_version,
         multiarch_dir,
@@ -1289,6 +1385,8 @@ def compiler(
 
         if host_or_target.os == "OSX" and macos_target:
             flags.append("-mmacosx-version-min=%s" % macos_target)
+        if host_or_target.os == "iOS" and ios_target:
+            flags.append("-mios-version-min=%s" % ios_target)
 
         # When not given an explicit compatibility version, clang-cl tries
         # to get one from MSVC, which might not even be the one used by the
@@ -1624,6 +1722,7 @@ host_windows_abi = windows_abi(host, host_c_compiler)
 
 # Generic compiler-based conditions.
 building_with_gcc = depends(c_compiler)(lambda info: info.type == "gcc")
+building_with_gnu_cc = depends(c_compiler)(lambda info: info.type != "clang-cl")
 
 
 @depends(cxx_compiler, ccache_prefix)
@@ -2210,6 +2309,38 @@ set_define(
 )
 set_config("WRAP_SYSTEM_INCLUDES", wrap_system_includes)
 set_config("VISIBILITY_FLAGS", visibility_flags)
+
+
+# try harder, when checking for __thread support, see bug 521750 comment #33 and below
+# We pass linker_optimize_flags to the linker because if dead_strip is
+# enabled, the linker in xcode 4.1 will crash. Without this it would crash when
+# linking XUL.
+
+
+@depends(target, c_compiler)
+def check_thread(target, c_compiler):
+    if target.cpu in ("mips32", "mips64"):
+        # mips builds fail with TLS variables because of a binutils bug.
+        # See bug 528687
+        return False
+    if target.os == "Android":
+        # The custom dynamic linker doesn't support TLS variables
+        return False
+    if target.kernel == "OpenBSD":
+        # OpenBSD doesn't have TLS support, and the test succeeds with clang++
+        return False
+    return c_compiler.type != "clang-cl"
+
+
+set_define(
+    "HAVE_THREAD_TLS_KEYWORD",
+    try_link(
+        body="static __thread bool tlsIsMainThread = false; return tlsIsMainThread;",
+        flags=linker_optimize_flags.ldflags,
+        check_msg="for __thread keyword for TLS variables",
+        when=check_thread,
+    ),
+)
 
 
 @template
@@ -3257,9 +3388,20 @@ def path_remappings(target, build_env, sysroot_path, windows_sdk_dir, vc_path):
     return path_remappings
 
 
+@depends(target)
+def is_intel_target(target):
+    return target.cpu in ("x86", "x86_64")
+
+
+@depends(target)
+def is_aarch64_target(target):
+    return target.cpu == "aarch64"
+
+
 set_config("MMX_FLAGS", ["-mmmx"])
 set_config("SSE_FLAGS", ["-msse"])
 set_config("SSE2_FLAGS", ["-msse2"])
+set_config("SSE3_FLAGS", ["-msse3"])
 set_config("SSSE3_FLAGS", ["-mssse3"])
 set_config("SSE4_1_FLAGS", ["-msse4.1"])
 set_config("SSE4_2_FLAGS", ["-msse4.2"])
@@ -3270,7 +3412,9 @@ set_config("AVX2_FLAGS", ["-mavx2"])
 set_config(
     "AVXVNNI_FLAGS",
     ["-mavxvnni"],
-    try_compile(check_msg="for -mavxvnni support", flags=["-mavxvnni"]),
+    try_compile(
+        check_msg="for -mavxvnni support", flags=["-mavxvnni"], when=is_intel_target
+    ),
 )
 set_config(
     "AVX512BW_FLAGS",
@@ -3278,5 +3422,42 @@ set_config(
     try_compile(
         check_msg="for -mavx512bw support",
         flags=["-mavx512bw", "-mavx512f", "-mavx512dq", "-mavx512cd"],
+        when=is_intel_target,
     ),
 )
+
+# AVX512VNNI can be based on either avx512bw or avx512vbmi. We choose the
+# former.
+set_config(
+    "AVX512VNNI_FLAGS",
+    ["-mavx512vnni", "-mavx512bw", "-mavx512f", "-mavx512dq", "-mavx512cd"],
+    try_compile(
+        check_msg="for -mavx512vnni support",
+        flags=["-mavx512vnni", "-mavx512bw", "-mavx512f", "-mavx512dq", "-mavx512cd"],
+        when=is_intel_target,
+    ),
+)
+
+
+set_config(
+    "NEON_I8MM_FLAGS",
+    ["-march=armv8.2-a+i8mm"],
+    try_compile(
+        check_msg="for i8mm target feature",
+        flags=["-march=armv8.2-a+i8mm"],
+        when=is_aarch64_target,
+    ),
+)
+
+# dtrace support
+##
+option("--enable-dtrace", help="Build with dtrace support")
+
+dtrace = check_header(
+    "sys/sdt.h",
+    when="--enable-dtrace",
+    onerror=lambda: die("dtrace enabled but sys/sdt.h not found"),
+)
+
+set_config("HAVE_DTRACE", True, when=dtrace)
+set_define("INCLUDE_MOZILLA_DTRACE", True, when=dtrace)

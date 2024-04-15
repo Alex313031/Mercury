@@ -65,6 +65,10 @@ export MOZ_DATA_REPORTING=0
 export MOZ_REQUIRE_SIGNING=
 export MOZ_TELEMETRY_REPORTING=
 
+# API Keys
+ac_add_options --with-google-location-service-api-keyfile=ga
+ac_add_options --with-google-safebrowsing-api-keyfile=ga
+
 # Branding
 ac_add_options --with-app-name=mercury
 ac_add_options --with-app-basename=Mercury

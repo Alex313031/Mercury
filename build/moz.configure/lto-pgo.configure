@@ -119,13 +119,16 @@ pgo_temporal = c_compiler.try_compile(
 @depends(
     c_compiler,
     select_linker,
+    target,
     pgo_profile_path,
     orderfile_path,
     target_is_windows,
     pgo_temporal,
 )
 @imports("multiprocessing")
-def pgo_flags(compiler, linker, profdata, orderfile, target_is_windows, pgo_temporal):
+def pgo_flags(
+    compiler, linker, target, profdata, orderfile, target_is_windows, pgo_temporal
+):
     if compiler.type == "gcc":
         return namespace(
             gen_cflags=["-fprofile-generate"],
@@ -145,7 +148,12 @@ def pgo_flags(compiler, linker, profdata, orderfile, target_is_windows, pgo_temp
         use_ldflags = []
         if orderfile:
             if compiler.type == "clang-cl":
-                use_ldflags += ["-ORDER:@" + orderfile]
+                use_ldflags += [
+                    "-ORDER:@" + orderfile,
+                    "/ignore:4037",  # Disable warn missing order symbol
+                ]
+            elif linker.KIND == "ld64" or (linker.KIND == "lld" and target.os == "OSX"):
+                use_ldflags += ["-Wl,-order_file", orderfile]
             elif linker.KIND == "lld":
                 use_ldflags += [
                     "-Wl,--symbol-ordering-file",
@@ -311,7 +319,6 @@ def lto(
 
     if (
         target.kernel == "Darwin"
-        and target.os == "OSX"
         and "cross" in values
         and select_linker.KIND == "ld64"
         and not ld64_known_good
@@ -387,7 +394,7 @@ def lto(
     # (For hot functions, PGO will put a multiplier on this limit.)
     if target.os == "WINNT":
         ldflags.append("-mllvm:-import-instr-limit=30")
-    elif target.os == "OSX":
+    elif target.kernel == "Darwin":
         ldflags.append("-Wl,-mllvm,-import-instr-limit=30")
     elif c_compiler.type == "clang":
         ldflags.append("-Wl,-plugin-opt=-import-instr-limit=30")
@@ -401,7 +408,7 @@ def lto(
                 ldflags.append("-opt:ltonewpassmanager")
             if c_compiler.version >= "12.0.0":
                 ldflags.append("-mllvm:-import-hot-multiplier=30")
-        elif target.os == "OSX":
+        elif target.kernel == "Darwin":
             ldflags.append("-Wl,-mllvm,-import-hot-multiplier=30")
         else:
             if c_compiler.version < "13.0.0":

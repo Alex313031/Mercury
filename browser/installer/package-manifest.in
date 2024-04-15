@@ -38,6 +38,7 @@
 #ifdef MOZ_UPDATER
 @APPNAME@/Contents/Library/LaunchServices
 #endif
+@APPNAME@/Contents/Frameworks
 @APPNAME@/Contents/PkgInfo
 @RESPATH@/firefox.icns
 @RESPATH@/document.icns
@@ -60,10 +61,7 @@
 @RESPATH@/update.locale
 @RESPATH@/updater.ini
 #endif
-#ifdef MOZ_DEFAULT_BROWSER_AGENT
-@RESPATH@/defaultagent.ini
-#endif
-#if defined(MOZ_UPDATE_AGENT) || defined(MOZ_DEFAULT_BROWSER_AGENT)
+#if defined(MOZ_UPDATE_AGENT)
 @RESPATH@/locale.ini
 #endif
 
@@ -144,7 +142,10 @@
 #endif
 @RESPATH@/application.ini
 #ifdef MOZ_UPDATER
+# update-settings.ini has been removed on macOS.
+#ifndef XP_MACOSX
 @RESPATH@/update-settings.ini
+#endif
 #endif
 @RESPATH@/platform.ini
 #ifndef MOZ_FOLD_LIBS
@@ -152,17 +153,8 @@
 #endif
 @BINPATH@/@DLL_PREFIX@lgpllibs@DLL_SUFFIX@
 @BINPATH@/@DLL_PREFIX@gkcodecs@DLL_SUFFIX@
-#ifdef MOZ_FFVPX
 @BINPATH@/@DLL_PREFIX@mozavutil@DLL_SUFFIX@
 @BINPATH@/@DLL_PREFIX@mozavcodec@DLL_SUFFIX@
-#endif
-#ifdef XP_WIN
-#ifdef _AMD64_
-@BINPATH@/@DLL_PREFIX@qipcap64@DLL_SUFFIX@
-#else
-@BINPATH@/@DLL_PREFIX@qipcap@DLL_SUFFIX@
-#endif
-#endif
 
 ; [Components]
 #ifdef ACCESSIBILITY
@@ -262,10 +254,13 @@
 @RESPATH@/browser/defaults/settings/main
 @RESPATH@/browser/defaults/settings/security-state
 
+# channel-prefs.js has been removed on macOS.
+#ifndef XP_MACOSX
 ; Warning: changing the path to channel-prefs.js can cause bugs (Bug 756325)
 ; Technically this is an app pref file, but we are keeping it in the original
 ; gre location for now.
 @RESPATH@/defaults/pref/channel-prefs.js
+#endif
 
 ; Mercury policies file
 @RESPATH@/distribution/policies.json
@@ -418,6 +413,12 @@ bin/libfreebl_64int_3.so
 ; [ Ping Sender ]
 ;
 @BINPATH@/pingsender@BIN_SUFFIX@
+
+; [ Native Messaging Host Proxy ]
+;
+#if defined(XP_WIN) || defined(XP_MACOSX)
+@BINPATH@/nmhproxy@BIN_SUFFIX@
+#endif
 
 ; [ Notification COM Server ]
 ;
