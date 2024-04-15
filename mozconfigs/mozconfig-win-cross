@@ -34,7 +34,7 @@ ac_add_options --enable-install-strip
 ac_add_options --enable-clang-plugin
 ac_add_options --enable-lto
 ac_add_options --enable-wasm-avx
-ac_add_options --enable-optimize="-mavx -maes /O2 /clang:-O3 /arch:AVX"
+ac_add_options --enable-optimize="-mavx -maes /O2 -mtune=sandybridge /clang:-O3 /arch:AVX"
 ac_add_options --enable-rust-simd
 ac_add_options --enable-hardening
 #ac_add_options --disable-trace-logging
@@ -110,10 +110,10 @@ ac_add_options MOZ_LTO=1
 #ac_add_options MOZ_PGO=1
 
 # Compiler, Linker, and Rust flags
-export CFLAGS="-mavx -maes /O2 /clang:-O3 /arch:AVX"
-export CPPFLAGS="-mavx -maes /O2 /clang:-O3 /arch:AVX"
-export CXXFLAGS="-mavx -maes /O2 /clang:-O3 /arch:AVX"
+export CFLAGS="-mavx -maes -mtune=sandybridge /O2 /clang:-O3 /arch:AVX"
+export CPPFLAGS="-mavx -maes -mtune=sandybridge /O2 /clang:-O3 /arch:AVX"
+export CXXFLAGS="-mavx -maes -mtune=sandybridge /O2 /clang:-O3 /arch:AVX"
 export LDFLAGS="-Wl,-O3 -mavx -maes"
 #export MOZ_LTO_LDFLAGS="-Wl,-mllvm,-polly"
-export RUSTFLAGS="-C target-feature=+avx -C codegen-units=1"
+export RUSTFLAGS="-C target-cpu=sandybridge -C target-feature=+avx -C codegen-units=1"
 export VERBOSE=1
