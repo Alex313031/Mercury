@@ -33,7 +33,6 @@ buildStale () {
 	printf "${YEL}NOTE: --no-clobber option was passed\n" &&
 	sleep 1s &&
 
-	printf "\n" &&
 	rm -f -v dist.deb &&
 	printf "\n" &&
 
@@ -58,7 +57,6 @@ sleep 1s &&
 
 rm -r -f -v ./dist/usr/lib/mercury &&
 
-printf "\n" &&
 rm -f -v dist.deb &&
 printf "\n" &&
 
