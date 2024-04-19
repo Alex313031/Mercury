@@ -21,6 +21,7 @@ ac_add_options --disable-tests
 ac_add_options --enable-strip
 ac_add_options --enable-install-strip
 ac_add_options --enable-clang-plugin
+ac_add_options --disable-elf-hack
 ac_add_options --enable-lto
 ac_add_options --enable-wasm-avx
 #ac_add_options --enable-avx2
@@ -68,8 +69,8 @@ export MOZ_REQUIRE_SIGNING=
 export MOZ_TELEMETRY_REPORTING=
 
 # API Keys
-ac_add_options --with-google-location-service-api-keyfile=ga
-ac_add_options --with-google-safebrowsing-api-keyfile=ga
+ac_add_options --with-google-location-service-api-keyfile=@TOPSRCDIR@/ga
+ac_add_options --with-google-safebrowsing-api-keyfile=@TOPSRCDIR@/ga
 
 # Branding
 ac_add_options --with-app-name=mercury
