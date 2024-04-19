@@ -18,7 +18,8 @@ try() { "$@" || die "${RED}Failed $*"; }
 # --help
 displayHelp () {
 	printf "\n" &&
-	printf "${bold}${GRE}Script to Rebase/Sync the Mozilla repo.${c0}\n" &&
+	printf "${bold}${GRE}Script to restore the Mozilla repo to a vanilla state.${c0}\n" &&
+	printf "${bold}${YEL}Useful for making changes without updating the Firefox version.${c0}\n" &&
 	printf "\n"
 }
 case $1 in
@@ -35,12 +36,10 @@ else
 fi
 
 printf "\n" &&
-printf "${bold}${GRE}Script to Rebase/Sync Mozilla repo.${c0}\n" &&
+printf "${bold}${GRE}Script to restore the Mozilla repo to a vanilla state.${c0}\n" &&
+printf "${bold}${YEL}Useful for making changes without updating the Firefox version.${c0}\n" &&
 printf "\n" &&
-printf "${YEL}Rebasing/Syncing with mozilla-unified Mercurial repository...${c0}\n" &&
-
-MERCURY_BRANCH="release"
-export MERCURY_BRANCH &&
+printf "${YEL}Removing/reverting changes made by Mercury to the Mozilla repo...${c0}\n" &&
 
 cd ${HG_SRC_DIR} &&
 
@@ -48,18 +47,8 @@ rm -r -f ./obj-* &&
 
 hg purge &&
 
-hg pull &&
+hg revert --all -C &&
 
 printf "\n" &&
-printf "${GRE}Checking out the ${MERCURY_BRANCH} branch...${c0}\n" &&
-
-hg update --clean -C $MERCURY_BRANCH &&
-
-printf "\n" &&
-printf "${GRE}Running \`./mach bootstrap\`...${c0}\n" &&
-
-./mach bootstrap &&
-
-printf "\n" &&
-printf "${GRE}Done! ${YEL}You can now run ./setup.sh\n" &&
+printf "${GRE}Done! ${YEL}You can now run ./setup.sh or make changes.\n" &&
 tput sgr0
