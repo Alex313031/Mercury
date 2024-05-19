@@ -6184,7 +6184,7 @@ class OverflowableToolbar {
    * nsIObserver implementation starts here.
    */
 
-  observe(aSubject, aTopic, aData) {
+  observe(aSubject, aTopic) {
     // This nsIObserver method allows us to defer initialization until after
     // this window has finished painting and starting up.
     if (
