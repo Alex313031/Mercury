@@ -47,7 +47,7 @@ BEGIN
   IDS_CANNOT_CREATE_FOLDER  "Cannot create folder '{0}'"
   IDS_PROGRESS_EXTRACTING  "Extracting"
   IDS_MIN_OS_TITLE  "Setup Error"
-  IDS_MIN_OS_TEXT  "Microsoft Windows 7 or newer is required."
+  IDS_MIN_OS_TEXT  "Microsoft Windows 10 or newer is required."
 END
 
 #include "../src/CPP/7zip/UI/FileManager/ProgressDialog.rc"

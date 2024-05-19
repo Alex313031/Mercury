@@ -443,6 +443,14 @@ pref("browser.overlink-delay", 80);
 
 pref("browser.theme.colorway-closet", true);
 
+#ifdef XP_MACOSX
+#ifdef NIGHTLY_BUILD
+pref("browser.theme.macos.native-theme", true);
+#else
+pref("browser.theme.macos.native-theme", false);
+#endif
+#endif
+
 // Whether expired built-in colorways themes that are active or retained
 // should be allowed to check for updates and be updated to an AMO hosted
 // theme with the same id (as part of preparing to remove from mozilla-central
@@ -478,7 +486,8 @@ pref("browser.urlbar.speculativeConnect.enabled", true);
 // search for bookmarklets typing "javascript: " followed by the actual query.
 pref("browser.urlbar.filter.javascript", true);
 
-// Enable a certain level of urlbar logging to the Browser Console. See Log.jsm.
+// Enable a certain level of urlbar logging to the Browser Console. See
+// ConsoleInstance.webidl.
 pref("browser.urlbar.loglevel", "Error");
 
 // the maximum number of results to show in autocomplete when doing richResults
@@ -521,7 +530,7 @@ pref("browser.search.param.search_rich_suggestions", "fen");
 pref("browser.urlbar.weather.featureGate", false);
 
 // Enable clipboard suggestions feature, the pref should be removed once stable.
-pref("browser.urlbar.clipboard.featureGate", true);
+pref("browser.urlbar.clipboard.featureGate", false);
 
 // When false, the weather suggestion will not be fetched when a VPN is
 // detected. When true, it will be fetched anyway.
@@ -721,9 +730,9 @@ pref("browser.urlbar.suggest.mdn", true);
 // Feature gate pref for Yelp suggestions in the urlbar.
 pref("browser.urlbar.yelp.featureGate", false);
 
-// The minimum prefix length of yelp query the user must type to trigger
-// the suggestion.
-pref("browser.urlbar.yelp.minKeywordLength", 5);
+// The minimum prefix length of a Yelp keyword the user must type to trigger the
+// suggestion. 0 means the min length should be taken from Nimbus.
+pref("browser.urlbar.yelp.minKeywordLength", 0);
 
 // Whether Yelp suggestions should be shown as top picks.
 pref("browser.urlbar.yelp.priority", false);
@@ -805,13 +814,6 @@ pref("browser.download.clearHistoryOnDelete", 0);
 pref("browser.helperApps.showOpenOptionForPdfJS", true);
 pref("browser.helperApps.showOpenOptionForViewableInternally", true);
 
-// Whether search-config-v2 is enabled.
-#ifdef NIGHTLY_BUILD
-pref("browser.search.newSearchConfig.enabled", true);
-#else
-pref("browser.search.newSearchConfig.enabled", false);
-#endif
-
 // search engines URL
 pref("browser.search.searchEnginesURL",      "https://addons.mozilla.org/%LOCALE%/firefox/search-engines/");
 
@@ -834,7 +836,11 @@ pref("browser.search.separatePrivateDefault.ui.banner.max", 0);
 pref("browser.search.serpEventTelemetry.enabled", false);
 
 // Enables search SERP telemetry page categorization.
+#ifdef NIGHTLY_BUILD
 pref("browser.search.serpEventTelemetryCategorization.enabled", false);
+#else
+pref("browser.search.serpEventTelemetryCategorization.enabled", false);
+#endif
 
 // Search Bar removal from the toolbar for users who haven't used it in 120
 // days
@@ -897,6 +903,10 @@ pref("browser.shopping.experience2023.sidebarClosedCount", 0);
 
 // When conditions are met, shows a prompt on the shopping sidebar asking users if they want to disable auto-open behavior
 pref("browser.shopping.experience2023.showKeepSidebarClosedMessage", true);
+
+// Enable display of megalist option in browser sidebar
+// Keep it hidden from about:config for now.
+// pref("browser.megalist.enabled", false);
 
 // Enables the display of the Mozilla VPN banner in private browsing windows
 pref("browser.privatebrowsing.vpnpromourl", "https://vpn.mozilla.org/?utm_source=firefox-browser&utm_medium=firefox-%CHANNEL%-browser&utm_campaign=private-browsing-vpn-link");
@@ -1181,11 +1191,7 @@ pref("privacy.history.custom",              false);
 // 6 - Last 24 hours
 pref("privacy.sanitize.timeSpan", 1);
 
-#if defined(NIGHTLY_BUILD)
-pref("privacy.sanitize.useOldClearHistoryDialog", false);
-#else
 pref("privacy.sanitize.useOldClearHistoryDialog", true);
-#endif
 
 pref("privacy.sanitize.clearOnShutdown.hasMigratedToNewPrefs", false);
 // flag to track migration of clear history dialog prefs, where cpd stands for
@@ -1366,8 +1372,9 @@ pref("browser.sessionstore.idleDelay", 180); // 3 minutes
 pref("browser.sessionstore.privacy_level", 0);
 // how many tabs can be reopened (per window)
 pref("browser.sessionstore.max_tabs_undo", 255);
-// how many windows can be reopened (per session) - on non-OS X platforms this
-// pref may be ignored when dealing with pop-up windows to ensure proper startup
+// how many windows will be saved and can be reopened per session - on non-macOS platforms this
+// pref may be ignored when dealing with pop-up windows to ensure the user actually gets
+// at least one window with a menu bar.
 pref("browser.sessionstore.max_windows_undo", 32);
 // number of crashes that can occur before the about:sessionrestore page is displayed
 // (this pref has no effect if more than 6 hours have passed since the last crash)
@@ -1511,7 +1518,11 @@ pref("browser.bookmarks.editDialog.maxRecentFolders", 7);
   // On windows these levels are:
   // See - security/sandbox/win/src/sandboxbroker/sandboxBroker.cpp
   // SetSecurityLevelForContentProcess() for what the different settings mean.
-  pref("security.sandbox.content.level", 6);
+  #if defined(NIGHTLY_BUILD)
+    pref("security.sandbox.content.level", 7);
+  #else
+    pref("security.sandbox.content.level", 6);
+  #endif
 
   // Pref controlling if messages relevant to sandbox violations are logged.
   pref("security.sandbox.logging.enabled", false);
@@ -1767,21 +1778,15 @@ pref("browser.topsites.contile.sov.enabled", false);
 pref("browser.partnerlink.attributionURL", "https://topsites.services.mozilla.com/cid/");
 pref("browser.partnerlink.campaign.topsites", "amzn_2020_a1");
 
-// Whether to show tab level system prompts opened via nsIPrompt(Service) as
-// SubDialogs in the TabDialogBox (true) or as TabModalPrompt in the
-// TabModalPromptBox (false).
-pref("prompts.tabChromePromptSubDialog", true);
-
-// Whether to show the dialogs opened at the content level, such as
-// alert() or prompt(), using a SubDialogManager in the TabDialogBox.
-pref("prompts.contentPromptSubDialog", true);
-
-// Whether to show window-modal dialogs opened for browser windows
-// in a SubDialog inside their parent, instead of an OS level window.
-pref("prompts.windowPromptSubDialog", true);
-
 // Activates preloading of the new tab url.
 pref("browser.newtab.preload", true);
+
+// Preference to enable wallpaper selection in the Customize Menu of new tab page
+pref("browser.newtabpage.activity-stream.newtabWallpapers.enabled", false);
+
+// Current new tab page background image.
+pref("browser.newtabpage.activity-stream.newtabWallpapers.wallpaper-light", "");
+pref("browser.newtabpage.activity-stream.newtabWallpapers.wallpaper-dark", "");
 
 pref("browser.newtabpage.activity-stream.newNewtabExperience.colors", "#0090ED,#FF4F5F,#2AC3A2,#FF7139,#A172FF,#FFA437,#FF2A8A");
 
@@ -1798,7 +1803,6 @@ pref("browser.newtabpage.activity-stream.improvesearch.topSiteSearchShortcuts", 
 
 // ASRouter provider configuration
 pref("browser.newtabpage.activity-stream.asrouter.providers.cfr", "{\"id\":\"cfr\",\"enabled\":true,\"type\":\"remote-settings\",\"collection\":\"cfr\",\"updateCycleInMs\":3600000}");
-pref("browser.newtabpage.activity-stream.asrouter.providers.whats-new-panel", "{\"id\":\"whats-new-panel\",\"enabled\":false,\"type\":\"remote-settings\",\"collection\":\"whats-new-panel\",\"updateCycleInMs\":3600000}");
 pref("browser.newtabpage.activity-stream.asrouter.providers.message-groups", "{\"id\":\"message-groups\",\"enabled\":true,\"type\":\"remote-settings\",\"collection\":\"message-groups\",\"updateCycleInMs\":3600000}");
 pref("browser.newtabpage.activity-stream.asrouter.providers.messaging-experiments", "{\"id\":\"messaging-experiments\",\"enabled\":true,\"type\":\"remote-experiments\",\"updateCycleInMs\":3600000}");
 
@@ -1910,9 +1914,6 @@ pref("browser.aboutwelcome.screens", "");
 // Used to enable window modal onboarding
 pref("browser.aboutwelcome.showModal", false);
 
-// The pref that controls if the What's New panel is enabled.
-pref("browser.messaging-system.whatsNewPanel.enabled", true);
-
 // Experiment Manager
 // See Console.sys.mjs LOG_LEVELS for all possible values
 pref("messaging-system.log", "warn");
@@ -1944,10 +1945,9 @@ pref("pdfjs.previousHandler.alwaysAskBeforeHandling", false);
 // Try to convert PDFs sent as octet-stream
 pref("pdfjs.handleOctetStream", true);
 
-pref("sidebar.companion", false);
-
 // Is the sidebar positioned ahead of the content browser
 pref("sidebar.position_start", true);
+pref("sidebar.revamp", false);
 
 pref("security.protectionspopup.recordEventTelemetry", false);
 pref("security.app_menu.recordEventTelemetry", false);
@@ -2415,7 +2415,7 @@ pref("browser.migrate.interactions.passwords", false);
 pref("browser.migrate.preferences-entrypoint.enabled", true);
 
 pref("extensions.pocket.api", "");
-pref("extensions.pocket.bffApi", "firefox-api-proxy.cdn.mozilla.net");
+pref("extensions.pocket.bffApi", "");
 pref("extensions.pocket.bffRecentSaves", false);
 pref("extensions.pocket.enabled", false);
 pref("extensions.pocket.oAuthConsumerKey", "");
@@ -2600,9 +2600,6 @@ pref("identity.fxaccounts.toolbar.pxiToolbarEnabled.monitorEnabled", false);
 pref("identity.fxaccounts.toolbar.pxiToolbarEnabled.relayEnabled", false);
 pref("identity.fxaccounts.toolbar.pxiToolbarEnabled.vpnEnabled", false);
 
-// Check bundled omni JARs for corruption.
-pref("corroborator.enabled", true);
-
 // Toolbox preferences
 pref("devtools.toolbox.footer.height", 250);
 pref("devtools.toolbox.sidebar.width", 500);
@@ -2610,7 +2607,8 @@ pref("devtools.toolbox.host", "bottom");
 pref("devtools.toolbox.previousHost", "right");
 pref("devtools.toolbox.selectedTool", "inspector");
 pref("devtools.toolbox.zoomValue", "1");
-pref("devtools.toolbox.splitconsoleEnabled", false);
+pref("devtools.toolbox.splitconsole.enabled", true);
+pref("devtools.toolbox.splitconsole.open", false);
 pref("devtools.toolbox.splitconsoleHeight", 100);
 pref("devtools.toolbox.tabsOrder", "");
 // This is only used for local Web Extension debugging,
@@ -2640,16 +2638,15 @@ pref("devtools.popups.debug", false);
 // Toolbox Button preferences
 pref("devtools.command-button-pick.enabled", true);
 pref("devtools.command-button-frames.enabled", true);
-pref("devtools.command-button-splitconsole.enabled", true);
 pref("devtools.command-button-responsive.enabled", true);
 pref("devtools.command-button-screenshot.enabled", false);
 pref("devtools.command-button-rulers.enabled", false);
 pref("devtools.command-button-measure.enabled", false);
 pref("devtools.command-button-noautohide.enabled", false);
 pref("devtools.command-button-errorcount.enabled", true);
-#ifndef MOZILLA_OFFICIAL
+// #ifndef MOZILLA_OFFICIAL
   pref("devtools.command-button-experimental-prefs.enabled", true);
-#endif
+// #endif
 
 // Inspector preferences
 // Enable the Inspector
@@ -3119,3 +3116,15 @@ pref("browser.mailto.dualPrompt", false);
 // When visiting a site which uses registerProtocolHandler: Ask the user to set Firefox as
 // default mailto handler.
 pref("browser.mailto.prompt.os", true);
+
+// Pref to initialize the BackupService soon after startup.
+pref("browser.backup.enabled", true);
+
+// Pref to enable the new profiles
+pref("browser.profiles.enabled", false);
+
+pref("startup.homepage_override_url_nimbus", "");
+pref("startup.homepage_override_nimbus_maxVersion", "");
+
+// Pref to enable the content relevancy feature.
+pref("toolkit.contentRelevancy.enabled", false);

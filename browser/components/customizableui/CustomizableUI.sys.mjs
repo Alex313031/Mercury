@@ -1423,7 +1423,7 @@ var CustomizableUIInternal = {
     }
   },
 
-  onCustomizeEnd(aWindow) {
+  onCustomizeEnd() {
     this._clearPreviousUIState();
   },
 

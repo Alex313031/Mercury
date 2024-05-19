@@ -249,10 +249,7 @@
 @RESPATH@/defaults/autoconfig/prefcalls.js
 @RESPATH@/browser/defaults/permissions
 ; Remote Settings JSON dumps
-@RESPATH@/browser/defaults/settings/last_modified.json
-@RESPATH@/browser/defaults/settings/blocklists
-@RESPATH@/browser/defaults/settings/main
-@RESPATH@/browser/defaults/settings/security-state
+@RESPATH@/browser/defaults/settings
 
 # channel-prefs.js has been removed on macOS.
 #ifndef XP_MACOSX
@@ -391,14 +388,10 @@ bin/libfreebl_64int_3.so
 @BINPATH@/crashreporter.app/
 #else
 @BINPATH@/crashreporter@BIN_SUFFIX@
-@RESPATH@/crashreporter.ini
-#ifdef XP_UNIX
-@RESPATH@/Throbber-small.gif
-#elif defined(XP_WIN)
+#if defined(XP_WIN)
 @BINPATH@/@DLL_PREFIX@mozwer@DLL_SUFFIX@
 #endif
 #endif
-@RESPATH@/browser/crashreporter-override.ini
 #ifdef MOZ_CRASHREPORTER_INJECTOR
 @BINPATH@/breakpadinjector.dll
 #endif
