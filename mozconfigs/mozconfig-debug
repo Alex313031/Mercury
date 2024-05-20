@@ -64,7 +64,6 @@ ac_add_options --with-distribution-id=com.alex313031.mercury
 
 # Make flags (set to number of CPU cores)
 mk_add_options MOZ_MAKE_FLAGS="-j16"
-export MOZ_MAKE_FLAGS="-j16"
 
 # Autoclobber
 mk_add_options AUTOCLOBBER=1
