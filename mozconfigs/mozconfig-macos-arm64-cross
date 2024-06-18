@@ -68,7 +68,7 @@ ac_add_options --with-google-location-service-api-keyfile=@TOPSRCDIR@/ga
 ac_add_options --with-google-safebrowsing-api-keyfile=@TOPSRCDIR@/ga
 
 # Branding
-ac_add_options --with-app-name=mercury
+ac_add_options --with-app-name=mercurybrowser
 ac_add_options --with-app-basename=Mercury
 ac_add_options --with-branding=browser/branding/mercury
 ac_add_options --with-l10n-base=$PWD/browser/locales/en-US
