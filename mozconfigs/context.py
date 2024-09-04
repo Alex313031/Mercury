@@ -349,22 +349,22 @@ class HostCompileFlags(BaseCompileFlags):
             (
                 "HOST_CXXFLAGS",
                 context.config.substs.get("HOST_CXXFLAGS"),
-                ("HOST_CXXFLAGS", "HOST_CXX_LDFLAGS"),
+                ("HOST_CXXFLAGS",),
             ),
             (
                 "HOST_CFLAGS",
                 context.config.substs.get("HOST_CFLAGS"),
-                ("HOST_CFLAGS", "HOST_C_LDFLAGS"),
+                ("HOST_CFLAGS",),
             ),
             (
                 "HOST_OPTIMIZE",
                 self._optimize_flags(),
-                ("HOST_CFLAGS", "HOST_CXXFLAGS", "HOST_C_LDFLAGS", "HOST_CXX_LDFLAGS"),
+                ("HOST_CFLAGS", "HOST_CXXFLAGS"),
             ),
-            ("RTL", None, ("HOST_CFLAGS", "HOST_C_LDFLAGS")),
+            ("RTL", None, ("HOST_CFLAGS",)),
             ("HOST_DEFINES", None, ("HOST_CFLAGS", "HOST_CXXFLAGS")),
-            ("MOZBUILD_HOST_CFLAGS", [], ("HOST_CFLAGS", "HOST_C_LDFLAGS")),
-            ("MOZBUILD_HOST_CXXFLAGS", [], ("HOST_CXXFLAGS", "HOST_CXX_LDFLAGS")),
+            ("MOZBUILD_HOST_CFLAGS", [], ("HOST_CFLAGS",)),
+            ("MOZBUILD_HOST_CXXFLAGS", [], ("HOST_CXXFLAGS",)),
             (
                 "BASE_INCLUDES",
                 ["-I%s" % main_src_dir, "-I%s" % context.objdir],
@@ -419,16 +419,16 @@ class AsmFlags(BaseCompileFlags):
                     debug_flags += ["-F", "cv8"]
                 elif self._context.config.substs.get("OS_ARCH") != "Darwin":
                     debug_flags += ["-F", "dwarf"]
-            elif (
-                self._context.config.substs.get("OS_ARCH") == "WINNT"
-                and self._context.config.substs.get("TARGET_CPU") == "aarch64"
-            ):
-                # armasm64 accepts a paucity of options compared to ml/ml64.
-                pass
+            elif self._context.config.substs.get("CC_TYPE") == "clang-cl":
+                if self._context.config.substs.get("TARGET_CPU") == "aarch64":
+                    # armasm64 accepts a paucity of options compared to ml/ml64.
+                    pass
+                else:
+                    # Unintuitively, -Zi for ml/ml64 is equivalent to -Z7 for cl.exe.
+                    # -Zi for cl.exe has a different purpose, so this is only used here.
+                    debug_flags += ["-Zi"]
             else:
-                debug_flags += self._context.config.substs.get(
-                    "MOZ_DEBUG_FLAGS", ""
-                ).split()
+                debug_flags += self._context.config.substs.get("MOZ_DEBUG_FLAGS", [])
         return debug_flags
 
 
@@ -484,7 +484,7 @@ class LinkFlags(BaseCompileFlags):
         if all(
             [
                 self._context.config.substs.get("OS_ARCH") == "WINNT",
-                not self._context.config.substs.get("GNU_CC"),
+                self._context.config.substs.get("CC_TYPE") == "clang-cl",
                 not self._context.config.substs.get("MOZ_DEBUG"),
             ]
         ):
@@ -503,7 +503,7 @@ class TargetCompileFlags(BaseCompileFlags):
         if self._context.config.substs.get(
             "MOZ_DEBUG"
         ) or self._context.config.substs.get("MOZ_DEBUG_SYMBOLS"):
-            return self._context.config.substs.get("MOZ_DEBUG_FLAGS", "").split()
+            return self._context.config.substs.get("MOZ_DEBUG_FLAGS", [])
         return []
 
     def _warnings_as_errors(self):

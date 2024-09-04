@@ -21,7 +21,8 @@ ac_add_options --disable-tests
 #ac_add_options --enable-install-strip
 ac_add_options --enable-clang-plugin
 ac_add_options --enable-lto
-ac_add_options --enable-optimize="-O3 -march=armv8.3-a+simd"
+ac_add_options --enable-jemalloc
+ac_add_options --enable-optimize="-O3 -march=armv8.3-a+simd -mcpu=apple-m1"
 ac_add_options --enable-rust-simd
 ac_add_options --enable-hardening
 #ac_add_options --disable-trace-logging
@@ -60,6 +61,7 @@ export MOZ_CRASHREPORTER=0
 export MOZ_DATA_REPORTING=0
 export MOZ_REQUIRE_SIGNING=
 export MOZ_TELEMETRY_REPORTING=
+export MOZ_PACKAGE_JSSHELL=1
 
 # API Keys
 ac_add_options --with-google-location-service-api-keyfile=@TOPSRCDIR@/ga
@@ -72,6 +74,9 @@ ac_add_options --with-branding=browser/branding/mercury
 ac_add_options --with-l10n-base=$PWD/browser/locales/en-US
 ac_add_options --with-distribution-id=com.alex313031.mercury
 #-app=/home/alex/bin/Mercury/application.ini
+
+export MOZ_MACBUNDLE_ID=${appId}
+export MOZ_MACBUNDLE_NAME="Mercury.app"
 
 # Make flags (set to number of CPU cores)
 mk_add_options MOZ_MAKE_FLAGS="-j5"
@@ -98,5 +103,5 @@ export CPPFLAGS="-O3 -march=armv8.3-a+simd"
 export CXXFLAGS="-O3 -march=armv8.3-a+simd"
 export LDFLAGS="-Wl,-O3 -march=armv8.3-a+simd"
 #export MOZ_LTO_LDFLAGS="-Wl,-mllvm,-polly"
-export RUSTFLAGS="-C target-feature=+v8.3a -C codegen-units=1"
+export RUSTFLAGS="-C target-feature=+v8.3a -C codegen-units=1 -C target-cpu=apple-m1"
 export VERBOSE=1

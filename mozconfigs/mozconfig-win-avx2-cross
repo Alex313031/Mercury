@@ -33,6 +33,7 @@ ac_add_options --enable-strip
 ac_add_options --enable-install-strip
 ac_add_options --enable-clang-plugin
 ac_add_options --enable-lto
+ac_add_options --enable-jemalloc
 ac_add_options --enable-wasm-avx
 ac_add_options --enable-optimize="/O2 /clang:-O3 -march=x86-64-v3"
 ac_add_options --enable-rust-simd
@@ -76,6 +77,7 @@ export MOZ_CRASHREPORTER=0
 export MOZ_DATA_REPORTING=0
 export MOZ_REQUIRE_SIGNING=
 export MOZ_TELEMETRY_REPORTING=
+export MOZ_PACKAGE_JSSHELL=1
 
 # API Keys
 ac_add_options --with-google-location-service-api-keyfile=@TOPSRCDIR@/ga
@@ -115,4 +117,5 @@ export CXXFLAGS="-march=x86-64-v3 /clang:-O3 /clang:-ffp-contract=fast"
 export LDFLAGS="-Wl,-O3 -march=x86-64-v3"
 #export MOZ_LTO_LDFLAGS="-Wl,-mllvm,-polly"
 export RUSTFLAGS="-C target-cpu=haswell -C target-feature=+avx2 -C codegen-units=1"
+export POLLY="-mllvm -polly -mllvm -polly-2nd-level-tiling -mllvm -polly-loopfusion-greedy -mllvm -polly-pattern-matching-based-opts -mllvm -polly-position=before-vectorizer -mllvm -polly-vectorizer=stripmine"
 export VERBOSE=1

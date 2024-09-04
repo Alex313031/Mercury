@@ -18,6 +18,9 @@ ac_add_options --enable-wasm-avx
 ac_add_options --enable-optimize="-O3 -mavx -maes"
 ac_add_options --enable-rust-simd
 ac_add_options --enable-hardening
+ac_add_options --disable-dmd
+ac_add_options --disable-gpsd
+ac_add_options --disable-necko-wifi
 #ac_add_options --disable-trace-logging
 
 # Media settings
@@ -49,6 +52,7 @@ export MOZ_CRASHREPORTER=0
 export MOZ_DATA_REPORTING=0
 export MOZ_REQUIRE_SIGNING=
 export MOZ_TELEMETRY_REPORTING=
+export MOZ_PACKAGE_JSSHELL=1
 
 # API Keys
 ac_add_options --with-google-location-service-api-keyfile=@TOPSRCDIR@/ga
@@ -70,10 +74,10 @@ mk_add_options AUTOCLOBBER=1
 export AUTOCLOBBER=1
 
 # Compiler, Linker, and Rust flags
-export CFLAGS="-O3 -mavx -maes"
-export CPPFLAGS="-O3 -mavx -maes"
-export CXXFLAGS="-O3 -mavx -maes"
-export LDFLAGS="-Wl,-O3 -mavx -maes"
+export CFLAGS="-Og -mavx -maes"
+export CPPFLAGS="-Og -mavx -maes"
+export CXXFLAGS="-Og -mavx -maes"
+export LDFLAGS="-Wl,-O0 -mavx -maes"
 #export MOZ_LTO_LDFLAGS="-Wl,-mllvm,-polly"
 export RUSTFLAGS="-C target-feature=+avx"
 export VERBOSE=1

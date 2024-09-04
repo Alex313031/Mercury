@@ -23,6 +23,7 @@ ac_add_options --disable-tests
 #ac_add_options --enable-install-strip
 ac_add_options --enable-clang-plugin
 ac_add_options --enable-lto
+ac_add_options --enable-jemalloc
 ac_add_options --enable-wasm-avx
 #ac_add_options --enable-avx2
 ac_add_options --enable-optimize="-O3 -march=x86-64-v3"
@@ -64,6 +65,7 @@ export MOZ_CRASHREPORTER=0
 export MOZ_DATA_REPORTING=0
 export MOZ_REQUIRE_SIGNING=
 export MOZ_TELEMETRY_REPORTING=
+export MOZ_PACKAGE_JSSHELL=1
 
 # API Keys
 ac_add_options --with-google-location-service-api-keyfile=@TOPSRCDIR@/ga

@@ -219,6 +219,8 @@ SPHINX_TREES["mots"] = "docs/mots"
 
 SPHINX_TREES["update-infrastructure"] = "docs/update-infrastructure"
 
+SPHINX_TREES["content-security"] = "docs/content-security"
+
 include("build/templates.mozbuild")
 
 DIRS += ["policies"]

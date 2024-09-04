@@ -4,36 +4,131 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+# Environment variables that impact the compilation step
+# ==============================================================
+option(
+    env="HOST_CPPFLAGS",
+    help="Extra flags for Preprocessing host sources.",
+    nargs=1,
+    default="",
+)
+
+
+option(
+    env="HOST_CFLAGS",
+    help="Extra flags for compiling host C sources.",
+    nargs=1,
+    default="",
+)
+
+
+option(
+    env="HOST_CXXFLAGS",
+    help="Extra flags for compiling host C++ sources.",
+    nargs=1,
+    default="",
+)
+
+
+option(
+    env="HOST_LDFLAGS",
+    help="Extra flags for linking host object files.",
+    nargs=1,
+    default="",
+)
+
+
+option(
+    env="CPPFLAGS",
+    help="Extra flags for preprocessing sources.",
+    nargs=1,
+    default="",
+)
+
+
+option(
+    env="CFLAGS",
+    help="Extra flags for compiling C sources.",
+    nargs=1,
+    default="",
+)
+
+
+option(
+    env="CXXFLAGS",
+    help="Extra flags for compiling C++ sources.",
+    nargs=1,
+    default="",
+)
+
+
+option(
+    env="ASFLAGS",
+    help="Extra flags for assembling sources.",
+    nargs=1,
+    default="",
+)
+
+
+option(
+    env="LDFLAGS",
+    help="Extra flags for linking object files.",
+    nargs=1,
+    default="",
+)
+
+
+option(
+    env="MOZ_OPTIMIZE_FLAGS",
+    help="Extra optimization flags.",
+    nargs=1,
+    default="",
+)
+
+
 # Code optimization
 # ==============================================================
 
 option("--disable-optimize", nargs="?", help="Disable optimizations via compiler flags")
 
 
+@depends(target, when="MOZ_PGO")
+def forced_pgo_optimization_level(target):
+    if target.kernel == "Linux" and target.os != "Android":
+        return "-O3"
+
+
 @depends("--enable-optimize")
 def moz_optimize(option):
-    flags = None
-
     if len(option):
-        flags = option[0]
-        if "-O0" in flags:
-            val = None
-        else:
-            val = "3"
+        if "-O0" not in option[0]:
+            return "3"
     elif option:
-        val = "1"
-    else:
-        val = None
-
-    return namespace(
-        optimize=val,
-        flags=flags,
-    )
+        return "1"
 
 
-set_config("MOZ_OPTIMIZE", moz_optimize.optimize)
-add_old_configure_assignment("MOZ_OPTIMIZE", moz_optimize.optimize)
-add_old_configure_assignment("MOZ_CONFIGURE_OPTIMIZE_FLAGS", moz_optimize.flags)
+@depends("--enable-optimize", forced_pgo_optimization_level)
+@imports(_from="mozbuild.shellutil", _import="split")
+def moz_optimize_flags(option, forced_pgo_optimization_level):
+    if len(option):
+        return split(option[0])
+    elif option and forced_pgo_optimization_level:
+        return [forced_pgo_optimization_level]
+
+
+set_config("MOZ_OPTIMIZE", moz_optimize)
+add_old_configure_assignment("MOZ_OPTIMIZE", moz_optimize)
+add_old_configure_assignment("MOZ_CONFIGURE_OPTIMIZE_FLAGS", moz_optimize_flags)
+
+
+@depends_if("MOZ_OPTIMIZE_FLAGS")
+@imports(_from="mozbuild.shellutil", _import="split")
+def moz_optimize_flags(env_optimize_flags):
+    return split(env_optimize_flags[0])
+
+
+add_old_configure_assignment("MOZ_OPTIMIZE_FLAGS", moz_optimize_flags)
+
 
 # Android NDK
 # ==============================================================
@@ -100,7 +195,7 @@ with only_when(host_is_osx | target_is_osx):
     )
 
     def mac_sdk_min_version():
-        return "14.4"
+        return "14.2"
 
     @depends(
         "--with-macos-sdk",
@@ -293,6 +388,17 @@ with only_when(target_is_ios):
         return sdk
 
     set_config("IPHONEOS_SDK_DIR", ios_sdk)
+
+# Windows console settings
+# ========================
+
+
+@dependable
+def win32_subsystem_version():
+    return "10.0"
+
+
+add_old_configure_assignment("WIN32_SUBSYSTEM_VERSION", win32_subsystem_version)
 
 
 # GC rooting and hazard analysis.
@@ -541,8 +647,7 @@ def check_compiler(configure_cache, compiler, language, target, android_version)
             # MSVC headers include C++17 features, but don't guard them
             # with appropriate checks.
             if info.type == "clang-cl":
-                flags.append("-Xclang")
-                flags.append("-std=c++17")
+                flags.append("-std:c++17")
             else:
                 flags.append("-std=gnu++17")
 
@@ -1208,7 +1313,11 @@ target_sysroot = sysroot(target)
 def system_lib_option(name, *args, **kwargs):
     option(name, *args, **kwargs)
 
-    @depends(name, target_sysroot.bootstrapped)
+    @depends(
+        name,
+        target_sysroot.bootstrapped,
+        when=kwargs.get("when"),
+    )
     def no_system_lib_in_sysroot(value, bootstrapped):
         if bootstrapped and value:
             die(
@@ -1546,6 +1655,11 @@ def compiler(
                     % (host_or_target.alias, info.version)
                 )
 
+        if host_or_target.os == "WINNT" and info.type == "gcc":
+            raise FatalCheckError(
+                "Firefox cannot be built with mingw-gcc and requires a mingw-clang toolchain to work."
+            )
+
         if info.flags:
             raise FatalCheckError("Unknown compiler or compiler not supported.")
 
@@ -1720,7 +1834,9 @@ host_windows_abi = windows_abi(host, host_c_compiler)
 
 # Generic compiler-based conditions.
 building_with_gcc = depends(c_compiler)(lambda info: info.type == "gcc")
-building_with_gnu_cc = depends(c_compiler)(lambda info: info.type != "clang-cl")
+building_with_gnu_compatible_cc = depends(c_compiler)(
+    lambda info: info.type != "clang-cl"
+)
 
 
 @depends(cxx_compiler, ccache_prefix)
@@ -2064,7 +2180,6 @@ linker_ldflags = linker_ldflags_tmpl(target)
 add_old_configure_assignment("LINKER_LDFLAGS", linker_ldflags)
 
 host_linker_ldflags = linker_ldflags_tmpl(host)
-add_old_configure_assignment("HOST_LINKER_LDFLAGS", host_linker_ldflags)
 
 
 # There's a wrinkle with MinGW: linker configuration is not enabled, so
@@ -2151,13 +2266,13 @@ try_compile(
 def default_debug_flags(compiler_info, target):
     # Debug info is ON by default.
     if compiler_info.type == "clang-cl":
-        return "-Z7"
+        return ("-Z7",)
     elif target.kernel == "WINNT" and compiler_info.type == "clang":
-        return "-g -gcodeview"
+        return ("-g", "-gcodeview")
     # The oldest versions of supported compilers default to DWARF-4, but
     # newer versions may default to DWARF-5 or newer (e.g. clang 14), which
     # Valgrind doesn't support. Force-use DWARF-4.
-    return "-gdwarf-4"
+    return ("-gdwarf-4",)
 
 
 option(env="MOZ_DEBUG_FLAGS", nargs=1, help="Debug compiler flags")
@@ -2174,14 +2289,15 @@ set_config("MOZ_DEBUG_SYMBOLS", depends_if("--enable-debug-symbols")(lambda _: T
 
 
 @depends("MOZ_DEBUG_FLAGS", "--enable-debug-symbols", default_debug_flags)
+@imports(_from="mozbuild.shellutil", _import="split")
 def debug_flags(env_debug_flags, enable_debug_flags, default_debug_flags):
     # If MOZ_DEBUG_FLAGS is set, and --enable-debug-symbols is set to a value,
     # --enable-debug-symbols takes precedence. Note, the value of
     # --enable-debug-symbols may be implied by --enable-debug.
     if len(enable_debug_flags):
-        return enable_debug_flags[0]
+        return split(enable_debug_flags[0])
     if env_debug_flags:
-        return env_debug_flags[0]
+        return split(env_debug_flags[0])
     return default_debug_flags
 
 
@@ -2385,11 +2501,6 @@ def preprocess_option(compiler):
 set_config("PREPROCESS_OPTION", preprocess_option)
 
 
-# We only want to include windows.configure when we are compiling on
-# Windows, or for Windows.
-include("windows.configure", when=is_windows)
-
-
 # On Power ISA, determine compiler flags for VMX, VSX and VSX-3.
 
 set_config(
@@ -2410,6 +2521,36 @@ set_config(
     when=depends(target.cpu)(lambda cpu: cpu.startswith("ppc")),
 )
 
+# TARGET_XPCOM_ABI
+# ==============================================================
+
+is_arm_eabi = c_compiler.try_compile(
+    body="""
+        #if defined(__ARM_EABI__)
+          return 0;
+        #else
+        #error Not ARM EABI.
+        #endif""",
+    check_msg="for ARM EABI",
+    when=building_with_gnu_compatible_cc
+    & depends(target.cpu)(lambda cpu: cpu == "arm"),
+)
+
+
+@depends(target, is_arm_eabi, c_compiler)
+def target_xpcom_abi(target, is_arm_eabi, compiler):
+    if compiler.type == "clang-cl":
+        return f"{target.cpu}-msvc"
+    elif target.cpu == "arm":
+        target_compiler_abi = "eabi" if is_arm_eabi else "oabi"
+        return f"{target.cpu}-{target_compiler_abi}-gcc3"
+    else:
+        return f"{target.cpu}-gcc3"
+
+
+set_config("TARGET_XPCOM_ABI", target_xpcom_abi)
+set_define("TARGET_XPCOM_ABI", depends(target_xpcom_abi)(lambda v: f'"{v}"'))
+
 # ASAN
 # ==============================================================
 
@@ -2421,7 +2562,89 @@ def asan():
     return True
 
 
+with only_when(asan):
+    option(
+        env="MOZ_CLANG_RT_ASAN_LIB_PATH",
+        nargs=1,
+        help="Path to clang runtime asan library",
+    )
+
+    @depends(
+        c_compiler,
+        target,
+        "MOZ_CLANG_RT_ASAN_LIB_PATH",
+    )
+    @imports("os")
+    @imports("glob")
+    def clang_rt_asan_lib_path(c_compiler, target, clang_rt_asan_lib):
+        if clang_rt_asan_lib:
+            if os.path.exists(clang_rt_asan_lib[0]):
+                return clang_rt_asan_lib[0]
+            else:
+                die(
+                    f"Specified MOZ_CLANG_RT_ASAN_LIB_PATH value '{clang_rt_asan_lib}' doesn't exist. "
+                )
+
+        # Look for the ASan runtime binary
+        if c_compiler.type == "clang-cl":
+            cpu = {"x86": "i386"}.get(target.cpu, target.cpu)
+            clang_rt_asan_lib = f"clang_rt.asan_dynamic-{cpu}.dll"
+            subdir = "windows"
+        elif target.os == "Android":
+            cpu = {"x86": "i686"}.get(target.cpu, target.cpu)
+            clang_rt_asan_lib = f"libclang_rt.asan-{cpu}-android.so"
+            subdir = "linux"
+        else:
+            return
+
+        search_path = os.path.join(
+            os.path.dirname(c_compiler.compiler),
+            "..",
+            "lib",
+            "clang",
+            "*",
+            "lib",
+            subdir,
+            clang_rt_asan_lib,
+        )
+        if candidates := glob.glob(search_path):
+            return candidates[0]
+
+        die(
+            f"Couldn't find {clang_rt_asan_lib}. "
+            f"It should be available in the same location as {c_compiler.type}."
+        )
+
+    set_config("MOZ_CLANG_RT_ASAN_LIB_PATH", clang_rt_asan_lib_path)
+
+
+@depends(
+    c_compiler,
+    target,
+    compilation_flags,
+    linker_flags,
+    build_environment,
+    when=asan,
+)
+def asan_flags(c_compiler, target, compilation_flags, linker_flags, build_env):
+    if c_compiler.type == "clang-cl":
+        # Suppressing errors in recompiled code.
+        if target.os == "WINNT":
+            flag = f"-fsanitize-blacklist={build_env.topsrcdir}/build/sanitizers/asan_blacklist_win.txt"
+            compilation_flags.cflags.append(flag)
+            compilation_flags.cxxflags.append(flag)
+
+    asan_flag = "-fsanitize=address"
+    compilation_flags.cflags.append(asan_flag)
+    compilation_flags.cxxflags.append(asan_flag)
+
+    if c_compiler.type != "clang-cl":
+        linker_flags.ldflags.extend([asan_flag, "-rdynamic"])
+
+
 add_old_configure_assignment("MOZ_ASAN", asan)
+set_define("MOZ_ASAN", True, when=asan)
+set_config("MOZ_ASAN", True, when=asan)
 
 # MSAN
 # ==============================================================
@@ -2434,7 +2657,18 @@ def msan():
     return True
 
 
+@depends(c_compiler, compilation_flags, linker_flags, when=msan)
+def msan_flags(c_compiler, compilation_flags, linker_flags):
+    flags = ["-fsanitize=memory", "-fsanitize-memory-track-origins"]
+    compilation_flags.cflags.extend(flags)
+    compilation_flags.cxxflags.extend(flags)
+    if c_compiler.type != "clang-cl":
+        linker_flags.ldflags.extend(flags + ["-rdynamic"])
+
+
 add_old_configure_assignment("MOZ_MSAN", msan)
+set_define("MOZ_MSAN", True, when=msan)
+set_config("MOZ_MSAN", True, when=msan)
 
 # TSAN
 # ==============================================================
@@ -2447,7 +2681,18 @@ def tsan():
     return True
 
 
-add_old_configure_assignment("MOZ_TSAN", tsan)
+@depends(c_compiler, compilation_flags, linker_flags, when=tsan)
+def tsan_flags(c_compiler, compilation_flags, linker_flags):
+    flag = "-fsanitize=thread"
+    compilation_flags.cflags.append(flag)
+    compilation_flags.cxxflags.append(flag)
+    if c_compiler.type != "clang-cl":
+        linker_flags.ldflags.extend(["-fsanitize=thread", "-rdynamic"])
+
+
+add_old_configure_assignment("MOZ_TSAN", tsan)  # still used in js/src/old-configure.in
+set_define("MOZ_TSAN", True, when=tsan)
+set_config("MOZ_TSAN", True, when=tsan)
 
 # UBSAN
 # ==============================================================
@@ -2457,7 +2702,7 @@ option(
 )
 
 
-@depends("--enable-undefined-sanitizer", moz_optimize.optimize)
+@depends("--enable-undefined-sanitizer", moz_optimize)
 def ubsan(options, optimize):
     if not options:
         return
@@ -2479,10 +2724,37 @@ def ubsan(options, optimize):
 
     checks = options if len(options) else default_checks
 
-    return ",".join(checks)
+    return checks
 
 
-add_old_configure_assignment("MOZ_UBSAN_CHECKS", ubsan)
+@depends(
+    ubsan, c_compiler, compilation_flags, linker_flags, build_environment, when=ubsan
+)
+@imports(_from="__builtin__", _import="open")
+@imports(_from="glob", _import="glob")
+@imports("shutil")
+def ubsan_flags(ubsan_checks, c_compiler, compilation_flags, linker_flags, build_env):
+    ubsan_txt = os.path.join(build_env.topobjdir, "ubsan_blacklist.txt")
+    with open(ubsan_txt, "w") as out_fd:
+        for blacklist in glob(
+            os.path.join(
+                build_env.topsrcdir, "build", "sanitizers", "ubsan_*_blacklist.txt"
+            )
+        ):
+            with open(blacklist) as in_fd:
+                shutil.copyfileobj(in_fd, out_fd)
+
+    joined_ubsan_checks = ",".join(ubsan_checks)
+
+    flags = [
+        f"-fsanitize={joined_ubsan_checks}",
+        f"-fno-sanitize-recover={joined_ubsan_checks}",
+        f"-fsanitize-blacklist={ubsan_txt}",
+    ]
+    compilation_flags.cflags.extend(flags)
+    compilation_flags.cxxflags.extend(flags)
+    if c_compiler.type != "clang-cl":
+        linker_flags.ldflags.extend(["-fsanitize=undefined", "-rdynamic"])
 
 
 option(
@@ -2496,7 +2768,34 @@ def ub_signed_overflow_san():
     return True
 
 
-add_old_configure_assignment("MOZ_SIGNED_OVERFLOW_SANITIZE", ub_signed_overflow_san)
+@depends(
+    c_compiler,
+    compilation_flags,
+    linker_flags,
+    build_environment,
+    when=ub_signed_overflow_san,
+)
+def ub_signed_overflow_san_flags(
+    c_compiler, compilation_flags, linker_flags, build_env
+):
+    sanitizer_blacklist = os.path.join(
+        build_env.topsrcdir,
+        "build",
+        "sanitizers",
+        "ubsan_signed_overflow_blacklist.txt",
+    )
+    flags = [
+        f"-fsanitize=signed-integer-overflow",
+        f"-fsanitize-blacklist={sanitizer_blacklist}",
+    ]
+    compilation_flags.cflags.extend(flags)
+    compilation_flags.cxxflags.extend(flags)
+    if c_compiler.type != "clang-cl":
+        linker_flags.ldflags.extend(["-fsanitize=signed-integer-overflow", "-rdynamic"])
+
+
+set_define("MOZ_SIGNED_OVERFLOW_SANITIZE", True, when=ub_signed_overflow_san)
+set_config("MOZ_SIGNED_OVERFLOW_SANITIZE", True, when=ub_signed_overflow_san)
 
 
 option(
@@ -2510,8 +2809,47 @@ def ub_unsigned_overflow_san():
     return True
 
 
-add_old_configure_assignment("MOZ_UNSIGNED_OVERFLOW_SANITIZE", ub_unsigned_overflow_san)
+@depends(
+    c_compiler,
+    compilation_flags,
+    linker_flags,
+    build_environment,
+    when=ub_unsigned_overflow_san,
+)
+def ub_unsigned_overflow_san_flags(
+    c_compiler, compilation_flags, linker_flags, build_env
+):
+    sanitizer_blacklist = os.path.join(
+        build_env.topsrcdir,
+        "build",
+        "sanitizers",
+        "ubsan_unsigned_overflow_blacklist.txt",
+    )
+    flags = [
+        f"-fsanitize=unsigned-integer-overflow",
+        f"-fsanitize-blacklist={sanitizer_blacklist}",
+    ]
+    compilation_flags.cflags.extend(flags)
+    compilation_flags.cxxflags.extend(flags)
+    if c_compiler.type != "clang-cl":
+        linker_flags.ldflags.extend(
+            ["-fsanitize=unsigned-integer-overflow", "-rdynamic"]
+        )
 
+
+set_define("MOZ_UNSIGNED_OVERFLOW_SANITIZE", True, when=ub_unsigned_overflow_san)
+set_config("MOZ_UNSIGNED_OVERFLOW_SANITIZE", True, when=ub_unsigned_overflow_san)
+
+#
+
+any_ubsan = ubsan | ub_signed_overflow_san | ub_unsigned_overflow_san
+set_define("MOZ_UBSAN", True, when=any_ubsan)
+set_config("MOZ_UBSAN", any_ubsan)
+
+
+# We only want to include windows.configure when we are compiling on
+# Windows, or for Windows.
+include("windows.configure", when=is_windows)
 
 # Security Hardening
 # ==============================================================
@@ -2680,7 +3018,7 @@ def frame_pointer_flags(compiler):
 
 
 @depends(
-    moz_optimize.optimize,
+    moz_optimize,
     moz_debug,
     target,
     "--enable-memory-sanitizer",
@@ -2894,9 +3232,9 @@ option(
     help="Enable building with the Clang plugin (gecko specific static analyzers)",
 )
 
-add_old_configure_assignment(
-    "ENABLE_CLANG_PLUGIN", depends_if("--enable-clang-plugin")(lambda _: True)
-)
+
+set_config("ENABLE_CLANG_PLUGIN", True, when="--enable-clang-plugin")
+set_define("MOZ_CLANG_PLUGIN", True, when="--enable-clang-plugin")
 
 
 @depends(host_c_compiler, c_compiler, when="--enable-clang-plugin")
@@ -2930,33 +3268,46 @@ llvm_config = check_prog(
 add_old_configure_assignment("LLVM_CONFIG", llvm_config)
 
 
-option(
-    "--enable-clang-plugin-alpha",
-    env="ENABLE_CLANG_PLUGIN_ALPHA",
-    help="Enable static analysis with clang-plugin alpha checks.",
+@template
+def llvm_tool(name):
+    @depends(host_c_compiler, c_compiler, bindgen_config_paths)
+    def llvm_tool(host_c_compiler, c_compiler, bindgen_config_paths):
+        clang = None
+        for compiler in (host_c_compiler, c_compiler):
+            if compiler and compiler.type == "clang":
+                clang = compiler.compiler
+                break
+            elif compiler and compiler.type == "clang-cl":
+                clang = os.path.join(os.path.dirname(compiler.compiler), "clang")
+                break
+
+        if not clang and bindgen_config_paths:
+            clang = bindgen_config_paths.clang_path
+        tool = name
+        if clang:
+            out = check_cmd_output(
+                clang, "--print-prog-name=%s" % tool, onerror=lambda: None
+            )
+            if out:
+                tool = out.rstrip()
+        return (tool,)
+
+    return llvm_tool
+
+
+llvm_objdump = check_prog(
+    "LLVM_OBJDUMP",
+    llvm_tool("llvm-objdump"),
+    what="llvm-objdump",
+    when="--enable-compile-environment",
+    paths=clang_search_path,
 )
 
+add_old_configure_assignment("LLVM_OBJDUMP", llvm_objdump)
 
-@depends("--enable-clang-plugin", "--enable-clang-plugin-alpha")
-def check_clang_plugin_alpha(enable_clang_plugin, enable_clang_plugin_alpha):
-    if enable_clang_plugin_alpha:
-        if enable_clang_plugin:
-            return True
-        die("Cannot enable clang-plugin alpha checkers without --enable-clang-plugin.")
-
-
-add_old_configure_assignment("ENABLE_CLANG_PLUGIN_ALPHA", check_clang_plugin_alpha)
-set_define("MOZ_CLANG_PLUGIN_ALPHA", check_clang_plugin_alpha)
-
-option(
-    "--enable-mozsearch-plugin",
-    env="ENABLE_MOZSEARCH_PLUGIN",
-    help="Enable building with the mozsearch indexer plugin",
-)
-
-add_old_configure_assignment(
-    "ENABLE_MOZSEARCH_PLUGIN", depends_if("--enable-mozsearch-plugin")(lambda _: True)
-)
+# Force clang-cl compiler to treat input as C++
+# ==============================================================
+add_flag("-TP", cxx_compiler, when=target_is_windows & ~building_with_gnu_compatible_cc)
 
 # Use the old libstdc++ ABI
 # ==============================================================
@@ -2970,6 +3321,27 @@ add_flag(
     host_cxx_compiler,
     when=stdcxx_compat,
 )
+
+
+# Always included configuration file
+# ==============================================================
+@depends(c_compiler, build_environment, build_project)
+def defines_cpp_flags(c_compiler, build_environment, build_project):
+    if build_project == "js":
+        config_h = "js/src/js-confdefs.h"
+    else:
+        config_h = "mozilla-config.h"
+
+    if c_compiler.type == "clang-cl":
+        flag = "-FI"
+    else:
+        flag = "-include"
+
+    return ["-DMOZILLA_CLIENT", flag, f"{build_environment.topobjdir}/{config_h}"]
+
+
+set_config("OS_COMPILE_CFLAGS", defines_cpp_flags)
+set_config("OS_COMPILE_CXXFLAGS", defines_cpp_flags)
 
 
 # Support various fuzzing options
@@ -3055,7 +3427,6 @@ set_define("FUZZING", enable_fuzzing)
 
 set_config("LIBFUZZER", enable_libfuzzer)
 set_define("LIBFUZZER", enable_libfuzzer)
-add_old_configure_assignment("LIBFUZZER", enable_libfuzzer)
 
 set_config("AFLFUZZ", enable_aflfuzzer)
 set_define("AFLFUZZ", enable_aflfuzzer)
@@ -3111,9 +3482,39 @@ def libfuzzer_flags(value, tsan, enable_js_fuzzilli):
     )
 
 
+@depends(libfuzzer_flags, when=enable_libfuzzer)
+def sancov(libfuzzer_flags):
+    return any(
+        flag.startswith(head)
+        for head in ("-fsanitize-coverage", "-fsanitize=fuzzer")
+        for flag in libfuzzer_flags.use_flags
+    )
+
+
+add_old_configure_assignment("SANCOV", sancov)
+
+
 set_config("HAVE_LIBFUZZER_FLAG_FUZZER_NO_LINK", libfuzzer_flags.no_link_flag_supported)
 set_config("LIBFUZZER_FLAGS", libfuzzer_flags.use_flags)
-add_old_configure_assignment("LIBFUZZER_FLAGS", libfuzzer_flags.use_flags)
+
+
+# Required for stand-alone (sanitizer-less) libFuzzer.
+# ==============================================================
+@depends(libfuzzer_flags, linker_flags, when=enable_libfuzzer)
+def add_libfuzzer_flags(libfuzzer_flags, linker_flags):
+    linker_flags.ldflags.extend(libfuzzer_flags.use_flags)
+    linker_flags.ldflags.append("-rdynamic")
+
+
+# The LLVM symbolizer is used by all sanitizers
+check_prog(
+    "LLVM_SYMBOLIZER",
+    ("llvm-symbolizer",),
+    allow_missing=True,
+    paths=clang_search_path,
+    when=asan | msan | tsan | any_ubsan | enable_fuzzing,
+)
+
 
 # Shared library building
 # ==============================================================
@@ -3236,14 +3637,12 @@ set_config("AR_FLAGS", target_ar_config.flags)
 @depends(c_compiler, extra_toolchain_flags, target_ar, target_ar_config)
 @checking("whether ar supports response files")
 @imports("os")
-@imports(_from="tempfile", _import="mkstemp")
 @imports(_from="__builtin__", _import="FileNotFoundError")
+@imports(_from="__builtin__", _import="open")
 @imports(_from="mozbuild.configure.util", _import="LineIO")
 def ar_supports_response_files(c_compiler, extra_toolchain_flags, ar, ar_config):
     lib_path = list_path = None
-    try:
-        fd, obj_path = mkstemp(prefix="conftest.", suffix=".o")
-        os.close(fd)
+    with create_temporary_file(suffix=".o") as obj_path:
         if (
             try_invoke_compiler(
                 # No configure_cache because it would not create the
@@ -3258,28 +3657,22 @@ def ar_supports_response_files(c_compiler, extra_toolchain_flags, ar, ar_config)
             )
             is not None
         ):
-            fd, list_path = mkstemp(prefix="conftest.", suffix=".list")
-            with os.fdopen(fd, "w") as list:
-                list.write(obj_path)
-                log.debug("Creating `%s` with content:", list_path)
-                log.debug("| %s", obj_path)
-            fd, lib_path = mkstemp(prefix="conftest.", suffix=".a")
-            os.close(fd)
-            os.remove(lib_path)
-            ar_command = (
-                [ar]
-                + [x.replace("$@", lib_path) for x in ar_config.flags]
-                + ["@" + list_path]
-            )
-            result = check_cmd_output(*ar_command, onerror=lambda: None)
-            return result is not None
-    finally:
-        for cleanup_path in (obj_path, list_path, lib_path):
-            if cleanup_path:
-                try:
-                    os.remove(cleanup_path)
-                except FileNotFoundError:
-                    pass
+            with create_temporary_file(suffix=".list") as list_path:
+                with open(list_path, "w") as fd:
+                    fd.write(obj_path)
+
+            log.debug("Creating `%s` with content:", list_path)
+            log.debug("| %s", obj_path)
+
+            with create_temporary_file(suffix=".a") as lib_path:
+                os.remove(lib_path)
+                ar_command = (
+                    [ar]
+                    + [x.replace("$@", lib_path) for x in ar_config.flags]
+                    + ["@" + list_path]
+                )
+                result = check_cmd_output(*ar_command, onerror=lambda: None)
+                return result is not None
 
 
 set_config("AR_SUPPORTS_RESPONSE_FILE", True, when=ar_supports_response_files)
@@ -3309,9 +3702,19 @@ def nm_names(toolchain_prefix, c_compiler):
 check_prog("NM", nm_names, paths=clang_search_path, when=target_has_linux_kernel)
 
 
+# We don't use it in the code, but it can be useful for debugging, so give
+# the user the option of enabling it.
 option("--enable-cpp-rtti", help="Enable C++ RTTI")
 
-add_old_configure_assignment("_MOZ_USE_RTTI", "1", when="--enable-cpp-rtti")
+
+@depends(compilation_flags, c_compiler, "--enable-cpp-rtti")
+def enable_cpp_rtti(compilation_flags, c_compiler, enable_rtti):
+    if enable_rtti:
+        return
+    if c_compiler.type == "clang-cl":
+        compilation_flags.cxxflags.append("-GR-")
+    else:
+        compilation_flags.cxxflags.append("-fno-rtti")
 
 
 option(
@@ -3447,6 +3850,26 @@ set_config(
     ),
 )
 
+set_config(
+    "SVE2_FLAGS",
+    ["-march=armv9-a+sve2"],
+    try_compile(
+        check_msg="for ARM SVE2 target feature",
+        flags=["-march=armv9-a+sve2"],
+        when=is_aarch64_target,
+    ),
+)
+
+set_config(
+    "DOTPROD_FLAGS",
+    ["-march=armv8.2-a+dotprod"],
+    try_compile(
+        check_msg="for ARM dotprod target feature",
+        flags=["-march=armv8.2-a+dotprod"],
+        when=is_aarch64_target,
+    ),
+)
+
 # dtrace support
 ##
 option("--enable-dtrace", help="Build with dtrace support")
@@ -3459,3 +3882,20 @@ dtrace = check_header(
 
 set_config("HAVE_DTRACE", True, when=dtrace)
 set_define("INCLUDE_MOZILLA_DTRACE", True, when=dtrace)
+
+
+@depends(
+    try_compile(
+        includes=["stdio.h"],
+        body='puts("demat");',
+        flags=moz_optimize_flags,
+        language="C",
+        check_msg="for valid C compiler optimization flags",
+    ),
+    moz_optimize_flags,
+    when=moz_optimize,
+)
+@imports(_from="mozbuild.shellutil", _import="quote")
+def check_optimization_flags(check_result, moz_optimize_flags):
+    if not check_result:
+        die(f"Invalid C compiler optimization flags: {quote(*moz_optimize_flags)}")

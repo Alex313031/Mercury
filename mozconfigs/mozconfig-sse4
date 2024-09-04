@@ -23,10 +23,14 @@ ac_add_options --enable-install-strip
 ac_add_options --enable-clang-plugin
 ac_add_options --disable-elf-hack
 ac_add_options --enable-lto
+ac_add_options --enable-jemalloc
 #ac_add_options --enable-wasm-avx
 ac_add_options --enable-optimize="-O3 -msse3 -mssse3 -msse4.1"
 ac_add_options --enable-rust-simd
 ac_add_options --enable-hardening
+ac_add_options --disable-dmd
+ac_add_options --disable-gpsd
+ac_add_options --disable-necko-wifi
 #ac_add_options --disable-trace-logging
 mk_add_options MOZILLA_OFFICIAL=1
 MOZILLA_OFFICIAL=1
@@ -66,6 +70,7 @@ export MOZ_CRASHREPORTER=0
 export MOZ_DATA_REPORTING=0
 export MOZ_REQUIRE_SIGNING=
 export MOZ_TELEMETRY_REPORTING=
+export MOZ_PACKAGE_JSSHELL=1
 
 # API Keys
 ac_add_options --with-google-location-service-api-keyfile=@TOPSRCDIR@/ga
@@ -111,4 +116,5 @@ export CXXFLAGS="-O3 -msse3 -mssse3 -msse4.1"
 export LDFLAGS="-Wl,-O3 -msse3 -mssse3 -msse4.1"
 #export MOZ_LTO_LDFLAGS="-Wl,-mllvm,-polly"
 export RUSTFLAGS="-C target-feature=+sse4.1 -C codegen-units=1"
+export POLLY="-mllvm -polly -mllvm -polly-2nd-level-tiling -mllvm -polly-loopfusion-greedy -mllvm -polly-pattern-matching-based-opts -mllvm -polly-position=before-vectorizer -mllvm -polly-vectorizer=stripmine"
 export VERBOSE=1
