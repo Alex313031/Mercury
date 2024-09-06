@@ -2539,7 +2539,7 @@ pref("extensions.pocket.refresh.emailButton.enabled", false);
 // Hides the recently saved section in the home panel.
 pref("extensions.pocket.refresh.hideRecentSaves.enabled", false);
 
-pref("signon.management.page.fileImport.enabled", true);hether the user enabled the OS re-auth dial
+pref("signon.management.page.fileImport.enabled", true);
 
 // "available"      - user can see feature offer.
 // "not available"  - feature is not available (will be removed after enabling on Release).
@@ -2608,7 +2608,8 @@ pref("doh-rollout.clearModeOnShutdown", false);
 // Normandy client preferences
 pref("app.normandy.api_url", "https://normandy.cdn.mozilla.net/api/v1");
 pref("app.normandy.dev_mode", false);
-pref("app.normandy.enabled", true);
+// Match Mercury
+pref("app.normandy.enabled", false);
 pref("app.normandy.first_run", true);
 pref("app.normandy.logging.level", 50); // Warn
 pref("app.normandy.run_interval_seconds", 21600); // 6 hours

@@ -1814,6 +1814,8 @@ with only_when("--enable-compile-environment"):
         if may_use_pack_relative_relocs:
             return flags
 
+    add_old_configure_assignment("PACK_REL_RELOC_FLAGS", pack_relative_relocs_flags)
+
     @depends(
         select_linker,
         pack_relative_relocs_flags,
@@ -3678,11 +3680,13 @@ with only_when(target_has_linux_kernel & compile_environment):
     set_config("MOZ_LINKER", True, when="MOZ_LINKER")
     set_define("MOZ_LINKER", True, when="MOZ_LINKER")
 
+    moz_linker = depends(when="MOZ_LINKER")(lambda: True)
+
     # gold emits wrong sysv-style elf hash tables when building both sysv and
     # GNU style tables. https://sourceware.org/bugzilla/show_bug.cgi?id=13597
     # Since the linker only understands the sysv ones, no need to build the
     # GNU style tables anyways.
-    check_and_add_linker_flag("-Wl,--hash-style=sysv", when="MOZ_LINKER")
+    check_and_add_linker_flag("-Wl,--hash-style=sysv", when=moz_linker)
 
 
 # 32-bits ethtool_cmd.speed

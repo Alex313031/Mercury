@@ -47,40 +47,8 @@ option(
 
 
 option(
-    env="CFLAGS",
-    help="Extra flags for compiling C sources.",
-    nargs=1,
-    default="",
-)
-
-
-option(
-    env="CXXFLAGS",
-    help="Extra flags for compiling C++ sources.",
-    nargs=1,
-    default="",
-)
-
-
-option(
     env="ASFLAGS",
     help="Extra flags for assembling sources.",
-    nargs=1,
-    default="",
-)
-
-
-option(
-    env="LDFLAGS",
-    help="Extra flags for linking object files.",
-    nargs=1,
-    default="",
-)
-
-
-option(
-    env="MOZ_OPTIMIZE_FLAGS",
-    help="Extra optimization flags.",
     nargs=1,
     default="",
 )
@@ -92,43 +60,30 @@ option(
 option("--disable-optimize", nargs="?", help="Disable optimizations via compiler flags")
 
 
-@depends(target, when="MOZ_PGO")
-def forced_pgo_optimization_level(target):
-    if target.kernel == "Linux" and target.os != "Android":
-        return "-O3"
-
-
 @depends("--enable-optimize")
 def moz_optimize(option):
+    flags = None
+
     if len(option):
-        if "-O0" not in option[0]:
-            return "3"
+        flags = option[0]
+        if "-O0" in flags:
+            val = None
+        else:
+            val = "3"
     elif option:
-        return "1"
+        val = "3"
+    else:
+        val = None
+
+    return namespace(
+        optimize=val,
+        flags=flags,
+    )
 
 
-@depends("--enable-optimize", forced_pgo_optimization_level)
-@imports(_from="mozbuild.shellutil", _import="split")
-def moz_optimize_flags(option, forced_pgo_optimization_level):
-    if len(option):
-        return split(option[0])
-    elif option and forced_pgo_optimization_level:
-        return [forced_pgo_optimization_level]
-
-
-set_config("MOZ_OPTIMIZE", moz_optimize)
-add_old_configure_assignment("MOZ_OPTIMIZE", moz_optimize)
-add_old_configure_assignment("MOZ_CONFIGURE_OPTIMIZE_FLAGS", moz_optimize_flags)
-
-
-@depends_if("MOZ_OPTIMIZE_FLAGS")
-@imports(_from="mozbuild.shellutil", _import="split")
-def moz_optimize_flags(env_optimize_flags):
-    return split(env_optimize_flags[0])
-
-
-add_old_configure_assignment("MOZ_OPTIMIZE_FLAGS", moz_optimize_flags)
-
+set_config("MOZ_OPTIMIZE", moz_optimize.optimize)
+add_old_configure_assignment("MOZ_OPTIMIZE", moz_optimize.optimize)
+add_old_configure_assignment("MOZ_CONFIGURE_OPTIMIZE_FLAGS", moz_optimize.flags)
 
 # Android NDK
 # ==============================================================
@@ -2501,6 +2456,11 @@ def preprocess_option(compiler):
 set_config("PREPROCESS_OPTION", preprocess_option)
 
 
+# We only want to include windows.configure when we are compiling on
+# Windows, or for Windows.
+include("windows.configure", when=is_windows)
+
+
 # On Power ISA, determine compiler flags for VMX, VSX and VSX-3.
 
 set_config(
@@ -2702,7 +2662,7 @@ option(
 )
 
 
-@depends("--enable-undefined-sanitizer", moz_optimize)
+@depends("--enable-undefined-sanitizer", moz_optimize.optimize)
 def ubsan(options, optimize):
     if not options:
         return
@@ -2846,10 +2806,6 @@ any_ubsan = ubsan | ub_signed_overflow_san | ub_unsigned_overflow_san
 set_define("MOZ_UBSAN", True, when=any_ubsan)
 set_config("MOZ_UBSAN", any_ubsan)
 
-
-# We only want to include windows.configure when we are compiling on
-# Windows, or for Windows.
-include("windows.configure", when=is_windows)
 
 # Security Hardening
 # ==============================================================
@@ -3018,7 +2974,7 @@ def frame_pointer_flags(compiler):
 
 
 @depends(
-    moz_optimize,
+    moz_optimize.optimize,
     moz_debug,
     target,
     "--enable-memory-sanitizer",
@@ -3232,9 +3188,9 @@ option(
     help="Enable building with the Clang plugin (gecko specific static analyzers)",
 )
 
-
-set_config("ENABLE_CLANG_PLUGIN", True, when="--enable-clang-plugin")
-set_define("MOZ_CLANG_PLUGIN", True, when="--enable-clang-plugin")
+add_old_configure_assignment(
+    "ENABLE_CLANG_PLUGIN", depends_if("--enable-clang-plugin")(lambda _: True)
+)
 
 
 @depends(host_c_compiler, c_compiler, when="--enable-clang-plugin")
@@ -3305,9 +3261,34 @@ llvm_objdump = check_prog(
 
 add_old_configure_assignment("LLVM_OBJDUMP", llvm_objdump)
 
-# Force clang-cl compiler to treat input as C++
-# ==============================================================
-add_flag("-TP", cxx_compiler, when=target_is_windows & ~building_with_gnu_compatible_cc)
+
+option(
+    "--enable-clang-plugin-alpha",
+    env="ENABLE_CLANG_PLUGIN_ALPHA",
+    help="Enable static analysis with clang-plugin alpha checks.",
+)
+
+
+@depends("--enable-clang-plugin", "--enable-clang-plugin-alpha")
+def check_clang_plugin_alpha(enable_clang_plugin, enable_clang_plugin_alpha):
+    if enable_clang_plugin_alpha:
+        if enable_clang_plugin:
+            return True
+        die("Cannot enable clang-plugin alpha checkers without --enable-clang-plugin.")
+
+
+add_old_configure_assignment("ENABLE_CLANG_PLUGIN_ALPHA", check_clang_plugin_alpha)
+set_define("MOZ_CLANG_PLUGIN_ALPHA", check_clang_plugin_alpha)
+
+option(
+    "--enable-mozsearch-plugin",
+    env="ENABLE_MOZSEARCH_PLUGIN",
+    help="Enable building with the mozsearch indexer plugin",
+)
+
+add_old_configure_assignment(
+    "ENABLE_MOZSEARCH_PLUGIN", depends_if("--enable-mozsearch-plugin")(lambda _: True)
+)
 
 # Use the old libstdc++ ABI
 # ==============================================================
@@ -3325,8 +3306,8 @@ add_flag(
 
 # Always included configuration file
 # ==============================================================
-@depends(c_compiler, build_environment, build_project)
-def defines_cpp_flags(c_compiler, build_environment, build_project):
+@depends(c_compiler, asm_flags, build_environment, build_project)
+def defines_cpp_flags(c_compiler, asm_flags, build_environment, build_project):
     if build_project == "js":
         config_h = "js/src/js-confdefs.h"
     else:
@@ -3337,7 +3318,12 @@ def defines_cpp_flags(c_compiler, build_environment, build_project):
     else:
         flag = "-include"
 
-    return ["-DMOZILLA_CLIENT", flag, f"{build_environment.topobjdir}/{config_h}"]
+    flags = ["-DMOZILLA_CLIENT", flag, f"{build_environment.topobjdir}/{config_h}"]
+
+    if build_project != "js" and c_compiler.type != "clang-cl":
+        asm_flags.asflags.extend(flags)
+
+    return flags
 
 
 set_config("OS_COMPILE_CFLAGS", defines_cpp_flags)
@@ -3806,8 +3792,8 @@ set_config("SSE3_FLAGS", ["-msse3"])
 set_config("SSSE3_FLAGS", ["-mssse3"])
 set_config("SSE4_1_FLAGS", ["-msse4.1"])
 set_config("SSE4_2_FLAGS", ["-msse4.2"])
-set_config("FMA_FLAGS", ["-mfma"])
 set_config("AES_FLAGS", ["-maes"])
+set_config("FMA_FLAGS", ["-mfma"])
 set_config("AVX_FLAGS", ["-mavx"])
 set_config("AVX2_FLAGS", ["-mavx2"])
 set_config(
@@ -3850,26 +3836,6 @@ set_config(
     ),
 )
 
-set_config(
-    "SVE2_FLAGS",
-    ["-march=armv9-a+sve2"],
-    try_compile(
-        check_msg="for ARM SVE2 target feature",
-        flags=["-march=armv9-a+sve2"],
-        when=is_aarch64_target,
-    ),
-)
-
-set_config(
-    "DOTPROD_FLAGS",
-    ["-march=armv8.2-a+dotprod"],
-    try_compile(
-        check_msg="for ARM dotprod target feature",
-        flags=["-march=armv8.2-a+dotprod"],
-        when=is_aarch64_target,
-    ),
-)
-
 # dtrace support
 ##
 option("--enable-dtrace", help="Build with dtrace support")
@@ -3882,20 +3848,3 @@ dtrace = check_header(
 
 set_config("HAVE_DTRACE", True, when=dtrace)
 set_define("INCLUDE_MOZILLA_DTRACE", True, when=dtrace)
-
-
-@depends(
-    try_compile(
-        includes=["stdio.h"],
-        body='puts("demat");',
-        flags=moz_optimize_flags,
-        language="C",
-        check_msg="for valid C compiler optimization flags",
-    ),
-    moz_optimize_flags,
-    when=moz_optimize,
-)
-@imports(_from="mozbuild.shellutil", _import="quote")
-def check_optimization_flags(check_result, moz_optimize_flags):
-    if not check_result:
-        die(f"Invalid C compiler optimization flags: {quote(*moz_optimize_flags)}")

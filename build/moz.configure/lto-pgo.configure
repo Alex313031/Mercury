@@ -42,11 +42,6 @@ option(
     choices=("cross",),
     help="Use a generated profile during the build",
 )
-enable_profile_use = depends_if("--enable-profile-use")(lambda _: True)
-
-imply_option("MOZ_PGO", enable_profile_use)
-set_config("MOZ_PROFILE_USE", enable_profile_use)
-
 
 option(
     "--with-pgo-profile-path",
@@ -54,6 +49,10 @@ option(
     ", or to a merged profdata file",
     nargs=1,
 )
+
+imply_option("MOZ_PGO", depends_if("--enable-profile-use")(lambda _: True))
+
+set_config("MOZ_PROFILE_USE", depends_if("--enable-profile-use")(lambda _: True))
 
 
 @depends(
