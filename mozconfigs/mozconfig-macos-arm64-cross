@@ -81,7 +81,12 @@ export MOZ_MACBUNDLE_ID=${appId}
 export MOZ_MACBUNDLE_NAME="Mercury.app"
 
 # Make flags (set to number of CPU cores)
-mk_add_options MOZ_MAKE_FLAGS="-j5"
+mk_add_options MOZ_MAKE_FLAGS="-j16"
+
+# Change to actual location of SDK
+## https://github.com/bitcoin-core/apple-sdk-tools
+## https://firefox-source-docs.mozilla.org/widget/cocoa/sdks.html
+ac_add_options --with-macos-sdk=/home/alex/temp/MacOSX.sdk
 
 # Autoclobber
 mk_add_options AUTOCLOBBER=1
